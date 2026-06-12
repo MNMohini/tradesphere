@@ -10,6 +10,6 @@ public class User {
         @Id
         private String email;
         private String password;
-        private String role;
-        private long phoneNumber;
+        private String designation;
+
 }
