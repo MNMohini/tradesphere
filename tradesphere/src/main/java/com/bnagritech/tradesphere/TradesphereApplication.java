@@ -10,5 +10,4 @@ public class TradesphereApplication {
 		System.out.println("hello");
 		SpringApplication.run(TradesphereApplication.class, args);
 	}
-
 }
