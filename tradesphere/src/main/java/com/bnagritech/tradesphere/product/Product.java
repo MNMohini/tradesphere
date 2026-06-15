@@ -7,6 +7,4 @@ public class Product {
     private String unitPerBox;
     private String MRP;
     private String PTR;
-    
-
 }
