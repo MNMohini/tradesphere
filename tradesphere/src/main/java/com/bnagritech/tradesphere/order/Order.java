@@ -7,4 +7,9 @@ public class Order {
     private String orderId;
     private String retailerId;
     private String employeeId;
+    private Double providedDiscount;
+    private String productNameWithQuantity;
+    private Double totalBill;
+    private Double amountAfterDiscount;
+
 }
