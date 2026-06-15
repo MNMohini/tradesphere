@@ -1,4 +1,11 @@
 package com.bnagritech.tradesphere.territory;
 
-public class TerritoryType {
+public enum TerritoryType {
+    COUNTRY,
+    REGION,
+    STATE,
+    DISTRICT,
+    CITY,
+    AREA,
+    BEAT
 }
