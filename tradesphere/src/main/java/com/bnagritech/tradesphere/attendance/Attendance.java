@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 public class Attendance {
     private String id;
     private String attendanceId;
+    private AttendanceType attendanceType;
     private String employeeId;
     private LocalDate attendanceDate;
     private LocalDateTime checkInTime;
