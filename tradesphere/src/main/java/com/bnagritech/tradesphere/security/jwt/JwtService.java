@@ -1,13 +1,19 @@
 package com.bnagritech.tradesphere.security.jwt;
 
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-public class jwtService {
+@Service
+public class JwtService {
+    @Value("{jwt.secret}")
     private String secret;
+
+    @Value("{jwt.expiration}")
     private long expiration;
+
     private  String generateToken(String userName){
         return Jwts.builder()
                 .subject(userName)
