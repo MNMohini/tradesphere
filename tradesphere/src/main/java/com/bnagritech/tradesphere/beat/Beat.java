@@ -1,7 +1,5 @@
 package com.bnagritech.tradesphere.beat;
 
-import jakarta.validation.constraints.Max;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
