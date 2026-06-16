@@ -1,4 +1,4 @@
-package com.bnagritech.tradesphere.security;
+package com.bnagritech.tradesphere.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

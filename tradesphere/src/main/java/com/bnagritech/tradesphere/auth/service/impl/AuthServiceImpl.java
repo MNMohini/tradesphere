@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.auth.service.impl;
 
 import com.bnagritech.tradesphere.auth.dto.RegisterRequest;
 import com.bnagritech.tradesphere.auth.dto.RegisterResponse;
+import com.bnagritech.tradesphere.auth.exception.UserAlreadyExistsException;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.auth.service.AuthService;
@@ -21,7 +22,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.existsByUserName(request.getUserName())) {
-            throw new RuntimeException("UserName already exists");
+            throw new UserAlreadyExistsException(
+                    "UserName already exists"
+            );
         }
         User user = User.builder()
                 .userName(request.getUserName())
