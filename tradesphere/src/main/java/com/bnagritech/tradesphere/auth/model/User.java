@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Document(collation = "User")
 public class User {
+
     @Id
     private String id;
     private String userName;
