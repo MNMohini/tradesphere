@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.auth.dto;
 
-import com.bnagritech.tradesphere.common.UserRole;
 import jakarta.validation.constraints.NotBlank;
 
 public class RegisterRequest {
