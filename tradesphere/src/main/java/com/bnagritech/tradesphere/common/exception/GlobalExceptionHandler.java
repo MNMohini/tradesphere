@@ -1,8 +1,6 @@
 package com.bnagritech.tradesphere.common.exception;
 
-import com.bnagritech.tradesphere.auth.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,14 +10,14 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<?> handleUserAlreadyExists(
-            UserAlreadyExistsException ex){
+            UserAlreadyExistsException ex) {
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
                         "timestamp", LocalDateTime.now(),
-                        "message",ex.getMessage()
+                        "message", ex.getMessage()
                 ));
     }
 
