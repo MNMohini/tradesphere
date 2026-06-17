@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.auth.service.impl;
 
+import com.bnagritech.tradesphere.auth.dto.LoginRequest;
 import com.bnagritech.tradesphere.auth.dto.LoginResponse;
 import com.bnagritech.tradesphere.auth.dto.RegisterRequest;
 import com.bnagritech.tradesphere.auth.dto.RegisterResponse;
@@ -49,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginResponse request) {
+    public LoginResponse login(LoginRequest request) {
         User user = userRepository
                 .findByUserName(request.getUserName())
                 .orElseThrow(
@@ -59,11 +60,11 @@ public class AuthServiceImpl implements AuthService {
                 );
         if (!passwordEncoder.matches(
                 request.getPassword(),
-                user.getPassword()
-        )) {
+                user.getPassword() ))
+        {
             throw new RuntimeException(
                     "Invalid password"
-            );
+             );
         }
         String token = jwtService.generateToken(
                 user.getUserName()
