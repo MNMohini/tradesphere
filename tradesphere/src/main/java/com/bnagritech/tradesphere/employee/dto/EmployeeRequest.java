@@ -11,6 +11,7 @@ public class EmployeeRequest {
 
     private String employeeId;
     private String employeeName;
+    private String userName;
     private String email;
     private String phoneNumber;
     private UserRole role;

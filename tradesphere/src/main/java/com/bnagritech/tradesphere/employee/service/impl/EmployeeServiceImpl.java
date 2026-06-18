@@ -24,9 +24,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employeeRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
-
-        if (employeeRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Employee Code already exists");
+        if (employeeRepository.existsByEmployeeId(request.getEmployeeId())) {
+            throw new RuntimeException("Employee Id already exists");
+        }
+        if (employeeRepository.existsByUserName(request.getUserName())) {
+            throw new RuntimeException("User Name already exists");
         }
 
         Employee employee = Employee.builder()
@@ -57,7 +59,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResponse getEmployeeByUserName(String userName) {
-        return null;
+        Employee employee = employeeRepository.findByUserName(userName)
+                .orElseThrow(()-> new RuntimeException("Employee not found"));
+        return mapToResponse(employee);
     }
 
     @Override
