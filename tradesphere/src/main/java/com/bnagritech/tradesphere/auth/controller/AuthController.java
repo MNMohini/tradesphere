@@ -14,14 +14,13 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
      @PostMapping("/register")
-public RegisterResponse register(@RequestBody RegisterRequest request){
+    public RegisterResponse register(@RequestBody RegisterRequest request){
 
          return authService.register(request);
      }
 
-
-@PostMapping("/login")
-public LoginResponse login(@RequestBody LoginRequest request){
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request){
 
     return authService.login(request);
 }
