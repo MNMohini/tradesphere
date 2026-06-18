@@ -1,15 +1,12 @@
 package com.bnagritech.tradesphere.employee.dto;
 
 import com.bnagritech.tradesphere.common.UserRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+
+import java.time.LocalDateTime;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class EmployeeRequest {
 
     private String employeeId;
@@ -18,4 +15,5 @@ public class EmployeeRequest {
     private String phoneNumber;
     private UserRole role;
     private String territoryId;
+    private LocalDateTime joiningDate;
 }
