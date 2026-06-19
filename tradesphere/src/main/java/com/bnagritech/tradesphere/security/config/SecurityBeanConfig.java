@@ -25,6 +25,7 @@ public class SecurityBeanConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/employees/**").authenticated()
                         .anyRequest().authenticated()
                 );
 
