@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Document(collection = "User")
 public class User {
-
     @Id
     private String id;
     private String userName;
@@ -26,6 +25,4 @@ public class User {
     private Boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updateBy;
-
-
 }
