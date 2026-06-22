@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 
 public interface RolePermissionRepository extends MongoRepository<RolePermission, String> {
-    @Override
+
     Optional<RolePermission> findByRoleId(String roleId);
 }
