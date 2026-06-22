@@ -21,6 +21,7 @@ public class RoleServiceImpl implements RoleService {
          }
 
          Role role = Role.builder()
+                 .roleId(request.getRoleId())
                  .roleName(request.getRoleName())
                  .description(request.getDescription())
                  .employeeId(request.getEmployeeId())

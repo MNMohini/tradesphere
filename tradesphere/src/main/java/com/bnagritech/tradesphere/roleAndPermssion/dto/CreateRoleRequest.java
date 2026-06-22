@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CreateRoleRequest {
-
+    private String roleId;
     private String roleName;
     private String description;
     private String employeeId;
