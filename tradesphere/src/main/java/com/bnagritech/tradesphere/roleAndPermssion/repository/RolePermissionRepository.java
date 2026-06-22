@@ -1,4 +1,11 @@
 package com.bnagritech.tradesphere.roleAndPermssion.repository;
 
-public interface RolePermissionRepository {
+import com.bnagritech.tradesphere.roleAndPermssion.model.RolePermission;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import java.util.Optional;
+
+public interface RolePermissionRepository extends MongoRepository<RolePermission, String> {
+    @Override
+    Optional<RolePermission> findByRoleId(String roleId);
 }
