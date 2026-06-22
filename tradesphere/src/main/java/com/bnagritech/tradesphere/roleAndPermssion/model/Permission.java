@@ -5,7 +5,7 @@ public enum Permission {
     create_Employee,
     update_Employee,
     delete_Employee,
-    
+
     create_Distributor,
     update_Distributor,
     delete_Distributor,
