@@ -20,8 +20,9 @@ public class RoleController {
         return roleService.createRole(request);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/allRoles")
     public List<Role> getAllRoles(){
         return roleService.getAllRolls();
     }
+
 }
