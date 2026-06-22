@@ -1,10 +1,9 @@
 package com.bnagritech.tradesphere.roleAndPermssion.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Sharded;
 
 @Document(collection = "Role")
 @Data
@@ -12,7 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role {
+    @Id
    private String roleId;
    private String roleName;
    private String description;
+   private String employeeId;
 }
