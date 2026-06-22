@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.roleAndPermssion.service.impl;
 
+import com.bnagritech.tradesphere.common.UserRole;
 import com.bnagritech.tradesphere.roleAndPermssion.dto.CreateRoleRequest;
 import com.bnagritech.tradesphere.roleAndPermssion.model.Role;
 import com.bnagritech.tradesphere.roleAndPermssion.repository.RoleRepository;
@@ -22,7 +23,7 @@ public class RoleServiceImpl implements RoleService {
 
          Role role = Role.builder()
                  .roleId(request.getRoleId())
-                 .roleName(request.getRoleName())
+                 .roleName(UserRole.valueOf(request.getRoleName()))
                  .description(request.getDescription())
                  .employeeId(request.getEmployeeId())
                  .build();
