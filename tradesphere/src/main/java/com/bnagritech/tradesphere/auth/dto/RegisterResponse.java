@@ -12,5 +12,4 @@ public class RegisterResponse {
     private UserRole role;
     private String employeeId;
     private Boolean active;
-
 }
