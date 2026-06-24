@@ -17,7 +17,6 @@ public class RoleController {
     @PostMapping("/create")
     public Role createRole(@RequestBody CreateRoleRequest request)
     {
-
         return roleService.createRole(request);
     }
 

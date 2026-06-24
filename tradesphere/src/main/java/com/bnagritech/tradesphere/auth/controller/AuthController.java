@@ -6,6 +6,7 @@ import com.bnagritech.tradesphere.auth.dto.RegisterRequest;
 import com.bnagritech.tradesphere.auth.dto.RegisterResponse;
 import com.bnagritech.tradesphere.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,15 +15,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
      @PostMapping("/register")
-    public RegisterResponse register(@RequestBody RegisterRequest request){
-
-         return authService.register(request);
+    public ResponseEntity<?> register(
+            @RequestBody RegisterRequest request){
+         RegisterResponse response = authService.register(request);
+         return ResponseEntity.ok(response);
      }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request){
-
-    return authService.login(request);
+    public ResponseEntity<?> login(
+            @RequestBody LoginRequest request){
+         LoginResponse response= authService.login(request);
+    return ResponseEntity.ok(response);
 }
 
 }

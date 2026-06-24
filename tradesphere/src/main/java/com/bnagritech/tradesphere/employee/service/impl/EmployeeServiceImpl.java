@@ -35,6 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeId(request.getEmployeeId())
                 .employeeName(request.getEmployeeName())
                 .email(request.getEmail())
+                .userName(request.getUserName())
                 .phoneNumber(Long.parseLong(request.getPhoneNumber()))
                 .role(request.getRole())
                 .territoryId(request.getTerritoryId())
