@@ -17,6 +17,5 @@ public class TerritoryResponse {
     private String description;
     private Boolean active;
     private LocalDateTime updateAt;
-    private LocalDateTime createdBy;
-    private String updatedAt;
+    private LocalDateTime createAt;
 }
