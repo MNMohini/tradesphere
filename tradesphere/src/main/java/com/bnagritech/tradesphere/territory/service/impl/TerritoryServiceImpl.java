@@ -70,8 +70,8 @@ public class TerritoryServiceImpl implements TerritoryService {
         return mapToResponse(updateTerritory);
     }
     @Override
-    public void deleteTerritory(String TerritoryId){
-        Territory territory= territoryRepository.findById(TerritoryId).orElseThrow(
+    public void deleteTerritory(String id){
+        Territory territory= territoryRepository.findById(id).orElseThrow(
                 ()-> new RuntimeException("Territory Not Found"));
         territoryRepository.delete(territory);
     }
