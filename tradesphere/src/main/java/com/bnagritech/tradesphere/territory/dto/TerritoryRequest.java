@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.territory.dto;
 
-import com.bnagritech.tradesphere.territory.TerritoryType;
 import lombok.Data;
 
 @Data
@@ -12,5 +11,5 @@ public class TerritoryRequest {
     private String city;
     private String description;
     private Boolean active;
-    private TerritoryType territoryType;
+    private String territoryType;
 }
