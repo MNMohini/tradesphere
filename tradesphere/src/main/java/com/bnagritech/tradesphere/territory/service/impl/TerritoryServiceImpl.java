@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -84,7 +85,23 @@ public class TerritoryServiceImpl implements TerritoryService {
                 ()-> new ResourceNotFoundException("Territory Not Found"));
         territoryRepository.delete(territory);
     }
-     private TerritoryResponse mapToResponse(Territory territory){
+
+    @Override
+    public List<TerritoryResponse> getAllTerritoriesByState(String state) {
+        Territory territory = territoryRepository.findByState(state).orElseThrow(
+                ()-> new ResourceNotFoundException("State Not Found"));
+        return Collections.singletonList(mapToResponse(territory));
+
+    }
+
+    @Override
+    public List<TerritoryResponse> getAllTerritoriesByCity(String city) {
+        Territory territory = territoryRepository.findByCity(city).orElseThrow(
+                ()-> new ResourceNotFoundException("City Not Found"));
+        return Collections.singletonList(mapToResponse(territory));
+    }
+
+    private TerritoryResponse mapToResponse(Territory territory){
         return TerritoryResponse.builder()
                 .territoryId(territory.getTerritoryId())
                 .territoryName(territory.getTerritoryName())
