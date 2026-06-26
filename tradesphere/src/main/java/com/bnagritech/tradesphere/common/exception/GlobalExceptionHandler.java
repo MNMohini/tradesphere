@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.common.exception;
 
+import org.springframework.data.mongodb.core.aggregation.VariableOperators;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,8 +18,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
                         "timestamp", LocalDateTime.now(),
-                        "message", ex.getMessage()
-                ));
+                        "message", ex.getMessage()));
     }
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "message",ex.getMessage()));
+    }
+
+
 
 }
