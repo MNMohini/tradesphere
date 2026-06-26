@@ -17,14 +17,12 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
-                        "timestamp", LocalDateTime.now(),
                         "message", ex.getMessage()));
     }
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
-                "timestamp", LocalDateTime.now(),
                 "message",ex.getMessage()));
     }
 
@@ -32,7 +30,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?>handleTerritoryAlreadyExists(TerritoryAlreadyExistException ex){
         return ResponseEntity.status((HttpStatus.BAD_REQUEST))
                 .body(Map.of(
-                        "timestamp", LocalDateTime.now(),
                         "message",ex.getMessage()
                 ));
     }

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/employees")
@@ -18,11 +20,11 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest request){
         return ResponseEntity.ok(employeeService.createEmployee(request));
     }
-    /*
-    @GetMapping("/{employeeId}")
-    public ResponseEntity<List<EmployeeResponse>>getAllEmployees(){
+
+    @GetMapping("/all")
+    public ResponseEntity<List<EmployeeResponse>>getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
-    }*/
+    }
     @GetMapping("/{employeeId}")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmployeeId(@PathVariable String employeeId){
         return ResponseEntity.ok(employeeService.getEmployeeByEmployeeId(employeeId));
