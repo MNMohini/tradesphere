@@ -1,12 +1,10 @@
 package com.bnagritech.tradesphere.common.exception;
 
-import org.springframework.data.mongodb.core.aggregation.VariableOperators;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -30,8 +28,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?>handleTerritoryAlreadyExists(TerritoryAlreadyExistException ex){
         return ResponseEntity.status((HttpStatus.BAD_REQUEST))
                 .body(Map.of(
-                        "message",ex.getMessage()
-                ));
+                        "message",ex.getMessage()));
     }
 
     @ExceptionHandler(TerritoryNotFoundException.class)
@@ -40,6 +37,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "message",ex.getMessage()
                 ));
+    }
+    @ExceptionHandler(EmployeeNotFoundException.class)
+    public ResponseEntity<?>handleUserNameNotFound(EmployeeNotFoundException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
     }
 
 }

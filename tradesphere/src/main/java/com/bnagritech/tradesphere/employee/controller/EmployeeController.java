@@ -16,7 +16,7 @@ import java.util.List;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest request){
         return ResponseEntity.ok(employeeService.createEmployee(request));
     }
@@ -29,6 +29,11 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponse> getEmployeeByEmployeeId(@PathVariable String employeeId){
         return ResponseEntity.ok(employeeService.getEmployeeByEmployeeId(employeeId));
     }
+    @GetMapping("/{userName}")
+    public ResponseEntity<EmployeeResponse> getEmployeeByUserName(@PathVariable String userName){
+        return ResponseEntity.ok(employeeService.getEmployeeByUserName(userName));
+    }
+
     @PutMapping("/{employeeId}")
     public ResponseEntity<EmployeeResponse> updateEmployee(
         @PathVariable String employeeId,

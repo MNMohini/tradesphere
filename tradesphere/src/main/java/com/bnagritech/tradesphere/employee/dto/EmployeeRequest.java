@@ -5,6 +5,7 @@ import lombok.Data;
 
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class EmployeeRequest {
@@ -16,5 +17,5 @@ public class EmployeeRequest {
     private String phoneNumber;
     private UserRole role;
     private String territoryId;
-    private LocalDateTime joiningDate;
+    private Date joiningDate;
 }

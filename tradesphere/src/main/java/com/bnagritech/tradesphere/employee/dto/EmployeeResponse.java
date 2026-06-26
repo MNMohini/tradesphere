@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Builder
@@ -22,7 +23,7 @@ public class EmployeeResponse {
     private long phoneNumber;
     private UserRole role;
     private String territoryId;
-    private String joiningDate;
+    private Date joiningDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

@@ -1,11 +1,15 @@
 package com.bnagritech.tradesphere.employee.service.impl;
 
+import com.bnagritech.tradesphere.common.exception.EmployeeNotFoundException;
+import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.employee.dto.EmployeeRequest;
 import com.bnagritech.tradesphere.employee.dto.EmployeeResponse;
 import com.bnagritech.tradesphere.employee.model.Employee;
 import com.bnagritech.tradesphere.employee.repository.EmployeeRepository;
 import com.bnagritech.tradesphere.employee.service.EmployeeService;
+import com.bnagritech.tradesphere.territory.model.Territory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,13 +26,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponse createEmployee(EmployeeRequest request) {
 
         if (employeeRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new EmployeeNotFoundException("Email already exists");
         }
         if (employeeRepository.existsByEmployeeId(request.getEmployeeId())) {
-            throw new RuntimeException("Employee Id already exists");
+            throw new EmployeeNotFoundException("Employee Id already exists");
         }
         if (employeeRepository.existsByUserName(request.getUserName())) {
-            throw new RuntimeException("User Name already exists");
+            throw new EmployeeNotFoundException("User Name already exists");
         }
 
         Employee employee = Employee.builder()
@@ -39,7 +43,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .phoneNumber(Long.parseLong(request.getPhoneNumber()))
                 .role(request.getRole())
                 .territoryId(request.getTerritoryId())
-                .joiningDate(String.valueOf(request.getJoiningDate()))
+                .joiningDate(request.getJoiningDate())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -60,8 +64,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResponse getEmployeeByUserName(String userName) {
-        Employee employee = employeeRepository.findByUserName(userName)
-                .orElseThrow(()-> new RuntimeException("Employee not found"));
+        Employee employee = employeeRepository.findByUserName(userName).orElseThrow(
+                ()-> new EmployeeNotFoundException("Employee Not Found"));
         return mapToResponse(employee);
     }
 
@@ -85,7 +89,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPhoneNumber(Long.parseLong(request.getPhoneNumber()));
         employee.setRole(request.getRole());
         employee.setTerritoryId(request.getTerritoryId());
-        employee.setJoiningDate(String.valueOf(request.getJoiningDate()));
+        employee.setJoiningDate(request.getJoiningDate());
         employee.setUpdatedAt(LocalDateTime.now());
 
         Employee updatedEmployee = employeeRepository.save(employee);

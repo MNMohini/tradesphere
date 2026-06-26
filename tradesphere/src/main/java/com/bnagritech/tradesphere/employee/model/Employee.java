@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Builder
@@ -25,7 +26,7 @@ public class Employee {
     private long phoneNumber;
     private UserRole role;
     private String territoryId;
-    private String joiningDate;
+    private Date joiningDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
