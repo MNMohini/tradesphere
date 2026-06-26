@@ -38,19 +38,18 @@ public class TerritoryController {
     public ResponseEntity<TerritoryResponse> updateTerritory(@PathVariable String id, @Valid @RequestBody TerritoryRequest request) {
         return ResponseEntity.ok(territoryService.updateTerritory(id, request));
     }
-    @GetMapping("/{state}")
-    public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByState(@PathVariable String state) {
-        return ResponseEntity.ok(territoryService.getAllTerritoriesByState(state));
+    @GetMapping("/state/{state}")
+    public ResponseEntity<List<TerritoryResponse>> getTerritoriesByState(@PathVariable String state) {
+        return ResponseEntity.ok(territoryService.getTerritoriesByState(state));
     }
-    @GetMapping("/{city}")
+    @GetMapping("/city/{city}")
     public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByCity(@PathVariable String city) {
-        return ResponseEntity.ok(territoryService.getAllTerritoriesByCity(city));
+        return ResponseEntity.ok(territoryService.getTerritoriesByCity(city));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTerritory(@PathVariable String id){
         territoryService.deleteTerritory(id);
         return ResponseEntity.ok("Territory deleted successfully");
     }
-
-
+    
 }
