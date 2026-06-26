@@ -38,6 +38,14 @@ public class TerritoryController {
     public ResponseEntity<TerritoryResponse> updateTerritory(@PathVariable String id, @Valid @RequestBody TerritoryRequest request) {
         return ResponseEntity.ok(territoryService.updateTerritory(id, request));
     }
+    @GetMapping("/{state}")
+    public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByState(@PathVariable String state) {
+        return ResponseEntity.ok(territoryService.getAllTerritoriesByState(state));
+    }
+    @GetMapping("/{city}")
+    public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByCity(@PathVariable String city) {
+        return ResponseEntity.ok(territoryService.getAllTerritoriesByCity(city));
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTerritory(@PathVariable String id){
         territoryService.deleteTerritory(id);
