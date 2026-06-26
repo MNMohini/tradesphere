@@ -11,6 +11,8 @@ public interface TerritoryRepository extends MongoRepository<Territory,String> {
 
     boolean existsTerritoryByTerritoryId(String territoryId);
 
+    boolean existsTerritoryByTerritoryNameAndCityAndState(
+            String territoryName, String city, String state);
     Optional<Territory> findByState(String state);
 
 }
