@@ -21,7 +21,14 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public TerritoryResponse createTerritory(TerritoryRequest request) {
         if (territoryRepository.existsTerritoryByTerritoryId(request.getTerritoryId())) {
-            throw new TerritoryAlreadyExistException("This Territory Id is already exists in the System");
+            throw new TerritoryAlreadyExistException("This Territory is already exists in the System");
+        }
+
+        if (territoryRepository.existsTerritoryByTerritoryNameAndCityAndState(
+                request.getTerritoryName().trim(),
+                request.getCity().trim(),
+                request.getState().trim())) {
+            throw new TerritoryAlreadyExistException("This Territory is already exists in the System");
         }
         Territory territory = Territory.builder()
                 .territoryId(request.getTerritoryId())
