@@ -22,11 +22,19 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
                 "timestamp", LocalDateTime.now(),
                 "message",ex.getMessage()));
     }
 
-
+    @ExceptionHandler(TerritoryAlreadyExistException.class)
+    public ResponseEntity<?>handleTerritoryAlreadyExists(TerritoryAlreadyExistException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "message",ex.getMessage()
+                ));
+    }
 
 }
