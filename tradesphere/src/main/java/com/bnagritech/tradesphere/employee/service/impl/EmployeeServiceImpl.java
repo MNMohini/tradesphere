@@ -73,7 +73,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponse getEmployeeByEmployeeId(String employeeId) {
 
         Employee employee = employeeRepository.findByEmployeeId(employeeId)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
 
         return mapToResponse(employee);
     }
@@ -82,7 +82,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponse updateEmployee(String employeeId, EmployeeRequest request) {
 
         Employee employee = employeeRepository.findByEmployeeId(employeeId)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
 
         employee.setEmployeeName(request.getEmployeeName());
         employee.setEmail(request.getEmail());
@@ -101,7 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteEmployee(String employeeId) {
 
         Employee employee = employeeRepository.findByEmployeeId(employeeId)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
 
         employeeRepository.delete(employee);
     }
