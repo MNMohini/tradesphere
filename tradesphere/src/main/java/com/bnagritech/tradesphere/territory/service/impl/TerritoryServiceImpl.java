@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.territory.service.impl;
 
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
+import com.bnagritech.tradesphere.common.exception.TerritoryAlreadyExistException;
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import com.bnagritech.tradesphere.territory.model.Territory;
@@ -20,7 +21,7 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public TerritoryResponse createTerritory(TerritoryRequest request) {
         if (territoryRepository.existsTerritoryByTerritoryId(request.getTerritoryId())) {
-            throw new RuntimeException("Territory Id already exists");
+            throw new TerritoryAlreadyExistException("This Territory Id is already exists in the System");
         }
         Territory territory = Territory.builder()
                 .territoryId(request.getTerritoryId())
