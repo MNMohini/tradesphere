@@ -37,4 +37,12 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(TerritoryNotFoundException.class)
+    public ResponseEntity<?>handleTerritoryNotFound(TerritoryNotFoundException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()
+                ));
+    }
+
 }
