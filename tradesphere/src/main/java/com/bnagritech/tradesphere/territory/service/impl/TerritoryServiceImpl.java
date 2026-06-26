@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.territory.service.impl;
 
+import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import com.bnagritech.tradesphere.territory.model.Territory;
@@ -49,14 +50,14 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public TerritoryResponse getTerritoryById(String id){
         Territory territory = territoryRepository.findById(id).orElseThrow(
-                ()-> new RuntimeException("Territory Not Found"));
+                ()-> new ResourceNotFoundException("Territory Not Found"));
    return mapToResponse(territory);
     }
 
     @Override
     public TerritoryResponse updateTerritory(String id, TerritoryRequest request){
         Territory territory= territoryRepository.findById(id).orElseThrow(
-                ()-> new RuntimeException("Territory Not Found"));
+                ()-> new ResourceNotFoundException("Territory Not Found"));
 
        territory.setTerritoryId(request.getTerritoryId());
        territory.setTerritoryName(request.getTerritoryName());
@@ -72,7 +73,7 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public void deleteTerritory(String id){
         Territory territory= territoryRepository.findById(id).orElseThrow(
-                ()-> new RuntimeException("Territory Not Found"));
+                ()-> new ResourceNotFoundException("Territory Not Found"));
         territoryRepository.delete(territory);
     }
      private TerritoryResponse mapToResponse(Territory territory){
