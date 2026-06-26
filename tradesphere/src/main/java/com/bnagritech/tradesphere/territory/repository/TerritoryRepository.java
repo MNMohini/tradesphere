@@ -4,6 +4,7 @@ import com.bnagritech.tradesphere.territory.model.Territory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,7 +14,7 @@ public interface TerritoryRepository extends MongoRepository<Territory,String> {
 
     boolean existsTerritoryByTerritoryNameAndCityAndState(
             String territoryName, String city, String state);
-    Optional<Territory> findByState(String state);
-    Optional<Territory> findByCity(String city);
+    List<Territory> findByStateIgnoreCase(String state);
+    List<Territory> findByCityIgnoreCase(String city);
 
 }

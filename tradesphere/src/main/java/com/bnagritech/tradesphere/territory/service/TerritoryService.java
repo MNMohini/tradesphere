@@ -11,6 +11,6 @@ public interface TerritoryService {
     TerritoryResponse getTerritoryById(String id);
     TerritoryResponse updateTerritory(String id,TerritoryRequest request);
     void deleteTerritory(String id);
-    List<TerritoryResponse>getAllTerritoriesByState(String state);
-    List<TerritoryResponse>getAllTerritoriesByCity(String city);
+    List<TerritoryResponse>getTerritoriesByState(String state);
+    List<TerritoryResponse>getTerritoriesByCity(String city);
 }

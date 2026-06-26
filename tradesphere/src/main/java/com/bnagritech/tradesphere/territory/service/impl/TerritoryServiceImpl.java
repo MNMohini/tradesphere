@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.territory.service.impl;
 
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.exception.TerritoryAlreadyExistException;
+import com.bnagritech.tradesphere.common.exception.TerritoryNotFoundException;
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import com.bnagritech.tradesphere.territory.model.Territory;
@@ -87,19 +88,28 @@ public class TerritoryServiceImpl implements TerritoryService {
     }
 
     @Override
-    public List<TerritoryResponse> getAllTerritoriesByState(String state) {
-        Territory territory = territoryRepository.findByState(state).orElseThrow(
-                ()-> new ResourceNotFoundException("State Not Found"));
-        return Collections.singletonList(mapToResponse(territory));
+    public List<TerritoryResponse> getTerritoriesByState(String state) {
+        List<Territory> territories = territoryRepository.findByStateIgnoreCase(state);
+        if (territories.isEmpty()) {
+            throw new TerritoryNotFoundException("No territory found in " + state);
+        }
+        return  territories.stream()
+                .map(this::mapToResponse)
+                .toList();
 
     }
 
     @Override
-    public List<TerritoryResponse> getAllTerritoriesByCity(String city) {
-        Territory territory = territoryRepository.findByCity(city).orElseThrow(
-                ()-> new ResourceNotFoundException("City Not Found"));
-        return Collections.singletonList(mapToResponse(territory));
+    public List<TerritoryResponse> getTerritoriesByCity(String city) {
+        List<Territory> territories = territoryRepository.findByCityIgnoreCase(city);
+        if (territories.isEmpty()) {
+            throw new TerritoryNotFoundException("No territory found in " + city);
+        }
+        return  territories.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
+
 
     private TerritoryResponse mapToResponse(Territory territory){
         return TerritoryResponse.builder()
