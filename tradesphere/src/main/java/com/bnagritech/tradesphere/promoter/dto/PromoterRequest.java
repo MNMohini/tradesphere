@@ -1,5 +1,8 @@
 package com.bnagritech.tradesphere.promoter.dto;
 
+import lombok.Data;
+
+@Data
 public class PromoterRequest {
 
     private String promoterId;
