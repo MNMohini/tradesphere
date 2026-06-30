@@ -1,15 +1,12 @@
 package com.bnagritech.tradesphere.employee.service.impl;
 
 import com.bnagritech.tradesphere.common.exception.EmployeeNotFoundException;
-import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.employee.dto.EmployeeRequest;
 import com.bnagritech.tradesphere.employee.dto.EmployeeResponse;
 import com.bnagritech.tradesphere.employee.model.Employee;
 import com.bnagritech.tradesphere.employee.repository.EmployeeRepository;
 import com.bnagritech.tradesphere.employee.service.EmployeeService;
-import com.bnagritech.tradesphere.territory.model.Territory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

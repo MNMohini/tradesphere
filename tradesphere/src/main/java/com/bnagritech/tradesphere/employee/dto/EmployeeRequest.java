@@ -4,8 +4,7 @@ import com.bnagritech.tradesphere.common.UserRole;
 import lombok.Data;
 
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 public class EmployeeRequest {
@@ -17,5 +16,5 @@ public class EmployeeRequest {
     private String phoneNumber;
     private UserRole role;
     private String territoryId;
-    private Date joiningDate;
+    private String joiningDate;
 }

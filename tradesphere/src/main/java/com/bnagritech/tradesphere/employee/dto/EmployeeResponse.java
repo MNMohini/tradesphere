@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -23,7 +24,7 @@ public class EmployeeResponse {
     private long phoneNumber;
     private UserRole role;
     private String territoryId;
-    private Date joiningDate;
+    private String joiningDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
