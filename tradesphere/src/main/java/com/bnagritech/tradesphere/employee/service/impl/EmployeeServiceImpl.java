@@ -1,6 +1,8 @@
 package com.bnagritech.tradesphere.employee.service.impl;
 
+import com.bnagritech.tradesphere.common.exception.EmployeeAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.EmployeeNotFoundException;
+import com.bnagritech.tradesphere.common.exception.UserAlreadyExistsException;
 import com.bnagritech.tradesphere.employee.dto.EmployeeRequest;
 import com.bnagritech.tradesphere.employee.dto.EmployeeResponse;
 import com.bnagritech.tradesphere.employee.model.Employee;
@@ -23,13 +25,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponse createEmployee(EmployeeRequest request) {
 
         if (employeeRepository.existsByEmail(request.getEmail())) {
-            throw new EmployeeNotFoundException("Email already exists");
+            throw new EmployeeAlreadyExistsException("Email already exists");
         }
         if (employeeRepository.existsByEmployeeId(request.getEmployeeId())) {
-            throw new EmployeeNotFoundException("Employee Id already exists");
+            throw new EmployeeAlreadyExistsException("Employee Id already exists");
         }
         if (employeeRepository.existsByUserName(request.getUserName())) {
-            throw new EmployeeNotFoundException("User Name already exists");
+            throw new UserAlreadyExistsException("User Name already exists");
         }
 
         Employee employee = Employee.builder()
