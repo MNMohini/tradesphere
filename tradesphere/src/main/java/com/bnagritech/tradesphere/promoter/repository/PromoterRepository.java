@@ -2,18 +2,25 @@ package com.bnagritech.tradesphere.promoter.repository;
 
 import com.bnagritech.tradesphere.promoter.model.Promoter;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface PromoterRepository extends MongoRepository<Promoter, String> {
 
     Optional<Promoter> findByPromoterId(String promoterId);
     Optional<Promoter> findByPhoneNumber(long phoneNumber);
-    Optional<?> findByEmail(String email);
+    Optional<Promoter> findByEmail(String email);
 
     List<Promoter> findByTerritoryId(String territoryId);
     List<Promoter> findByStatus(String status);
     List<Promoter> findByState(String state);
+
+
+    boolean existsByPromoterId(String promoterId);
+    boolean existsByPhoneNumber(long phoneNumber);
+    boolean existsByEmail(String email);
 
 }
