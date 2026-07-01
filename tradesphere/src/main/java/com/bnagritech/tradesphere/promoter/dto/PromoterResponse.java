@@ -14,7 +14,7 @@ public class PromoterResponse {
     private String promoterName;
     private String address;
     private String employeeId;
-    private String phoneNumber;
+    private long phoneNumber;
     private String email;
     private String territoryId;
     private String territoryName;
