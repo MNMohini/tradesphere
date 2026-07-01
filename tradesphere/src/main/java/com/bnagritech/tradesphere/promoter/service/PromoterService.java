@@ -18,10 +18,4 @@ public interface PromoterService {
     List<PromoterResponse> getPromoterByTerritory(String territoryId);
     List<PromoterResponse> getPromoterByStatus(Boolean status);
 
-
-
-
-
-
-
 }
