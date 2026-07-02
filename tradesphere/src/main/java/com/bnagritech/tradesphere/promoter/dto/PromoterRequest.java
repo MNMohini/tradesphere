@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.promoter.dto;
 
+import com.bnagritech.tradesphere.employee.model.Employee;
 import lombok.Data;
 
 @Data
