@@ -112,7 +112,6 @@ import java.util.List;
 
         return mapToResponse(promoter);
     }
-
     @Override
     public List<PromoterResponse> getPromoterByTerritory(String territoryId) {
 
