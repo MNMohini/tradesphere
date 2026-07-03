@@ -1,5 +1,4 @@
 package com.bnagritech.tradesphere.promoter.controller;
-
 import com.bnagritech.tradesphere.employee.dto.EmployeeRequest;
 import com.bnagritech.tradesphere.employee.dto.EmployeeResponse;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
@@ -32,6 +31,14 @@ public class PromoterController {
     @GetMapping("/prmId/{promoterId}")
     public ResponseEntity<PromoterResponse> getPromoterById(@PathVariable String promoterId){
         return ResponseEntity.ok(promoterService.getPromoterById(promoterId));
+    }
+
+    @PutMapping("/prmId{promoterId}")
+    public ResponseEntity<PromoterResponse> updatePromoter(
+            @PathVariable String promoterId,
+            @RequestBody PromoterRequest request)
+    {
+        return ResponseEntity.ok(promoterService.updatePromoter(promoterId,request));
     }
 
 }
