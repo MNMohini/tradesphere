@@ -12,9 +12,9 @@ public class RetailerRequest {
     private String  retailerCode;
     private String shopName;
     private String ownerName;
-    private String contactNumber;
+    private long phoneNumber;
     private String alternateContactNumber;
-    private String retailerEmail;
+    private String email;
     private String address;
     private String territoryId;
     private String beatId;
