@@ -1,6 +1,6 @@
 package com.bnagritech.tradesphere.roleAndPermssion.model;
 
-import com.bnagritech.tradesphere.common.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

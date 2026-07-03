@@ -1,7 +1,4 @@
-package com.bnagritech.tradesphere.common;
-
-import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.bnagritech.tradesphere.common.enums;
 
 
 public enum UserRole {

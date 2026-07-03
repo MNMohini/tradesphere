@@ -1,12 +1,10 @@
 package com.bnagritech.tradesphere.promoter.dto;
 
-import com.bnagritech.tradesphere.common.UserRole;
-import com.bnagritech.tradesphere.employee.model.Employee;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 

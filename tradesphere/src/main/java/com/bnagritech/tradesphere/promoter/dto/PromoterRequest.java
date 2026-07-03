@@ -1,7 +1,6 @@
 package com.bnagritech.tradesphere.promoter.dto;
 
-import com.bnagritech.tradesphere.common.UserRole;
-import com.bnagritech.tradesphere.employee.model.Employee;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.Data;
 
 import java.time.LocalDateTime;

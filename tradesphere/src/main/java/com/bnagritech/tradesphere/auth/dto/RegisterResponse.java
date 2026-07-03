@@ -1,6 +1,6 @@
 package com.bnagritech.tradesphere.auth.dto;
 
-import com.bnagritech.tradesphere.common.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.Builder;
 import lombok.Data;
 

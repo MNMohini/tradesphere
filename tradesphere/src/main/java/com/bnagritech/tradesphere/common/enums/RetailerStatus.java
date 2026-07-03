@@ -1,4 +1,4 @@
-package com.bnagritech.tradesphere.retailer;
+package com.bnagritech.tradesphere.common.enums;
 
 public enum RetailerStatus {
     ACTIVE,

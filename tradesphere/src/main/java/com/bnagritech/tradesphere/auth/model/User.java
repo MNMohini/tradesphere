@@ -1,15 +1,11 @@
 package com.bnagritech.tradesphere.auth.model;
 
-import com.bnagritech.tradesphere.common.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
 
 @Data
 @Builder

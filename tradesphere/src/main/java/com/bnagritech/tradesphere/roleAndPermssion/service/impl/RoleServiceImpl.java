@@ -1,6 +1,6 @@
 package com.bnagritech.tradesphere.roleAndPermssion.service.impl;
 
-import com.bnagritech.tradesphere.common.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.roleAndPermssion.dto.CreateRoleRequest;
 import com.bnagritech.tradesphere.roleAndPermssion.model.Role;
 import com.bnagritech.tradesphere.roleAndPermssion.repository.RoleRepository;

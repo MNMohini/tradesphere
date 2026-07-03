@@ -1,10 +1,7 @@
 package com.bnagritech.tradesphere.employee.dto;
 
-import com.bnagritech.tradesphere.common.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.Data;
-
-
-import java.time.LocalDate;
 
 @Data
 public class EmployeeRequest {
