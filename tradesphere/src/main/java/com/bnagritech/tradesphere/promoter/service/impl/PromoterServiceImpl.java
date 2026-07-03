@@ -114,14 +114,19 @@ import java.util.List;
     }
     @Override
     public List<PromoterResponse> getPromoterByTerritory(String territoryId) {
-
-        return List.of();
+    List<Promoter> promoters = promoterRepository.findByTerritoryId(territoryId);
+        return promoters.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
     public List<PromoterResponse> getPromoterByStatus(Boolean status) {
+        List<Promoter> promoters = promoterRepository.findByStatus(String.valueOf(status));
+        return promoters.stream()
+                .map(this::mapToResponse)
+                .toList();
 
-        return List.of();
     }
 
     private PromoterResponse mapToResponse(Promoter promoter) {
