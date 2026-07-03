@@ -42,10 +42,14 @@ public class PromoterController {
     }
 
     @GetMapping("/number/{phoneNumber}")
-    public ResponseEntity<PromoterResponse> getPromoterPhoneNumber(@PathVariable long phoneNumber){
-        return ResponseEntity.ok(promoterService.getPromoterPhoneNumber(phoneNumber));
+    public ResponseEntity<PromoterResponse> getPromoterByPhoneNumber(@PathVariable long phoneNumber){
+        return ResponseEntity.ok(promoterService.getPromoterByPhoneNumber(phoneNumber));
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<PromoterResponse> getPromoterByEmail(@PathVariable String email){
+        return ResponseEntity.ok(promoterService.getPromoterByEmail(email));
+    }
 
     @DeleteMapping("/prmId/{promoterId}")
     public ResponseEntity<String> deletePromoter(@PathVariable String promoterId) {

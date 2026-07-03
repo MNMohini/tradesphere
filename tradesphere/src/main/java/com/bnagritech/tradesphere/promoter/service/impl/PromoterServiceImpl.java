@@ -93,7 +93,7 @@ import java.util.List;
 
 
     @Override
-    public PromoterResponse getPromoterPhoneNumber(long  phoneNumber) {
+    public PromoterResponse getPromoterByPhoneNumber(long  phoneNumber) {
         Promoter promoter = promoterRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(
                         ()->

@@ -13,7 +13,7 @@ public interface PromoterService {
     PromoterResponse getPromoterById(String promoterId);
     PromoterResponse updatePromoter(String promoterId, PromoterRequest request);
     void deletePromoter (String promoterId);
-    PromoterResponse getPromoterPhoneNumber(long phoneNumber);
+    PromoterResponse getPromoterByPhoneNumber(long phoneNumber);
     PromoterResponse getPromoterByEmail(String email);
     List<PromoterResponse> getPromoterByTerritory(String territoryId);
     List<PromoterResponse> getPromoterByStatus(Boolean status);
