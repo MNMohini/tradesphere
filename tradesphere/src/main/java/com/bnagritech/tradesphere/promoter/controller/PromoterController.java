@@ -53,6 +53,11 @@ public class PromoterController {
         return ResponseEntity.ok(promoterService.getPromoterByTerritory(territoryId));
     }
 
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<PromoterResponse>> getPromoterByStatus(@PathVariable boolean status) {
+        return ResponseEntity.ok(promoterService.getPromoterByStatus(status));
+    }
+
 
     @DeleteMapping("/prmId/{promoterId}")
     public ResponseEntity<String> deletePromoter(@PathVariable String promoterId) {
