@@ -50,5 +50,11 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "message",ex.getMessage()));
     }
+    @ExceptionHandler(PromoterNotFoundException.class)
+    public ResponseEntity<?>handlePromoterNotFound(PromoterNotFoundException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
 
 }
