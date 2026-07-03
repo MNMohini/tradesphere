@@ -1,10 +1,8 @@
 package com.bnagritech.tradesphere.promoter.controller;
-import com.bnagritech.tradesphere.employee.dto.EmployeeRequest;
-import com.bnagritech.tradesphere.employee.dto.EmployeeResponse;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
-import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
 import com.bnagritech.tradesphere.promoter.service.PromoterService;
+import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PromoterController {
     private final PromoterService promoterService;
-     private final PromoterRepository promoterRepository;
 
     @PostMapping("/create")
     public ResponseEntity<PromoterResponse> createPromoter(@RequestBody PromoterRequest request){
@@ -50,6 +47,12 @@ public class PromoterController {
     public ResponseEntity<PromoterResponse> getPromoterByEmail(@PathVariable String email){
         return ResponseEntity.ok(promoterService.getPromoterByEmail(email));
     }
+
+    @GetMapping("/territory/{territoryId}")
+    public ResponseEntity<List<PromoterResponse>> getPromoterByTerritory(@PathVariable String territoryId) {
+        return ResponseEntity.ok(promoterService.getPromoterByTerritory(territoryId));
+    }
+
 
     @DeleteMapping("/prmId/{promoterId}")
     public ResponseEntity<String> deletePromoter(@PathVariable String promoterId) {
