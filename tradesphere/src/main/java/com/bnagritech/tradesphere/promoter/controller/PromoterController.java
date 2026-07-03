@@ -41,4 +41,10 @@ public class PromoterController {
         return ResponseEntity.ok(promoterService.updatePromoter(promoterId,request));
     }
 
+    @DeleteMapping("/prmId/{promoterId}")
+    public ResponseEntity<String> deletePromoter(@PathVariable String promoterId){
+        promoterService.deletePromoter(promoterId);
+        return ResponseEntity.ok("Promoter details deleted successfully");
+    }
+
 }
