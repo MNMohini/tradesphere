@@ -34,7 +34,7 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeByUserName(userName));
     }
 
-    @PutMapping("/empId{employeeId}")
+    @PutMapping("/empId/{employeeId}")
     public ResponseEntity<EmployeeResponse> updateEmployee(
         @PathVariable String employeeId,
         @RequestBody EmployeeRequest request)

@@ -20,7 +20,7 @@ public interface PromoterRepository extends MongoRepository<Promoter, String> {
 
 
     boolean existsByPromoterId(String promoterId);
-    boolean existsByPhoneNumber(long phoneNumber);
+    boolean existsByEmployeeId(String employeeId);
     boolean existsByEmail(String email);
 
 }

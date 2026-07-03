@@ -14,13 +14,12 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "promoter")
+@Document(collection = "promoters")
 public class Promoter {
     private String promoterId;
     private String promoterName;
     private String address;
-    @DBRef
-    private Employee employee;
+    private String employeeId;
     private long phoneNumber;
     private String email;
     private String territoryId;

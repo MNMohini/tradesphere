@@ -1,8 +1,7 @@
 package com.bnagritech.tradesphere.promoter.service.impl;
 
+import com.bnagritech.tradesphere.common.exception.EmployeeAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.employee.model.Employee;
-import com.bnagritech.tradesphere.employee.repository.EmployeeRepository;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
 import com.bnagritech.tradesphere.promoter.model.Promoter;
@@ -16,27 +15,38 @@ import java.util.List;
     @RequiredArgsConstructor
     public class PromoterServiceImpl implements PromoterService {
         private final PromoterRepository promoterRepository;
-        private final EmployeeRepository employeeRepository;
 
         @Override
         public PromoterResponse createPromoter(PromoterRequest request) {
 
-            Employee employee = employeeRepository.findByEmployeeId(request.getEmployeeId())
-                    .orElseThrow(
-                            ()->
-                                    new ResourceNotFoundException(
-                                            "Employee not found with "+request.getEmployeeId() +"id"));
-            Promoter promoter= new Promoter();
-            promoter.setPromoterId(request.getPromoterId());
-            promoter.setPromoterName(request.getPromoterId());
-            promoter.setPhoneNumber(request.getPhoneNumber());
-            promoter.setEmail(request.getEmail());
-            promoter.setAddress(request.getAddress());
-            promoter.setEmployee(employee);
-            Promoter savedPromoter= promoterRepository.save(promoter);
-            return  mapToResponse(savedPromoter);
-        }
+            if (promoterRepository.existsByEmail(request.getEmail())) {
+                throw new EmployeeAlreadyExistsException("Email already exists");
+            }
+            if (promoterRepository.existsByPromoterId(request.getPromoterId())) {
+                throw new EmployeeAlreadyExistsException("Promoter Id already exists");
+            }
+            if (promoterRepository.existsByEmployeeId(request.getEmployeeId())) {
+                throw new EmployeeAlreadyExistsException("Employee Id already exists");
+            }
 
+            Promoter promoter = Promoter.builder()
+                    .promoterId(request.getPromoterId())
+                    .promoterName(request.getPromoterName())
+                    .phoneNumber(request.getPhoneNumber())
+                    .address(request.getAddress())
+                    .email(request.getEmail())
+                    .employeeId(request.getEmployeeId())
+                    .territoryId(request.getTerritoryId())
+                    .territoryName(request.getTerritoryName())
+                    .city(request.getCity())
+                    .state(request.getState())
+                    .status(request.getStatus())
+                    .build();
+            Promoter savedPromoter = promoterRepository.save(promoter);
+
+            return mapToResponse(savedPromoter);
+
+        }
         @Override
         public List<PromoterResponse> getAllPromoters() {
             return promoterRepository.findAll()
@@ -58,24 +68,20 @@ import java.util.List;
 
         @Override
         public PromoterResponse updatePromoter(String promoterId, PromoterRequest request) {
-            Promoter promoter = promoterRepository.findByPromoterId(promoterId)
-                    .orElseThrow(
-                            ()->
-                                    new ResourceNotFoundException(
-                                            "Employee not found with " +promoterId +" id"));
 
-            Employee employee = employeeRepository.findByEmployeeId(request.getEmployeeId())
-                    .orElseThrow(
-                            ()->
-                                    new ResourceNotFoundException(
-                                            "Employee not found with "+request.getEmployeeId() +"id"));
+            Promoter promoter = promoterRepository.findByPromoterId(promoterId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Promoter not found"));
 
             promoter.setPromoterId(request.getPromoterId());
-            promoter.setPromoterName(request.getPromoterId());
+            promoter.setPromoterName(request.getPromoterName());
             promoter.setPhoneNumber(request.getPhoneNumber());
             promoter.setEmail(request.getEmail());
             promoter.setAddress(request.getAddress());
-            promoter.setEmployee(employee);
+            promoter.setEmployeeId(request.getEmployeeId());
+            promoter.setStatus(request.getStatus());
+            promoter.setTerritoryId(request.getTerritoryId());
+            promoter.setTerritoryName(request.getTerritoryName());
+
             Promoter updatedPromoter= promoterRepository.save(promoter);
             return  mapToResponse(updatedPromoter);
         }
@@ -139,11 +145,8 @@ import java.util.List;
         response.setState(promoter.getState());
         response.setCity(promoter.getCity());
         response.setStatus(promoter.getStatus());
+        response.setEmployeeId(promoter.getEmployeeId());
 
-        if (promoter.getEmployee() != null) {
-            response.setEmployeeId(promoter.getEmployee().getEmployeeId());
-            response.setEmployeeName(promoter.getEmployee().getEmployeeName());
-        }
             return response;
         }
 

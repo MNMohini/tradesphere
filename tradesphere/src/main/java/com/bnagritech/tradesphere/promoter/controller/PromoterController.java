@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/promoters")
+@RequestMapping("/api/promoters")
 @RequiredArgsConstructor
 public class PromoterController {
     private final PromoterService promoterService;
@@ -30,7 +30,7 @@ public class PromoterController {
         return ResponseEntity.ok(promoterService.getPromoterById(promoterId));
     }
 
-    @PutMapping("/prmId{promoterId}")
+    @PutMapping("/prmId/{promoterId}")
     public ResponseEntity<PromoterResponse> updatePromoter(
             @PathVariable String promoterId,
             @RequestBody PromoterRequest request)
