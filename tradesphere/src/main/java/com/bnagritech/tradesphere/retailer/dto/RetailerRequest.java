@@ -2,9 +2,10 @@ package com.bnagritech.tradesphere.retailer.dto;
 
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-
+@Data
 public class RetailerRequest {
 
     private String retailerId;
