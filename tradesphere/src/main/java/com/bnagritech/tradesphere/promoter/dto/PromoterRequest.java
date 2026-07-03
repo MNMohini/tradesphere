@@ -1,7 +1,10 @@
 package com.bnagritech.tradesphere.promoter.dto;
 
+import com.bnagritech.tradesphere.common.UserRole;
 import com.bnagritech.tradesphere.employee.model.Employee;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class PromoterRequest {
@@ -17,4 +20,7 @@ public class PromoterRequest {
     private String city;
     private String state;
     private String status;
+    private UserRole createdBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedBy;
 }

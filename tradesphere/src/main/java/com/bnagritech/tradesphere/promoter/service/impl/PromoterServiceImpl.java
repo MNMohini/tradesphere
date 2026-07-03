@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.promoter.service.impl;
 
 import com.bnagritech.tradesphere.common.exception.EmployeeAlreadyExistsException;
+import com.bnagritech.tradesphere.common.exception.PromoterNotFoundException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
@@ -70,7 +71,7 @@ import java.util.List;
         public PromoterResponse updatePromoter(String promoterId, PromoterRequest request) {
 
             Promoter promoter = promoterRepository.findByPromoterId(promoterId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Promoter not found"));
+                    .orElseThrow(() -> new PromoterNotFoundException("Promoter not found"));
 
             promoter.setPromoterId(request.getPromoterId());
             promoter.setPromoterName(request.getPromoterName());
@@ -79,6 +80,8 @@ import java.util.List;
             promoter.setAddress(request.getAddress());
             promoter.setEmployeeId(request.getEmployeeId());
             promoter.setStatus(request.getStatus());
+            promoter.setCity(request.getCity());
+            promoter.setState(request.getState());
             promoter.setTerritoryId(request.getTerritoryId());
             promoter.setTerritoryName(request.getTerritoryName());
 
@@ -146,6 +149,8 @@ import java.util.List;
         response.setCity(promoter.getCity());
         response.setStatus(promoter.getStatus());
         response.setEmployeeId(promoter.getEmployeeId());
+        response.setTerritoryId(promoter.getTerritoryId());
+        response.setTerritoryName(promoter.getTerritoryName());
 
             return response;
         }
