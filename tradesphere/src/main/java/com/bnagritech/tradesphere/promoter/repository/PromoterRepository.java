@@ -13,7 +13,7 @@ public interface PromoterRepository extends MongoRepository<Promoter, String> {
 
     List<Promoter> findByTerritoryId(String territoryId);
     List<Promoter> findByStatus(String status);
-    List<Promoter> findByState(String state);
+    //List<Promoter> findByState(String state);
 
 
     boolean existsByPromoterId(String promoterId);
