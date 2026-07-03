@@ -29,4 +29,9 @@ public class PromoterController {
         return ResponseEntity.ok(promoterService.getAllPromoters());
     }
 
+    @GetMapping("/prmId/{promoterId}")
+    public ResponseEntity<PromoterResponse> getPromoterById(@PathVariable String promoterId){
+        return ResponseEntity.ok(promoterService.getPromoterById(promoterId));
+    }
+
 }
