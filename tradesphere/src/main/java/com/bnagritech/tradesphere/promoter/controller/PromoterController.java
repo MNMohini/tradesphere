@@ -41,10 +41,17 @@ public class PromoterController {
         return ResponseEntity.ok(promoterService.updatePromoter(promoterId,request));
     }
 
+    @GetMapping("/number/{phoneNumber}")
+    public ResponseEntity<PromoterResponse> getPromoterPhoneNumber(@PathVariable long phoneNumber){
+        return ResponseEntity.ok(promoterService.getPromoterPhoneNumber(phoneNumber));
+    }
+
+
     @DeleteMapping("/prmId/{promoterId}")
-    public ResponseEntity<String> deletePromoter(@PathVariable String promoterId){
+    public ResponseEntity<String> deletePromoter(@PathVariable String promoterId) {
         promoterService.deletePromoter(promoterId);
         return ResponseEntity.ok("Promoter details deleted successfully");
     }
+
 
 }
