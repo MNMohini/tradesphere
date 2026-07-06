@@ -56,5 +56,11 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "message",ex.getMessage()));
     }
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<?>handleResourceAlreadyExists(ResourceAlreadyExistsException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
 
 }
