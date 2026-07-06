@@ -23,7 +23,4 @@ public interface RetailerService{
     List<RetailerResponse> getRetailerByStatus(Boolean active);
     List<RetailerResponse> getAllRetailer();
 
-
-
-
 }

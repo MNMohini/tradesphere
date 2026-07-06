@@ -2,13 +2,23 @@ package com.bnagritech.tradesphere.retailer.service.impl;
 
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
+import com.bnagritech.tradesphere.retailer.repository.RetailerRepository;
 import com.bnagritech.tradesphere.retailer.service.RetailerService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
+@RequiredArgsConstructor
 public class RetailerServiceImpl implements RetailerService {
+
+    private final RetailerRepository retailerRepository;
+
     @Override
     public RetailerResponse createRetailer(RetailerRequest request) {
+        if(retailerRepository.existsByEmail(request.getEmail())){
+            throw new RuntimeException("Resource already exists");
+        }
         return null;
     }
 
