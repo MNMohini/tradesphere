@@ -38,5 +38,6 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
 
     List<Retailer> findByShopNameContainingIgnoreCase(String shopName);
     List<Retailer> findByOwnerNameContainingIgnoreCase(String shopName);
+    List<Retailer> findRetailerByEmployeeId(String employeeId);
 
 }

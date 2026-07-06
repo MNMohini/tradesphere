@@ -21,6 +21,7 @@ public class Retailer {
     private String id;
     private String retailerId;
     private String  retailerCode;
+    private String employeeId;
     private String shopName;
     private String ownerName;
     private long phoneNumber;
