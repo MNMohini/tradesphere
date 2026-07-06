@@ -5,5 +5,6 @@ public enum RetailerType {
     SUPER_MARKET,
     WHOLESALER,
     DISTRIBUTOR_RETAILER,
+    //
     CSD
 }

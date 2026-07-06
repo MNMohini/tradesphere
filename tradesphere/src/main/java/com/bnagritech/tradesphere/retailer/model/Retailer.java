@@ -27,6 +27,8 @@ public class Retailer {
     private String alternateContactNumber;
     private String email;
     private String address;
+    private String city;
+    private String state;
     private String territoryId;
     private String beatId;
     private String promoterId;
