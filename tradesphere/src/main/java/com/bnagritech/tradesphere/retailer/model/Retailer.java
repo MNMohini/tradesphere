@@ -41,7 +41,6 @@ public class Retailer {
     private Double creditDays;
     private Double creditLimits;
     private RetailerStatus retailerStatus;
-    private boolean status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;

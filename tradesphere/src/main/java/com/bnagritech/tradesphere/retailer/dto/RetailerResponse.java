@@ -26,13 +26,13 @@ public class RetailerResponse {
     private String beatId;
     private String promoterId;
     private RetailerType retailerType;
+    private RetailerStatus retailerStatus;
     private String gstNumber;
     private String panNumber;
     private Double latitude;
     private Double longitude;
     private Double creditDays;
     private Double creditLimits;
-    private boolean status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;
