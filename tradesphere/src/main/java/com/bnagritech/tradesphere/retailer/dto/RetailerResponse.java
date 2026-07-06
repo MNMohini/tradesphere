@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 public class RetailerResponse {
     private String id;
     private String retailerId;
-    private String  retailerCode;
     private String shopName;
     private String ownerName;
     private long phoneNumber;
@@ -33,7 +32,6 @@ public class RetailerResponse {
     private Double longitude;
     private Double creditDays;
     private Double creditLimits;
-    private RetailerStatus retailerStatus;
     private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

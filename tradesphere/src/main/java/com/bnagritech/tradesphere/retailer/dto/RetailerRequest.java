@@ -21,6 +21,8 @@ public class RetailerRequest {
     private String promoterId;
     private RetailerType retailerType;
     private String gstNumber;
+    private String City;
+    private String State;
     private String panNumber;
     private Double latitude;
     private Double longitude;
