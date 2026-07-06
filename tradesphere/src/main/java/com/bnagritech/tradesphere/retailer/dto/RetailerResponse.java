@@ -32,7 +32,7 @@ public class RetailerResponse {
     private Double longitude;
     private Double creditDays;
     private Double creditLimits;
-    private boolean active;
+    private boolean status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;

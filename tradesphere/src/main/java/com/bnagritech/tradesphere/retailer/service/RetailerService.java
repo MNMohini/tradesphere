@@ -17,6 +17,7 @@ public interface RetailerService{
     void deleteRetailer (String retailerId );
     List<RetailerResponse> getRetailerByTerritory(String territoryId);
     List<RetailerResponse> getRetailerByShopName(String shopName);
+    List<RetailerResponse> getRetailerByOwnerName(String ownerName);
     List<RetailerResponse> getRetailerByEmployeeId(String employeeId);
     List<RetailerResponse> getRetailerByCity(String city);
     List<RetailerResponse> getRetailerByState(String state);

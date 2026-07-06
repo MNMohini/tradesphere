@@ -13,6 +13,7 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
     Optional<Retailer> findByRetailerId(String retailerId);
     Optional<Retailer> findByPhoneNumber(long phoneNumber);
     Optional<Retailer> findByEmail(String email);
+    Optional<Retailer> findByShopName(String shopName);
 
     //Duplicate checks
     boolean existsByRetailerId(String retailerId);
@@ -32,7 +33,7 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
     //territory management
 
     List<Retailer>findByTerritoryId(String territoryId);
-    List<Retailer>findRetailerByActive(boolean active);
+    List<Retailer>findRetailerByStatus(boolean status);
 
     //Search
 
