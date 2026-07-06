@@ -1,6 +1,8 @@
 package com.bnagritech.tradesphere.retailer.service.impl;
 
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
+import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
+import com.bnagritech.tradesphere.promoter.model.Promoter;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
 import com.bnagritech.tradesphere.retailer.model.Retailer;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +60,7 @@ public class RetailerServiceImpl implements RetailerService {
                     .updatedAt(request.getUpdatedAt())
                     .createdBy(request.getCreatedBy())
                     .updatedBy(request.getUpdatedBy())
-                    .active(request.isActive())
+                    .status(request.isActive())
                     .build();
         Retailer savedRetailer = retailerRepository.save(retailer);
         return mapToResponse(savedRetailer);
@@ -65,22 +68,46 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public RetailerResponse getRetailerById(String retailerId) {
-        return null;
+        Retailer retailer = retailerRepository.findByRetailerId(retailerId)
+                .orElseThrow(
+                        ()->
+                                new ResourceNotFoundException(
+                                        "Retailer not found with " +retailerId +" id"));
+
+        return mapToResponse(retailer);
     }
 
     @Override
     public RetailerResponse updateRetailer(String retailerId, RetailerRequest request) {
+        Retailer retailer = retailerRepository.findByRetailerId(retailerId)
+                .orElseThrow(
+                        ()->
+                                new ResourceNotFoundException(
+                                        "Retailer not found with " +retailerId +" id"));
         return null;
     }
 
     @Override
     public RetailerResponse getRetailerByPhoneNumber(long phoneNumber) {
-        return null;
+        Retailer retailer = retailerRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(
+                        ()->
+                                 new ResourceNotFoundException(
+                                         "Retailer not found with " +phoneNumber
+                                 )
+                );
+        return mapToResponse(retailer);
     }
 
     @Override
     public RetailerResponse getRetailerByEmail(String email) {
-        return null;
+        Retailer retailer = retailerRepository.findByEmail(email)
+                .orElseThrow(
+                        ()->
+                                new ResourceNotFoundException(
+                                        "Retailer not found with " +email ));
+
+        return mapToResponse(retailer);
     }
 
     @Override
@@ -100,32 +127,59 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public List<RetailerResponse> getRetailerByTerritory(String territoryId) {
-        return List.of();
+        List<Retailer> retailerList = retailerRepository.findByTerritoryId(territoryId);
+        return retailerList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
     public List<RetailerResponse> getRetailerByShopName(String shopName) {
-        return List.of();
+        List<Retailer> retailerList = retailerRepository.findByShopNameContainingIgnoreCase(shopName);
+        return retailerList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
+    public List<RetailerResponse> getRetailerByOwnerName(String ownerName) {
+        List<Retailer> retailerList = retailerRepository.findByOwnerNameContainingIgnoreCase(ownerName);
+        return  retailerList.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+
+    @Override
     public List<RetailerResponse> getRetailerByEmployeeId(String employeeId) {
-        return List.of();
+        List<Retailer> retailerList = retailerRepository.findRetailerByEmployeeId(employeeId);
+        return retailerList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
     public List<RetailerResponse> getRetailerByCity(String city) {
-        return List.of();
+        List<Retailer> retailerList = retailerRepository.findByCity(city);
+        return retailerList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
     public List<RetailerResponse> getRetailerByState(String state) {
-        return List.of();
+       List<Retailer> retailerList = retailerRepository.findByState(state);
+        return retailerList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
-    public List<RetailerResponse> getRetailerByStatus(Boolean active) {
-        return List.of();
+    public List<RetailerResponse> getRetailerByStatus(Boolean status) {
+        List<Retailer> retailerList = retailerRepository.findRetailerByStatus(status);
+        return retailerList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -154,7 +208,7 @@ public class RetailerServiceImpl implements RetailerService {
         retailerResponse.setCreditLimits(retailer.getCreditLimits());
         retailerResponse.setCreatedAt(retailer.getCreatedAt());
         retailerResponse.setUpdatedAt(retailer.getUpdatedAt());
-        retailerResponse.setActive(Boolean.parseBoolean(retailer.getAddress()));
+        retailerResponse.setStatus(Boolean.parseBoolean(retailer.getAddress()));
         retailerResponse.setCreatedBy(retailer.getCreatedBy());
         retailerResponse.setUpdatedBy(retailer.getUpdatedBy());
 
