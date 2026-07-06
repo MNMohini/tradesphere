@@ -15,7 +15,7 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
     Optional<Retailer> findByEmail(String email);
 
     //Duplicate checks
-
+    boolean existsByRetailerId(String retailerId);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(long phoneNumber);
     boolean existsByShopNameAndCityAndState(
