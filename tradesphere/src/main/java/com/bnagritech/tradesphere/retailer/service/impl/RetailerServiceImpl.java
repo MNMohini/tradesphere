@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RetailerServiceImpl implements RetailerService {
@@ -33,10 +34,33 @@ public class RetailerServiceImpl implements RetailerService {
                 request.getState())){
             throw new ResourceAlreadyExistsException("Resource already exists");
         }
-
-
-
-        return null;
+            Retailer retailer = Retailer.builder()
+                    .retailerId(request.getRetailerId())
+                    .shopName(request.getShopName())
+                    .ownerName(request.getOwnerName())
+                    .phoneNumber(request.getPhoneNumber())
+                    .alternateContactNumber(request.getAlternateContactNumber())
+                    .email(request.getEmail())
+                    .address(request.getAddress())
+                    .territoryId(request.getTerritoryId())
+                    .beatId(request.getBeatId())
+                    .promoterId(request.getPromoterId())
+                    .retailerType(request.getRetailerType())
+                    .retailerStatus(request.getRetailerStatus())
+                    .gstNumber(request.getGstNumber())
+                    .panNumber(request.getPanNumber())
+                    .longitude(request.getLongitude())
+                    .latitude(request.getLatitude())
+                    .creditDays(request.getCreditDays())
+                    .creditLimits(request.getCreditLimits())
+                    .createdAt(request.getCreatedAt())
+                    .updatedAt(request.getUpdatedAt())
+                    .createdBy(request.getCreatedBy())
+                    .updatedBy(request.getUpdatedBy())
+                    .active(request.isActive())
+                    .build();
+        Retailer savedRetailer = retailerRepository.save(retailer);
+        return mapToResponse(savedRetailer);
     }
 
     @Override
