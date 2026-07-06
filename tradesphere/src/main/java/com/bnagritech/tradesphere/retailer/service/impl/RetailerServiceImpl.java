@@ -3,7 +3,6 @@ package com.bnagritech.tradesphere.retailer.service.impl;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.promoter.model.Promoter;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
 import com.bnagritech.tradesphere.retailer.model.Retailer;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +83,33 @@ public class RetailerServiceImpl implements RetailerService {
                         ()->
                                 new ResourceNotFoundException(
                                         "Retailer not found with " +retailerId +" id"));
-        return null;
+        retailer.setRetailerId(request.getRetailerId());
+        retailer.setRetailerStatus(request.getRetailerStatus());
+        retailer.setShopName(request.getShopName());
+        retailer.setOwnerName(request.getOwnerName());
+        retailer.setPhoneNumber(request.getPhoneNumber());
+        retailer.setAlternateContactNumber(request.getAlternateContactNumber());
+        retailer.setEmail(request.getEmail());
+        retailer.setCity(request.getCity());
+        retailer.setState(request.getState());
+        retailer.setAddress(request.getAddress());
+        retailer.setTerritoryId(request.getTerritoryId());
+        retailer.setBeatId(request.getBeatId());
+        retailer.setPromoterId(request.getPromoterId());
+        retailer.setRetailerType(request.getRetailerType());
+        retailer.setRetailerStatus(request.getRetailerStatus());
+        retailer.setGstNumber(request.getGstNumber());
+        retailer.setPanNumber(request.getPanNumber());
+        retailer.setLongitude(request.getLongitude());
+        retailer.setLatitude(request.getLatitude());
+        retailer.setCreditDays(request.getCreditDays());
+        retailer.setCreditLimits(request.getCreditLimits());
+        retailer.setUpdatedAt(request.getUpdatedAt());
+        retailer.setCreatedBy(request.getCreatedBy());
+        retailer.setUpdatedBy(request.getUpdatedBy());
+
+            Retailer updatedRetailer = retailerRepository.save(retailer);
+            return mapToResponse(updatedRetailer);
     }
 
     @Override
@@ -130,7 +154,11 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public void deleteRetailer(String retailerId) {
-
+        Retailer retailer = retailerRepository.findByRetailerId(retailerId)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException(
+                                "Retailer not found with " +retailerId + " id"));
+        retailerRepository.delete(retailer);
     }
 
     @Override
