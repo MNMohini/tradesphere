@@ -1,7 +1,9 @@
 package com.bnagritech.tradesphere.retailer.service.impl;
 
+import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
+import com.bnagritech.tradesphere.retailer.model.Retailer;
 import com.bnagritech.tradesphere.retailer.repository.RetailerRepository;
 import com.bnagritech.tradesphere.retailer.service.RetailerService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,23 @@ public class RetailerServiceImpl implements RetailerService {
     @Override
     public RetailerResponse createRetailer(RetailerRequest request) {
         if(retailerRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("Resource already exists");
+            throw new ResourceAlreadyExistsException("Resource already exists");
         }
+        if(retailerRepository.existsByPhoneNumber(request.getPhoneNumber())){
+            throw new ResourceAlreadyExistsException("Resource already exists");
+        }
+        if (retailerRepository.existsByRetailerId(request.getRetailerId())){
+            throw new ResourceAlreadyExistsException("Resource already exists");
+        }
+        if (retailerRepository.existsByShopNameAndCityAndState(
+                request.getShopName(),
+                request.getCity(),
+                request.getState())){
+            throw new ResourceAlreadyExistsException("Resource already exists");
+        }
+
+
+
         return null;
     }
 
@@ -90,5 +107,33 @@ public class RetailerServiceImpl implements RetailerService {
     @Override
     public List<RetailerResponse> getAllRetailer() {
         return List.of();
+    }
+
+    private RetailerResponse mapToResponse(Retailer retailer){
+        RetailerResponse retailerResponse = new RetailerResponse();
+        retailerResponse.setRetailerId(retailer.getRetailerId());
+        retailerResponse.setShopName(retailer.getShopName());
+        retailerResponse.setOwnerName(retailer.getOwnerName());
+        retailerResponse.setPhoneNumber(retailer.getPhoneNumber());
+        retailerResponse.setAlternateContactNumber(retailer.getAlternateContactNumber());
+        retailerResponse.setEmail(retailer.getEmail());
+        retailerResponse.setAddress(retailer.getAddress());
+        retailerResponse.setTerritoryId(retailer.getTerritoryId());
+        retailerResponse.setBeatId(retailer.getBeatId());
+        retailerResponse.setPromoterId(retailer.getPromoterId());
+        retailerResponse.setRetailerType(retailer.getRetailerType());
+        retailerResponse.setGstNumber(retailer.getGstNumber());
+        retailerResponse.setPanNumber(retailer.getPanNumber());
+        retailerResponse.setLatitude(retailer.getLatitude());
+        retailerResponse.setLongitude(retailer.getLongitude());
+        retailerResponse.setCreditDays(retailer.getCreditDays());
+        retailerResponse.setCreditLimits(retailer.getCreditLimits());
+        retailerResponse.setCreatedAt(retailer.getCreatedAt());
+        retailerResponse.setUpdatedAt(retailer.getUpdatedAt());
+        retailerResponse.setActive(Boolean.parseBoolean(retailer.getAddress()));
+        retailerResponse.setCreatedBy(retailer.getCreatedBy());
+        retailerResponse.setUpdatedBy(retailer.getUpdatedBy());
+
+        return retailerResponse;
     }
 }
