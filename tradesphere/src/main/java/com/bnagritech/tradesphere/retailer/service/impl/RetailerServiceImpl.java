@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.retailer.service.impl;
 
+import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.promoter.model.Promoter;
@@ -60,7 +61,7 @@ public class RetailerServiceImpl implements RetailerService {
                     .updatedAt(request.getUpdatedAt())
                     .createdBy(request.getCreatedBy())
                     .updatedBy(request.getUpdatedBy())
-                    .status(request.isActive())
+                    .retailerStatus(request.getRetailerStatus())
                     .build();
         Retailer savedRetailer = retailerRepository.save(retailer);
         return mapToResponse(savedRetailer);
@@ -112,7 +113,14 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public RetailerResponse updateRetailerStatus(String retailerId, RetailerRequest request) {
-        return null;
+        Retailer retailer = retailerRepository.findByRetailerId(retailerId)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException(
+                                "Retailer not found with " +retailerId + " id"));
+         retailer.setRetailerStatus(request.getRetailerStatus());
+         Retailer updatedRetailer= retailerRepository.save(retailer);
+
+        return mapToResponse(updatedRetailer);
     }
 
     @Override
@@ -175,8 +183,8 @@ public class RetailerServiceImpl implements RetailerService {
     }
 
     @Override
-    public List<RetailerResponse> getRetailerByStatus(Boolean status) {
-        List<Retailer> retailerList = retailerRepository.findRetailerByStatus(status);
+    public List<RetailerResponse> getRetailerByRetailerStatus(RetailerStatus status) {
+        List<Retailer> retailerList = retailerRepository.findRetailerByRetailerStatus(status);
         return retailerList.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -208,7 +216,7 @@ public class RetailerServiceImpl implements RetailerService {
         retailerResponse.setCreditLimits(retailer.getCreditLimits());
         retailerResponse.setCreatedAt(retailer.getCreatedAt());
         retailerResponse.setUpdatedAt(retailer.getUpdatedAt());
-        retailerResponse.setStatus(Boolean.parseBoolean(retailer.getAddress()));
+        retailerResponse.setRetailerStatus(retailer.getRetailerStatus());
         retailerResponse.setCreatedBy(retailer.getCreatedBy());
         retailerResponse.setUpdatedBy(retailer.getUpdatedBy());
 
