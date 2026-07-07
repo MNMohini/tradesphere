@@ -14,8 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RetailerResponse {
-    private String id;
+
     private String retailerId;
+    private String employeeId;
     private String shopName;
     private String ownerName;
     private long phoneNumber;
@@ -26,13 +27,15 @@ public class RetailerResponse {
     private String beatId;
     private String promoterId;
     private RetailerType retailerType;
-    private RetailerStatus retailerStatus;
     private String gstNumber;
+    private String City;
+    private String State;
     private String panNumber;
     private Double latitude;
     private Double longitude;
     private Double creditDays;
     private Double creditLimits;
+    private RetailerStatus retailerStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;

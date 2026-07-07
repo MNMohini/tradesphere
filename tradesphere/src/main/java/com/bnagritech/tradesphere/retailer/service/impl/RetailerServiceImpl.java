@@ -43,6 +43,8 @@ public class RetailerServiceImpl implements RetailerService {
                     .phoneNumber(request.getPhoneNumber())
                     .alternateContactNumber(request.getAlternateContactNumber())
                     .email(request.getEmail())
+                    .city(request.getCity())
+                    .state(request.getState())
                     .address(request.getAddress())
                     .territoryId(request.getTerritoryId())
                     .beatId(request.getBeatId())
@@ -149,7 +151,13 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public RetailerResponse assignRetailer(String retailerId, RetailerRequest request) {
-        return null;
+        Retailer retailer = retailerRepository.findByRetailerId(retailerId)
+                .orElseThrow(
+                        ()->
+                                new ResourceNotFoundException("Retailer not found"));
+        retailer.setEmployeeId(request.getEmployeeId());
+
+        return mapToResponse(retailerRepository.save(retailer));
     }
 
     @Override
@@ -220,12 +228,18 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public List<RetailerResponse> getAllRetailer() {
-        return List.of();
+
+        return retailerRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     private RetailerResponse mapToResponse(Retailer retailer){
         RetailerResponse retailerResponse = new RetailerResponse();
         retailerResponse.setRetailerId(retailer.getRetailerId());
+        retailerResponse.setCity(retailer.getCity());
+        retailerResponse.setState(retailer.getState());
         retailerResponse.setShopName(retailer.getShopName());
         retailerResponse.setOwnerName(retailer.getOwnerName());
         retailerResponse.setPhoneNumber(retailer.getPhoneNumber());

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class RetailerRequest {
 
     private String retailerId;
-    private String  retailerCode;
+    private String employeeId;
     private String shopName;
     private String ownerName;
     private long phoneNumber;

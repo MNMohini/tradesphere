@@ -31,5 +31,20 @@ public class RetailerController {
     public ResponseEntity<List<RetailerResponse>>getAllRetailer() {
         return ResponseEntity.ok(retailerService.getAllRetailer());
     }
-
+    //get retailer by id
+    @GetMapping("/rtId/{retailerId}")
+    public ResponseEntity<RetailerResponse> getRetailerById(@PathVariable String retailerId){
+        return ResponseEntity.ok(retailerService.getRetailerById(retailerId));
+    }
+    //get retailer by phoneNumber
+    @GetMapping("/phn/{phoneNumber}")
+    public ResponseEntity<RetailerResponse> getRetailerByPhoneNumber(@PathVariable long phoneNumber){
+        return ResponseEntity.ok(retailerService.getRetailerByPhoneNumber(phoneNumber));
+    }
+    //get retailers by city
+    @GetMapping("/city/{city}")
+    public ResponseEntity<List<RetailerResponse>> getRetailerByCity(@PathVariable String city){
+        return ResponseEntity.ok(retailerService.getRetailerByCity(city));
+    }
+    //
 }

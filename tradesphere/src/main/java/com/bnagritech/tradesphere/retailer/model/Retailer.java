@@ -20,7 +20,6 @@ public class Retailer {
     @Id
     private String id;
     private String retailerId;
-    private String  retailerCode;
     private String employeeId;
     private String shopName;
     private String ownerName;

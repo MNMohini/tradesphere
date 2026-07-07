@@ -2,7 +2,6 @@ package com.bnagritech.tradesphere.promoter.controller;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
 import com.bnagritech.tradesphere.promoter.service.PromoterService;
-import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
