@@ -100,6 +100,7 @@ public class RetailerServiceImpl implements RetailerService {
         retailer.setPromoterId(request.getPromoterId());
         retailer.setRetailerType(request.getRetailerType());
         retailer.setRetailerStatus(request.getRetailerStatus());
+        retailer.setEmployeeId(request.getEmployeeId());
         retailer.setGstNumber(request.getGstNumber());
         retailer.setPanNumber(request.getPanNumber());
         retailer.setLongitude(request.getLongitude());
@@ -243,6 +244,7 @@ public class RetailerServiceImpl implements RetailerService {
         retailerResponse.setShopName(retailer.getShopName());
         retailerResponse.setOwnerName(retailer.getOwnerName());
         retailerResponse.setPhoneNumber(retailer.getPhoneNumber());
+        retailerResponse.setEmployeeId(retailer.getEmployeeId());
         retailerResponse.setAlternateContactNumber(retailer.getAlternateContactNumber());
         retailerResponse.setEmail(retailer.getEmail());
         retailerResponse.setAddress(retailer.getAddress());
