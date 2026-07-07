@@ -2,9 +2,7 @@ package com.bnagritech.tradesphere.auth.model;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -17,45 +15,41 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     private String id;
-
     //Login
     private String userName;
     private String password;
-
     //contact details
     private String email;
     private String phoneNumber;
-
     //Personal
     private String firstName;
     private String lastName;
-    private String profileImage;
-
+    private String profileImageUrl;
     //mapping
     private String employeeId;
-    private String promoterId;
-    private String territoryId;
-
     //Role
     private UserRole role;
-
     //account status
-    private Boolean active;
+    private Boolean active = true;
     @Builder.Default
     private Boolean verified= false;
     @Builder.Default
     private Boolean accountLocked= false;
     @Builder.Default
     private Integer failedLoginAttempts = 0;
-
     //audit
+    private  LocalDateTime lastLoginAt;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updateAt;
+    @CreatedBy
     private String createdBy;
+    @LastModifiedBy
     private String updatedBy;
 
-
+    //passwordReset
+    private  String resetPasswordToken;
+    private LocalDateTime resetPasswordTokenExpiry;
 
 }
