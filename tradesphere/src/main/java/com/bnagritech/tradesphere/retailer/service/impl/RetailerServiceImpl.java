@@ -143,7 +143,7 @@ public class RetailerServiceImpl implements RetailerService {
         Retailer retailer = retailerRepository.findByRetailerId(retailerId)
                 .orElseThrow(
                         ()-> new ResourceNotFoundException(
-                                "Retailer not found with " +retailerId + " id"));
+                                "Retailer not found with " +retailerId ));
          retailer.setRetailerStatus(request.getRetailerStatus());
          Retailer updatedRetailer= retailerRepository.save(retailer);
 
