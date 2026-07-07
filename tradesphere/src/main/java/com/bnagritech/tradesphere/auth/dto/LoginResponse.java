@@ -8,8 +8,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponse {
-    private String accessToken;
-    private String userName;
-    private UserRole role;
 
+    private String token;
+    private String userName;
+    private String userId;
+    private String fullName;
+    private String email;
+    private String profileImageUrl;
+    private UserRole role;
 }
