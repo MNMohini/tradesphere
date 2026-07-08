@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ForgotPasswordResponse {
     private String message;
+    private Boolean success;
     private String email;
     private LocalDateTime tokenExpiryTime;
 }

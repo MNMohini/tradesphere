@@ -13,12 +13,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterResponse {
-    private String id;
+    private String userId;
     //Login
     private String userName;
     //contact details
     private String email;
     private String phoneNumber;
+    private String message;
     //Personal
     private String firstName;
     private String lastName;

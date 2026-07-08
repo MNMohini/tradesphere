@@ -62,5 +62,11 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "message",ex.getMessage()));
     }
+    @ExceptionHandler(UserInactiveException.class)
+    public ResponseEntity<?>handleUserInactive(UserInactiveException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
 
 }

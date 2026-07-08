@@ -2,6 +2,8 @@ package com.bnagritech.tradesphere.auth.service;
 
 import com.bnagritech.tradesphere.auth.dto.*;
 
+import java.util.List;
+
 
 public interface AuthService {
 
@@ -21,6 +23,14 @@ public interface AuthService {
     ResetPasswordResponse resetPassword(
             ResetPasswordRequest request
     );
+    //change password
+    ChangePasswordResponse changePassword(
+            ChangePasswordRequest request
+    );
+    //Admin only(activate/deactivated user account)
+    UserResponse updateUserStatus(
+            String userId, UpdateUserStatusRequest request
+    );
     //logout user
     void logout(
             String token
@@ -30,12 +40,13 @@ public interface AuthService {
             String userId,
             Boolean active
     );
-    //lock / unlock account
-    RegisterResponse changeAccountLockStatus(
-            String userId,
-            Boolean locked
-    );
+    //admin
+    // get all system users
+    List<UserResponse> getAllUsers();
 
+    //admin
+    //get single User details
+    UserResponse getUserById(String userId);
 }
 
 

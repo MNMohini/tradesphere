@@ -17,4 +17,5 @@ public class LoginResponse {
     private String profileImageUrl;
     private UserRole role;
     private boolean active;
+    private String message;
 }
