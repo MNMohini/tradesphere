@@ -1,12 +1,7 @@
 package com.bnagritech.tradesphere.auth.dto;
 
-import lombok.Builder;
-import lombok.Data;
-
-@Data
-public class ResetPasswordRequest {
-    private String token;
+public class ChangePasswordRequest {
+    private String oldPassword;
     private String newPassword;
     private String confirmPassword;
-
 }

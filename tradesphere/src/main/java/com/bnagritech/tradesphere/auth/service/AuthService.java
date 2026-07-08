@@ -1,15 +1,42 @@
 package com.bnagritech.tradesphere.auth.service;
 
-import com.bnagritech.tradesphere.auth.dto.LoginRequest;
-import com.bnagritech.tradesphere.auth.dto.LoginResponse;
-import com.bnagritech.tradesphere.auth.dto.RegisterRequest;
-import com.bnagritech.tradesphere.auth.dto.RegisterResponse;
-
-
+import com.bnagritech.tradesphere.auth.dto.*;
 
 
 public interface AuthService {
 
-    RegisterResponse register(RegisterRequest request);
-    LoginResponse login(LoginRequest request);
+    //create user account
+    RegisterResponse register(
+            RegisterRequest request
+    );
+    //login + generate JWT token
+    LoginResponse login(
+            LoginRequest request
+    );
+    //forgot password
+    ForgotPasswordResponse forgotPassword(
+            ForgotPasswordRequest request
+    );
+    //reset password
+    ResetPasswordResponse resetPassword(
+            ResetPasswordRequest request
+    );
+    //logout user
+    void logout(
+            String token
+    );
+    //enable / disable user
+    RegisterResponse changeUserStatus(
+            String userId,
+            Boolean active
+    );
+    //lock / unlock account
+    RegisterResponse changeAccountLockStatus(
+            String userId,
+            Boolean locked
+    );
+
 }
+
+
+

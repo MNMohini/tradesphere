@@ -1,9 +1,6 @@
 package com.bnagritech.tradesphere.auth.service.impl;
 
-import com.bnagritech.tradesphere.auth.dto.LoginRequest;
-import com.bnagritech.tradesphere.auth.dto.LoginResponse;
-import com.bnagritech.tradesphere.auth.dto.RegisterRequest;
-import com.bnagritech.tradesphere.auth.dto.RegisterResponse;
+import com.bnagritech.tradesphere.auth.dto.*;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.auth.service.AuthService;
@@ -53,33 +50,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
     }
-/*
-    @Override
-    public RegisterResponse register(
-            RegisterRequest request) {
-
-        User user = User.builder()
-                .userName(request.getUserName())
-                .password(
-                        passwordEncoder.encode(
-                                request.getPassword()))
-                .employeeId(
-                        request.getEmployeeId())
-                .role(request.getRole())
-                .active(true)
-                .createdAt(
-                        LocalDateTime.now())
-                .build();
-
-      User savedUser =  userRepository.save(user);
-
-        return RegisterResponse.builder()
-                .userName(savedUser.getUserName())
-                .employeeId(savedUser.getEmployeeId())
-                .role(savedUser.getRole())
-                .build();
-    }*/
-
     @Override
     public LoginResponse login(LoginRequest request) {
         authenticationManager.authenticate(
@@ -91,9 +61,34 @@ public class AuthServiceImpl implements AuthService {
 
         String accessToken = jwtService.generateToken(user.getUserName());
         return LoginResponse.builder()
-                .accessToken(accessToken)
+                .token(accessToken)
                 .userName(user.getUserName())
                 .role(user.getRole())
                 .build();
+    }
+
+    @Override
+    public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
+        return null;
+    }
+
+    @Override
+    public ResetPasswordResponse resetPassword(ResetPasswordRequest request) {
+        return null;
+    }
+
+    @Override
+    public void logout(String token) {
+
+    }
+
+    @Override
+    public RegisterResponse changeUserStatus(String userId, Boolean active) {
+        return null;
+    }
+
+    @Override
+    public RegisterResponse changeAccountLockStatus(String userId, Boolean locked) {
+        return null;
     }
 }

@@ -9,5 +9,6 @@ import java.time.LocalDateTime;
 @Builder
 public class ResetPasswordResponse {
     private String message;
+    private boolean success;
     private LocalDateTime updatedAt;
 }
