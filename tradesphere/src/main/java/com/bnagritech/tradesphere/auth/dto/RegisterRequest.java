@@ -2,9 +2,13 @@ package com.bnagritech.tradesphere.auth.dto;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RegisterRequest {
     //login
     @NotBlank(message = "Username is required")

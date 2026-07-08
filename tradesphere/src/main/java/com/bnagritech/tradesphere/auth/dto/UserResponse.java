@@ -1,21 +1,21 @@
 package com.bnagritech.tradesphere.auth.dto;
 
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChangePasswordResponse {
+public class UserResponse {
     private String username;
     private String userId;
-    private String message;
-    private Boolean success;
-    private LocalDateTime changeAt;
-
+    private String email;
+    private String employeeId;
+    private long phoneNumber;
+    private UserRole role;
+    private boolean active;
 }
