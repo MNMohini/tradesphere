@@ -50,7 +50,12 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .employeeId(request.getEmployeeId())
+                .phoneNumber(request.getPhoneNumber())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .lastLoginAt(LocalDateTime.now())
                 .active(true)
+                .email(request.getEmail())
                 .createdAt(LocalDateTime.now())
                 .updateAt(LocalDateTime.now())
                 .build();
@@ -59,8 +64,6 @@ public class AuthServiceImpl implements AuthService {
         return RegisterResponse.builder()
                 .userId(savedUser.getId())
                 .userName(savedUser.getUserName())
-                .employeeId(savedUser.getEmployeeId())
-                .role(savedUser.getRole())
                 .message("User registered successfully")
                 .build();
 
@@ -104,6 +107,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         return ForgotPasswordResponse.builder()
                 .success(true)
+                .token(token)
                 .message("Reset Password token generated Successfully")
                 .build();
     }
@@ -182,13 +186,10 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
     }
-
     @Override
     public void logout(String token) {
         SecurityContextHolder.clearContext();
-
     }
-
     @Override
     public RegisterResponse changeUserStatus(String userId, Boolean active) {
 
@@ -204,20 +205,17 @@ public class AuthServiceImpl implements AuthService {
                 .message(active ? "User activated successfully":"User deactivated successfully")
                 .build();
     }
-
     @Override
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(this::mapToUserResponse)
                 .toList();
-
     }
     @Override
     public UserResponse getUserById(String userId) {
         User user = userRepository
                 .findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
         return mapToUserResponse(user);
 
     }
