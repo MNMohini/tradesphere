@@ -54,7 +54,6 @@ public class Beat {
     private ApprovalStatus approvalStatus;
     // Status
     private BeatStatus status;
-
     // Audit
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
