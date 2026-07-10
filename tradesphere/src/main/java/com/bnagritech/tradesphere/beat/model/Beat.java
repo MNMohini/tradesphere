@@ -1,7 +1,6 @@
 package com.bnagritech.tradesphere.beat.model;
 
-import com.bnagritech.tradesphere.common.enums.BeatStatus;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
+import com.bnagritech.tradesphere.common.enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,44 +18,48 @@ import java.util.List;
 @NoArgsConstructor
 @Document(collection = "beats")
 public class Beat {
+
     @Id
-    private String id;
     private String beatId;
-    private String beatCode;
+    // Basic Details
     private String beatName;
+    private String beatCode;
     private String description;
-
-    private String territoryId;
-
-    private String promoterId;
-
     private RetailerType beatType;
-    private RetailerType beatOwnerType;
-    private BeatStatus beatStatus;
-    private String managerId;
-    private RetailerType retailerType;
-
-    private List<String> retailerId;
-    private Integer retailerCount;
-
+    // Territory
+    private String territoryId;
+    // Employee Assignment
     private String assignedEmployeeId;
-    private String employeeName;
-    private String employeePhone;
-    private String employeeEmail;
-    private List<String> visitDay;
-
-    private BeatStatus active;
-    private Boolean isDeleted;
-    private LocalDateTime updatedAt;
-    private LocalDateTime createdAt;
-    private String createdBy;
-    private String updatedBy;
-
-    private String country;
+    private RetailerType beatOwnerType;
+    private String managerId;
+    // Location
     private String state;
     private String city;
-    private String pinCode;
     private String area;
+    private String pinCode;
     private Double latitude;
     private Double longitude;
+    // Retailers in this Beat
+    private List<BeatRetailer> retailers;
+    private Integer totalRetailers;
+    // Schedule
+    private List<BeatDay> beatDays;
+    private BeatFrequency frequency;
+    private LocalDate effectiveFrom;
+    private LocalDate effectiveTo;
+    // Route Information
+    private Double estimatedDistanceKm;
+    private Integer estimatedTravelTimeMinutes;
+    // Approval Flow
+    private ApprovalStatus approvalStatus;
+    private String approvedBy;
+    private LocalDateTime approvedAt;
+    // Status
+    private BeatStatus status;
+    private Boolean isDeleted;
+    // Audit
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String createdBy;
+    private String updatedBy;
 }
