@@ -21,7 +21,7 @@ public interface BeatRepository extends MongoRepository<Beat, String> {
     Optional<Beat> findByBeatId(String beatId);
     // TERRITORY BASED OPERATIONS
     List<Beat> findByTerritoryId(String territoryId);
-    // EMPLOYEE BEAT / PJP
+    // EMPLOYEE BEAT
     List<Beat> findByAssignedEmployeeId(String employeeId);
     // Employee day wise route
     List<Beat> findByAssignedEmployeeIdAndBeatDaysContaining(String employeeId, BeatDay beatDay);
