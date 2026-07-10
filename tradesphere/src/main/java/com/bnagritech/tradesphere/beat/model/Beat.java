@@ -52,14 +52,11 @@ public class Beat {
     private Integer estimatedTravelTimeMinutes;
     // Approval Flow
     private ApprovalStatus approvalStatus;
-    private String approvedBy;
-    private LocalDateTime approvedAt;
     // Status
     private BeatStatus status;
-    private Boolean isDeleted;
+
     // Audit
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String createdBy;
-    private String updatedBy;
+
 }
