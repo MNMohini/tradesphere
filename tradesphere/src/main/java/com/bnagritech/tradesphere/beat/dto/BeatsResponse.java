@@ -13,6 +13,7 @@ import java.util.List;
 public class BeatsResponse {
 
     // Basic Details
+    private String beatId;
     private String beatName;
     private String beatCode;
     private String description;

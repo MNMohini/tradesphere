@@ -1,10 +1,7 @@
 package com.bnagritech.tradesphere.beat.dto;
 
 import com.bnagritech.tradesphere.beat.model.BeatRetailer;
-import com.bnagritech.tradesphere.common.enums.BeatDay;
-import com.bnagritech.tradesphere.common.enums.BeatFrequency;
-import com.bnagritech.tradesphere.common.enums.BeatOwnerType;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
+import com.bnagritech.tradesphere.common.enums.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -40,4 +37,5 @@ public class BeatsRequest {
     // Route Information
     private Double estimatedDistanceKm;
     private Integer estimatedTravelTimeMinutes;
+    private ApprovalStatus approvalStatus;
 }
