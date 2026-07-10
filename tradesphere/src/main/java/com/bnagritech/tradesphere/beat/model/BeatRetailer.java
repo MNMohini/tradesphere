@@ -1,7 +1,16 @@
 package com.bnagritech.tradesphere.beat.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalTime;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class BeatRetailer {
     // Retailer Reference
     private String retailerId;
