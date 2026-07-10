@@ -29,12 +29,16 @@ public class Beat {
 
     private String promoterId;
 
-    private RetailerType BeatType;
+    private RetailerType beatType;
+    private RetailerType beatOwnerType;
+    private BeatStatus beatStatus;
+    private String managerId;
+    private RetailerType retailerType;
 
     private List<String> retailerId;
     private Integer retailerCount;
 
-    private String assignedEmployeeID;
+    private String assignedEmployeeId;
     private String employeeName;
     private String employeePhone;
     private String employeeEmail;
