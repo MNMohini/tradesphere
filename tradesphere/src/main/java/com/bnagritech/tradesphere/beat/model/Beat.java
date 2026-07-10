@@ -30,7 +30,7 @@ public class Beat {
     private String territoryId;
     // Employee Assignment
     private String assignedEmployeeId;
-    private RetailerType beatOwnerType;
+    private BeatOwnerType beatOwnerType;
     private String managerId;
     // Location
     private String state;
