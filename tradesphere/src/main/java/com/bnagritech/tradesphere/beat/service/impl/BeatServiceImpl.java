@@ -30,6 +30,9 @@ public class BeatServiceImpl implements BeatService {
                 request.getBeatName(), request.getTerritoryId(), request.getBeatCode())) {
             throw new ResourceAlreadyExistsException("Beat already exists");
         }
+        if (beatRepository.existsByBeatId(request.getBeatId())){
+            throw new ResourceAlreadyExistsException("Beat already exists");
+        }
         Beat beat = Beat.builder()
                 .beatName(request.getBeatName())
                 .beatCode(request.getBeatCode())
