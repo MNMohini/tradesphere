@@ -16,7 +16,7 @@ public interface BeatRepository extends MongoRepository<Beat, String> {
     // DUPLICATE VALIDATION
     boolean existsByBeatNameAndTerritoryIdAndBeatCode(String beatName, String territoryId, String beatCode);
     // Unique beat code validation
-    boolean existsByBeatCode(String beatCode);
+    boolean existsByBeatId(String beatId);
     // Get single active beat
     Optional<Beat> findByBeatId(String beatId);
     // TERRITORY BASED OPERATIONS
