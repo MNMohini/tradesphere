@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.auth.model;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.*;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -29,8 +30,7 @@ public class User {
     private String employeeId;
     //Role
     private UserRole role;
-    //account status
-    private Boolean active = true;
+    private UserStatus status;
     @Builder.Default
     private Boolean verified= false;
     @Builder.Default
@@ -51,5 +51,9 @@ public class User {
     //passwordReset
     private  String resetPasswordToken;
     private LocalDateTime resetPasswordTokenExpiry;
+
+    //refresh token
+    private String refreshToken;
+    private LocalDateTime refreshTokenExpiry;
 
 }
