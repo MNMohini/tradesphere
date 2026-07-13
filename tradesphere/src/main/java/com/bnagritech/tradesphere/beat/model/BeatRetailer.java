@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -12,6 +15,9 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BeatRetailer {
+    @Id
+    private String id;
+    private String beatId;
     // Retailer Reference
     private String retailerId;
     // Route sequence Example: 1 -> Sharma Store 2 -> Gupta Traders
@@ -24,5 +30,8 @@ public class BeatRetailer {
     private Integer expectedVisitDurationMinutes;
     // Active in this beat or removed
     private Boolean active;
+    private String remark;
+    private LocalDateTime assignedDate;
+    private String assignedBy;
 
 }
