@@ -4,6 +4,7 @@ import com.bnagritech.tradesphere.auth.dto.*;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.auth.service.AuthService;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.exception.UserAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.UserInactiveException;
@@ -45,6 +46,11 @@ public class AuthServiceImpl implements AuthService {
             throw new UserAlreadyExistsException(
                     "User already exists with this phone number");
         }
+        if (userRepository.existsByEmployeeId(request.getEmployeeId())) {
+            throw new UserAlreadyExistsException(
+                    "User already exists with this employee id");
+        }
+
         User user = User.builder()
                 .userName(request.getUserName())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -54,7 +60,8 @@ public class AuthServiceImpl implements AuthService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .lastLoginAt(LocalDateTime.now())
-                .active(true)
+                .status(UserStatus.ACTIVE)
+                .accountLocked(false)
                 .email(request.getEmail())
                 .createdAt(LocalDateTime.now())
                 .updateAt(LocalDateTime.now())
@@ -77,18 +84,22 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUserNameOrEmail(
                 request.getUserNameOrEmail(),
                         request.getUserNameOrEmail())
-                .orElseThrow(()-> new ResourceNotFoundException("Invalid Username or email"));
-        if(!user.getActive()){
-            throw new UserInactiveException("Your account is inactive.Contact to admin");
+                .orElseThrow(()-> new ResourceNotFoundException("Invalid Username/email or password"));
+        if(user.getStatus()!=UserStatus.ACTIVE){
+            throw new UserInactiveException("Your account isn't active.Contact to admin");
+        }
+        if(user.getAccountLocked()){
+            throw new UserInactiveException("Your account is locked.Contact to admin");
         }
 
         String token = jwtService.generateToken(String.valueOf(user));
+        String refreshToken = jwtService.generateRefreshToken(String.valueOf(user));
         return LoginResponse.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .message("Login successfully")
                 .token(token)
-                .active(user.getActive())
+                .status(UserStatus.ACTIVE)
                 .userName(user.getUserName())
                 .role(user.getRole())
                 .build();
@@ -107,7 +118,6 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         return ForgotPasswordResponse.builder()
                 .success(true)
-                .token(token)
                 .message("Reset Password token generated Successfully")
                 .build();
     }
@@ -133,6 +143,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public ChangePasswordResponse changePassword(String userId, ChangePasswordRequest request) {
+        return null;
+    }
+
+    @Override
     public ChangePasswordResponse changePassword(ChangePasswordRequest request) {
         //get logged-in username from jwt security context
         String userName = SecurityContextHolder
@@ -155,10 +170,7 @@ public class AuthServiceImpl implements AuthService {
                 request.getNewPassword()));
         userRepository.save(user);
         return ChangePasswordResponse.builder()
-                .userId(user.getId())
-                .username(user.getUserName())
                 .message("Password changed successfully")
-                .success(true)
                 .changeAt(LocalDateTime.now())
                 .build();
     }
@@ -170,7 +182,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(
                         () -> new RuntimeException("User not found"));
         // Update active status
-        user.setActive(request.isActive());
+        user.setStatus(request.getStatus());
         // Save changes
         User updatedUser =
                 userRepository.save(user);
@@ -182,7 +194,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(updatedUser.getEmail())
                 .phoneNumber(Long.parseLong(updatedUser.getPhoneNumber()))
                 .role(updatedUser.getRole())
-                .active(updatedUser.getActive())
+                .status(updatedUser.getStatus())
                 .build();
 
     }
@@ -190,12 +202,18 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String token) {
         SecurityContextHolder.clearContext();
     }
+
+    @Override
+    public UserResponse changeUserStatus(String userId, UserStatus status) {
+        return null;
+    }
+
     @Override
     public RegisterResponse changeUserStatus(String userId, Boolean active) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setActive(active);
+        user.setStatus(user.getStatus());
         User updatedUser = userRepository.save(user);
         return RegisterResponse.builder()
                 .userId(updatedUser.getId())
@@ -231,9 +249,15 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .phoneNumber(Long.parseLong(user.getPhoneNumber()))
                 .role(user.getRole())
-                .active(user.getActive())
+                .status(user.getStatus())
                 .build();
 
     }
+    private  User getUser(String userId){
+        return  userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    }
+
 
 }
