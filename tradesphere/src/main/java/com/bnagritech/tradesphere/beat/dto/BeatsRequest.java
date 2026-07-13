@@ -10,6 +10,8 @@ import java.util.List;
 public class BeatsRequest {
     // Basic Details
     private String beatName;
+    private String beatId;
+    private String managerId;
     private String beatCode;
     private String description;
     private RetailerType beatType;
