@@ -12,10 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangePasswordResponse {
-    private String username;
-    private String userId;
     private String message;
-    private Boolean success;
     private LocalDateTime changeAt;
 
 }

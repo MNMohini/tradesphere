@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.auth.dto;
 
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateUserStatusRequest {
-    private boolean active;
+    private UserStatus status;
 
 }

@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.auth.dto;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +29,7 @@ public class RegisterResponse {
     private String employeeId;
     //Role
     private UserRole role;
-    private Boolean active;
+    private UserStatus status;
     private Boolean verified;
     private LocalDateTime createdAt;
 }
