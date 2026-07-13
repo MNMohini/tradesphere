@@ -20,7 +20,6 @@ public class BeatsRequest {
     // Employee Assignment
     private String assignedEmployeeId;
     private BeatOwnerType beatOwnerType;
-    private String managerId;
     // Location
     private String state;
     private String city;
