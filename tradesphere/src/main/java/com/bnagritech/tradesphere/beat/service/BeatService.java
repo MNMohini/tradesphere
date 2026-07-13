@@ -28,7 +28,6 @@ public interface BeatService {
     // APPROVAL
     BeatsResponse approveBeat(String beatId, String managerId);
     BeatsResponse rejectBeat(String beatId, String managerId);
-    // SEARCH
     List<BeatsResponse> searchByCity(String city);
     List<BeatsResponse> searchByState(String state);
     // DASHBOARD FILTERS
