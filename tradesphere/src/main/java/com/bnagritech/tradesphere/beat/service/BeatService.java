@@ -36,3 +36,4 @@ public interface BeatService {
     List<BeatsResponse> getByApprovalStatus(ApprovalStatus approvalStatus);
 
 }
+
