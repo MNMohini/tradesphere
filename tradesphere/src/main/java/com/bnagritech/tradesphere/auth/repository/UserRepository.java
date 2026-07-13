@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.auth.repository;
 
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +16,8 @@ public interface UserRepository extends MongoRepository<User , String> {
     // forgot password
     Optional<User> findByEmail(String email);
     Optional<User> findByUserNameOrEmail(String UserName, String email);
-    Optional<User> findByUserNameOrActive(String UserName, Boolean active);
-    Optional<User> findByRoleOrActive(UserRole role, Boolean active);
+    Optional<User> findByUserNameOrStatus(String UserName, UserStatus status);
+    Optional<User> findByRoleOrStatus(UserRole role, UserStatus status);
     // reset password token validation
     Optional<User> findByResetPasswordToken(String resetPasswordToken);
     Optional<User> findByEmployeeId(String employeeId);
@@ -29,7 +30,7 @@ public interface UserRepository extends MongoRepository<User , String> {
     // employee already has login or not
     boolean existsByEmployeeId(String employeeId);
     List<User> findByRole(UserRole role);
-    List<User>findByActive(Boolean active);
+    List<User>findByStatus(UserStatus status);
 
 }
 
