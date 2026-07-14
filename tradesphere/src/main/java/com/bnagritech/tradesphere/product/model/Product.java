@@ -1,4 +1,4 @@
-package com.bnagritech.tradesphere.product;
+package com.bnagritech.tradesphere.product.model;
 
 public class Product {
     private int id;
