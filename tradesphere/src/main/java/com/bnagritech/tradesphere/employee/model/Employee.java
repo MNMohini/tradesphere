@@ -21,9 +21,10 @@ public class Employee {
     private String employeeId;
     private String userName;
     private String employeeName;
-    private String email;
-    private long phoneNumber;
     private UserRole role;
+    private String phoneNumber;
+    private String profileImageUrl;
+    private String email;
     private String territoryId;
     private String joiningDate;
     private LocalDateTime createdAt;

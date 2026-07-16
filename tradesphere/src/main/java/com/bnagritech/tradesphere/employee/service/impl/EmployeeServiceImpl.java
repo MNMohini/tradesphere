@@ -39,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeName(request.getEmployeeName())
                 .email(request.getEmail())
                 .userName(request.getUserName())
-                .phoneNumber(Long.parseLong(request.getPhoneNumber()))
+                .phoneNumber(request.getPhoneNumber())
                 .role(request.getRole())
                 .territoryId(request.getTerritoryId())
                 .joiningDate(request.getJoiningDate())
@@ -85,7 +85,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employee.setEmployeeName(request.getEmployeeName());
         employee.setEmail(request.getEmail());
-        employee.setPhoneNumber(Long.parseLong(request.getPhoneNumber()));
+        employee.setPhoneNumber(request.getPhoneNumber());
         employee.setRole(request.getRole());
         employee.setTerritoryId(request.getTerritoryId());
         employee.setJoiningDate(request.getJoiningDate());

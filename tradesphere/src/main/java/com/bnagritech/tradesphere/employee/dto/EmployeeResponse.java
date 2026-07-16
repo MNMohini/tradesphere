@@ -19,7 +19,7 @@ public class EmployeeResponse {
     private String userName;
     private String employeeName;
     private String email;
-    private long phoneNumber;
+    private String phoneNumber;
     private UserRole role;
     private String territoryId;
     private String joiningDate;
