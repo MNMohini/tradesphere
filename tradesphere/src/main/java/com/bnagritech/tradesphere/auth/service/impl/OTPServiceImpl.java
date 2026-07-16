@@ -25,7 +25,7 @@ public class OTPServiceImpl implements OTPService {
     }
 
     @Override
-    public boolean verifyOTP(String phoneNumber, String otp) {
+    public boolean verifyOtp(String phoneNumber, String otp) {
 
         VerificationCheck verificationCheck =
                 VerificationCheck.creator(twilioConfig.getVerifyServiceSid())

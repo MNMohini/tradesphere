@@ -12,7 +12,6 @@ import com.bnagritech.tradesphere.employee.repository.EmployeeRepository;
 import com.bnagritech.tradesphere.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,7 +26,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+
 
 @Service
 @Slf4j
@@ -162,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found."));
 
-        boolean verified = otpService.verifyOTP(
+        boolean verified = otpService.verifyOtp(
                 request.getPhoneNumber(),
                 request.getOTP());
 
@@ -278,12 +277,6 @@ public class AuthServiceImpl implements AuthService {
             return mapToUserResponse(user);
 
         }
-
-        @Override
-        public UserResponse getCurrentUser () {
-            return null;
-        }
-
     private UserResponse mapToUserResponse(
             User user) {
         return UserResponse.builder()
@@ -296,7 +289,6 @@ public class AuthServiceImpl implements AuthService {
                 .status(user.getStatus())
                 .build();
     }
-
     private RegisterResponse mapToRegisterResponse(
             User user) {
         return RegisterResponse.builder()

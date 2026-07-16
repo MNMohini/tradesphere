@@ -24,7 +24,7 @@ public interface AuthService {
     List<UserResponse> getAllUsers();
     //get single User details
     UserResponse getUserByUserId(String userId);
-    UserResponse getCurrentUser();
+
 }
 
 
