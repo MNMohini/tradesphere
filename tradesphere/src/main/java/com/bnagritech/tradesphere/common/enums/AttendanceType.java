@@ -1,9 +1,9 @@
-package com.bnagritech.tradesphere.attendance;
+package com.bnagritech.tradesphere.common.enums;
 
 public enum AttendanceType {
     PRESENT,
     ABSENT,
     HALF_DAY,
     LATE,
-    SICK_LEAVE
+    LEAVE
 }

@@ -1,4 +1,6 @@
-package com.bnagritech.tradesphere.attendance;
+package com.bnagritech.tradesphere.attendance.model;
+
+import com.bnagritech.tradesphere.common.enums.AttendanceType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
