@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -68,5 +69,38 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "message",ex.getMessage()));
     }
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<?>handleInvalidCredential(InvalidCredentialsException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<?>handleAccountLocked(AccountLockedException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
+    @ExceptionHandler(InvalidOTPException.class)
+    public ResponseEntity<?>handleInvalidOTP(InvalidOTPException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
+    @ExceptionHandler(PasswordNotMatchException.class)
+    public ResponseEntity<?>handlePasswordNotMatch(PasswordNotMatchException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?>handleBadRequest(BadRequestException ex){
+        return ResponseEntity.status((HttpStatus.BAD_REQUEST))
+                .body(Map.of(
+                        "message",ex.getMessage()));
+    }
+
+
+
 
 }

@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.auth.model;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,22 +18,22 @@ public class User {
     @Id
     private String id;
     //Login
+    @NotBlank
     private String userName;
+    @NotBlank
     private String password;
     //contact details
+    @NotBlank
     private String email;
     private String phoneNumber;
     //Personal
-    private String firstName;
-    private String lastName;
+    private String employeeName;
     private String profileImageUrl;
     //mapping
     private String employeeId;
     //Role
     private UserRole role;
     private UserStatus status;
-    @Builder.Default
-    private Boolean verified= false;
     @Builder.Default
     private Boolean accountLocked= false;
     @Builder.Default
@@ -47,13 +48,10 @@ public class User {
     private String createdBy;
     @LastModifiedBy
     private String updatedBy;
-
     //passwordReset
-    private  String resetPasswordToken;
-    private LocalDateTime resetPasswordTokenExpiry;
-
-    //refresh token
-    private String refreshToken;
-    private LocalDateTime refreshTokenExpiry;
-
+    private  String resetPasswordOTP;
+    private LocalDateTime OTPExpires;
+    private Boolean otpVerified=  false;
+    private LocalDateTime accountLockedUntil;
+    private LocalDateTime lastPasswordChange;
 }

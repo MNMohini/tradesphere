@@ -10,10 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 public class LoginResponse {
 
-    private String token;
-    private String refreshToken;
+    private String accessToken;
     private String tokenType;
     private String userName;
+    private Long expiresIn;
     private String userId;
     private String fullName;
     private String email;

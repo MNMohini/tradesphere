@@ -17,7 +17,7 @@ public class AuthController {
      @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody RegisterRequest request){
-         RegisterResponse response = authService.register(request);
+         RegisterResponse response = authService.createUserAccount(request);
          return ResponseEntity.ok(response);
      }
 
@@ -59,9 +59,6 @@ public class AuthController {
         );
     }
 
-
-
-
     // ONLY ADMIN CAN UPDATE STATUS
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/users/{userId}/status")
@@ -94,7 +91,7 @@ public class AuthController {
     public ResponseEntity<UserResponse> getUserById(
             @PathVariable String userId){
          return ResponseEntity.ok(
-                authService.getUserById(userId));
+                authService.getUserByUserId(userId));
     }
     // LOGOUT
     @PostMapping("/logout")

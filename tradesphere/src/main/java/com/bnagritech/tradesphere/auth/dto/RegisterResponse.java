@@ -22,14 +22,14 @@ public class RegisterResponse {
     private String phoneNumber;
     private String message;
     //Personal
-    private String firstName;
-    private String lastName;
+    private String employeeName;
+    private UserStatus userStatus;
     private String profileImageUrl;
     //mapping
     private String employeeId;
+    private Boolean verified;
     //Role
     private UserRole role;
     private UserStatus status;
-    private Boolean verified;
     private LocalDateTime createdAt;
 }

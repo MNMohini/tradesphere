@@ -16,10 +16,7 @@ public interface UserRepository extends MongoRepository<User , String> {
     // forgot password
     Optional<User> findByEmail(String email);
     Optional<User> findByUserNameOrEmail(String UserName, String email);
-    Optional<User> findByUserNameOrStatus(String UserName, UserStatus status);
-    Optional<User> findByRoleOrStatus(UserRole role, UserStatus status);
-    // reset password token validation
-    Optional<User> findByResetPasswordToken(String resetPasswordToken);
+    Optional<User> findByPhoneNumber(String phoneNumber);
     Optional<User> findByEmployeeId(String employeeId);
     // duplicate username check
     boolean existsByUserName(String userName);
@@ -29,8 +26,6 @@ public interface UserRepository extends MongoRepository<User , String> {
     boolean existsByPhoneNumber(String phoneNumber);
     // employee already has login or not
     boolean existsByEmployeeId(String employeeId);
-    List<User> findByRole(UserRole role);
-    List<User>findByStatus(UserStatus status);
 
 }
 

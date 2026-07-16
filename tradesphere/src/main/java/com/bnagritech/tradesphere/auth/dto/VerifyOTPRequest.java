@@ -6,12 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResetPasswordRequest {
-    private String token;
+public class VerifyOTPRequest {
+    private String OTP;
     private String phoneNumber;
-    private String newPassword;
-    private String confirmPassword;
 
 }
