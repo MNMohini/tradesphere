@@ -8,6 +8,8 @@ public class ProductRequest {
     private int id;
     @NotBlank(message = "Product name is required")
     private String productName;
+    @NotBlank(message = "Product Id is required")
+    private String productId;
     @NotBlank(message = "SKUCode is required")
     private String skuCode;
     @NotBlank(message = "MRP is required")

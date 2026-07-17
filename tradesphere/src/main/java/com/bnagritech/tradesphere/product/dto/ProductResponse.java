@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class ProductResponse {
     private int id;
+    private String productId;
     private String productName;
     private String skuCode;
     private String MRP;
