@@ -6,8 +6,8 @@ public enum UserRole {
     NATIONAL_HEAD,
     REGIONAL_MANAGER,
     AREA_MANAGER,
-    SO,
-    SR,
+    SALES_OFFICER,
+    SALES_REPRESENTATIVE,
     SUPERVISOR,
     PROMOTER
 }
