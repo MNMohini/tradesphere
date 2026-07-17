@@ -1,5 +1,15 @@
 package com.bnagritech.tradesphere.product.dto;
 
-public class ProductResponse {
+import lombok.Builder;
+import lombok.Data;
 
+@Data
+@Builder
+public class ProductResponse {
+    private int id;
+    private String productName;
+    private String skuCode;
+    private String MRP;
+    private String PTR;
+    private String imageUrl;
 }
