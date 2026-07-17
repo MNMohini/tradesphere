@@ -2,12 +2,13 @@ package com.bnagritech.tradesphere.common.enums;
 
 public enum RetailerType {
     //B TO B
-    WHOLESALER,
+    HORECA,
     // B TO C
     GENERAL_STORE,
     SUPER_MARKET,
     DISTRIBUTOR_RETAILER,
     E_COMMERCE,
     //canteen stores department
-    CSD
+    CSD,
+    CPC
 }
