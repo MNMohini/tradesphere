@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "products")
 public class Product {
     private int id;
+    private String productId;
     private String productName;
     private String skuCode;
     private String MRP;
