@@ -12,7 +12,7 @@ public class RetailerRequest {
     private String employeeId;
     private String shopName;
     private String ownerName;
-    private long phoneNumber;
+    private String phoneNumber;
     private String alternateContactNumber;
     private String email;
     private String address;

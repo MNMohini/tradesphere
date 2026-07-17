@@ -116,14 +116,12 @@ public class RetailerServiceImpl implements RetailerService {
     }
 
     @Override
-    public RetailerResponse getRetailerByPhoneNumber(long phoneNumber) {
+    public RetailerResponse getRetailerByPhoneNumber(String phoneNumber) {
         Retailer retailer = retailerRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(
                         ()->
                                  new ResourceNotFoundException(
-                                         "Retailer not found with " +phoneNumber
-                                 )
-                );
+                                         "Retailer not found with " +phoneNumber));
         return mapToResponse(retailer);
     }
 

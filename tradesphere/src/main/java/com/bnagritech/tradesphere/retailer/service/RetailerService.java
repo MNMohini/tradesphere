@@ -11,7 +11,7 @@ public interface RetailerService{
     RetailerResponse createRetailer(RetailerRequest request);
     RetailerResponse getRetailerById(String retailerId);
     RetailerResponse updateRetailer(String retailerId,RetailerRequest request);
-    RetailerResponse getRetailerByPhoneNumber(long phoneNumber);
+    RetailerResponse getRetailerByPhoneNumber(String phoneNumber);
     RetailerResponse getRetailerByEmail(String email);
     RetailerResponse updateRetailerStatus(String retailerId,RetailerRequest request);
     RetailerResponse assignRetailer(String retailerId,RetailerRequest request);

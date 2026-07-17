@@ -12,13 +12,13 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
     // single retailer search
 
     Optional<Retailer> findByRetailerId(String retailerId);
-    Optional<Retailer> findByPhoneNumber(long phoneNumber);
+    Optional<Retailer> findByPhoneNumber(String phoneNumber);
     Optional<Retailer> findByEmail(String email);
 
     //Duplicate checks
     boolean existsByRetailerId(String retailerId);
     boolean existsByEmail(String email);
-    boolean existsByPhoneNumber(long phoneNumber);
+    boolean existsByPhoneNumber(String phoneNumber);
     boolean existsByShopNameAndCityAndState(
             String shopName,
             String city,
