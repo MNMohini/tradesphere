@@ -1,6 +1,4 @@
 package com.bnagritech.tradesphere.product.controller;
-import com.bnagritech.tradesphere.employee.dto.EmployeeRequest;
-import com.bnagritech.tradesphere.employee.dto.EmployeeResponse;
 import com.bnagritech.tradesphere.product.dto.ProductRequest;
 import com.bnagritech.tradesphere.product.dto.ProductResponse;
 import com.bnagritech.tradesphere.product.service.ProductService;
