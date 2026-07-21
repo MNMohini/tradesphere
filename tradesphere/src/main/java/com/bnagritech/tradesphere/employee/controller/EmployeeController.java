@@ -19,7 +19,6 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest request){
         return ResponseEntity.ok(employeeService.createEmployee(request));
     }
-
     @GetMapping("/all")
     public ResponseEntity<List<EmployeeResponse>>getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
