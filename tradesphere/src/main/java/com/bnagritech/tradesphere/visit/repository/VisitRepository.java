@@ -12,8 +12,7 @@ import java.util.Optional;
 @Repository
 public interface VisitRepository extends MongoRepository<Visit, String> {
     Optional<Visit> findByVisitCode(String visitCode);
-
-   List<Visit> findByEmployeeId(String employeeId);
+    List<Visit> findByEmployeeId(String employeeId);
     List<Visit> findByRetailerId(String retailerId);
     List<Visit> findByBeatId(String beatId);
     List<Visit> findByTerritoryId(String territoryId);
