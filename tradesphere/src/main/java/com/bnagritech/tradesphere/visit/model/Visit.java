@@ -45,6 +45,4 @@ public class Visit {
     private String updatedBy;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
-
-
 }
