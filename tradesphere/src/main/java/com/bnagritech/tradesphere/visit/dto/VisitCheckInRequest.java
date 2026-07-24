@@ -15,4 +15,7 @@ public class VisitCheckInRequest {
     private String employeeId;
     private String beatId;
     private String TerritoryId;
+    private String pictureUrl;
+    private Double longitude;
+    private Double latitude;
 }
