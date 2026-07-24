@@ -29,6 +29,7 @@ public class Visit {
     private LocalDateTime plannedDate;
     private LocalDateTime checkInDate;
     private LocalDateTime checkOutDate;
+    private String pictureUrl;
     private Double longitude;
     private Double latitude;
     private Double gpsAccuracy;
