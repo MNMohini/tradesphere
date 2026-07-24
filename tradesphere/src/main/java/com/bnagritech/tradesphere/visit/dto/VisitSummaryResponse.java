@@ -10,4 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VisitSummaryResponse {
+
+    private long totalVisits;
+    private long completedVisits;
+    private long pendingVisits;
+    private long cancelledVisits;
+    private long missedVisits;
 }
