@@ -11,4 +11,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class VisitDashboardResponse {
 
+    private long todayVisits;
+    private long completedToday;
+    private long pendingToday;
+    private long checkedIn;
+    private long totalOrdersBooked;
+    private double totalCollection;
+    private double productivityPercentage;
+
 }
