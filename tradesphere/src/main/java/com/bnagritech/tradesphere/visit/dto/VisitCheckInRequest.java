@@ -1,5 +1,7 @@
 package com.bnagritech.tradesphere.visit.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,13 +11,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VisitCheckInRequest {
-    private String checkinDate;
-    private String checkoutDate;
-    private  String visitId;
-    private String employeeId;
-    private String beatId;
-    private String TerritoryId;
-    private String pictureUrl;
-    private Double longitude;
+    @NotBlank(message = "Visit Id is required")
+    private String visitId;
+
+    @NotNull(message = "Latitude is required")
     private Double latitude;
+
+    @NotNull(message = "Longitude is required")
+    private Double longitude;
+
+    private Double gpsAccuracy;
 }
+
