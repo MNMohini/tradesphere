@@ -1,5 +1,7 @@
 package com.bnagritech.tradesphere.visit.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,13 +14,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class VisitCheckOutResponse {
-    private String employeeId;
-    private String beatId;
-    private String territoryId;
-    private String pictureUrl;
-    private Double longitude;
-    private Double latitude;
-    private LocalDateTime checkInDate;
-    private LocalDateTime checkOutDate;
+    @NotBlank(message = "Visit Id is required")
     private String visitId;
+
+    @NotNull(message = "Latitude is required")
+    private Double latitude;
+
+    @NotNull(message = "Longitude is required")
+    private Double longitude;
+
+    private String remarks;
 }
