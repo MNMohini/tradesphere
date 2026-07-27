@@ -6,12 +6,10 @@ import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface BeatRepository extends MongoRepository<Beat, String> {
     // DUPLICATE VALIDATION
     boolean existsByBeatNameAndTerritoryIdAndBeatCode(String beatName, String territoryId, String beatCode);

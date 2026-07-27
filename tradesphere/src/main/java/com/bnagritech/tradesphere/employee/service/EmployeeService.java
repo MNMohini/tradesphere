@@ -2,8 +2,6 @@ package com.bnagritech.tradesphere.employee.service;
 
 import com.bnagritech.tradesphere.employee.dto.EmployeeRequest;
 import com.bnagritech.tradesphere.employee.dto.EmployeeResponse;
-import lombok.Data;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
