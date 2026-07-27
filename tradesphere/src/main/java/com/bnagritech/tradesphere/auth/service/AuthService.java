@@ -1,7 +1,6 @@
 package com.bnagritech.tradesphere.auth.service;
 
 import com.bnagritech.tradesphere.auth.dto.*;
-import com.bnagritech.tradesphere.common.enums.UserStatus;
 
 import java.util.List;
 public interface AuthService {

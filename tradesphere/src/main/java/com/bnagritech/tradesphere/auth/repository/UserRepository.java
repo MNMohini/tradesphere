@@ -1,14 +1,10 @@
 package com.bnagritech.tradesphere.auth.repository;
 
 import com.bnagritech.tradesphere.auth.model.User;
-import com.bnagritech.tradesphere.common.enums.UserRole;
-import com.bnagritech.tradesphere.common.enums.UserStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
-@Repository
+
 public interface UserRepository extends MongoRepository<User , String> {
 
     // login using username
