@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ProductResponse {
-    private int id;
+    private String id;
     private String productId;
     private String productName;
     private String skuCode;

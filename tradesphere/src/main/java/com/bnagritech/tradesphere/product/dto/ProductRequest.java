@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ProductRequest {
-    private int id;
+    private String id;
     @NotBlank(message = "Product name is required")
     private String productName;
     @NotBlank(message = "Product Id is required")
