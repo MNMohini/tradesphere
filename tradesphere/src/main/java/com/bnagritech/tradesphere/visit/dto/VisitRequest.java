@@ -1,5 +1,4 @@
 package com.bnagritech.tradesphere.visit.dto;
-
 import com.bnagritech.tradesphere.common.VisitType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +28,7 @@ public class VisitRequest {
 
     @NotNull(message = "Visit type is required")
     private VisitType visitType;
+    private String visitCode;
 
     private String remarks;
 }

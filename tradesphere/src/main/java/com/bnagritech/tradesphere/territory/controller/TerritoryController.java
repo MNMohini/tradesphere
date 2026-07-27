@@ -3,10 +3,8 @@ package com.bnagritech.tradesphere.territory.controller;
 
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
-import com.bnagritech.tradesphere.territory.repository.TerritoryRepository;
 import com.bnagritech.tradesphere.territory.service.TerritoryService;
 import jakarta.validation.Valid;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
