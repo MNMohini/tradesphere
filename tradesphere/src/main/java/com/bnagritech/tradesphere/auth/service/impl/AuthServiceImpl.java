@@ -21,8 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeRepository employeeRepository;
      private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
      private static final int ACCOUNT_LOCKED_DURATION_MINUTES=15;
-     private final SecureRandom secureRandom = new SecureRandom();
+
 
     @Override
     public RegisterResponse createUserAccount(RegisterRequest request) {
@@ -322,9 +320,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
     }
-    private String generateOtp() {
-        return String.format("%06d", secureRandom.nextInt(1000000));
-    }
-
+  
 }
 

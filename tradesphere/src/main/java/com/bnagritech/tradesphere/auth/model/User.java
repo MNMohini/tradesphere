@@ -51,7 +51,7 @@ public class User {
     //passwordReset
     private  String resetPasswordOTP;
     private LocalDateTime OTPExpires;
-    private Boolean otpVerified=  false;
+    private Boolean otpVerified;
     private LocalDateTime accountLockedUntil;
     private LocalDateTime lastPasswordChange;
 }
