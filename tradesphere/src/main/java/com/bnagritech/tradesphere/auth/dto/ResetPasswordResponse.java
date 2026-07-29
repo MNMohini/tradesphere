@@ -14,5 +14,5 @@ import java.time.LocalDateTime;
 public class ResetPasswordResponse {
     private String message;
     private boolean success;
-    private LocalDateTime updatedAt;
+    private LocalDateTime resetAt;
 }
