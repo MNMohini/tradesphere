@@ -18,7 +18,7 @@ public class AuthController {
 
      @PostMapping("/createUser")
      @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> creteUser(
+    public ResponseEntity<?> createUser(
            @Valid @RequestBody RegisterRequest request){
          RegisterResponse response = authService.createUserAccount(request);
          return ResponseEntity.ok(response);
@@ -31,21 +31,16 @@ public class AuthController {
     return ResponseEntity.ok(response);
 }
     // FORGOT PASSWORD
-    @PostMapping("/forgotpassword")
+    @PostMapping("/forgotPassword")
     public ResponseEntity<ForgotPasswordResponse> forgotPassword(
         @Valid @RequestBody ForgotPasswordRequest request) {
          return ResponseEntity.ok(
                 authService.forgotPassword(request)
         );
     }
-    @PostMapping("verifyOTP")
-    public ResponseEntity<VerifyOTPResponse> verifyOtp(
-            @Valid @RequestBody VerifyOTPRequest request){
-         return ResponseEntity.ok(authService.verifyOTP(request));
-    }
 
     // RESET PASSWORD
-    @PostMapping("/resetpassword")
+    @PostMapping("/resetPassword")
     public ResponseEntity<ResetPasswordResponse> resetPassword(
            @Valid @RequestBody ResetPasswordRequest request) {
         return ResponseEntity.ok(
@@ -53,12 +48,12 @@ public class AuthController {
         );
     }
     // CHANGE PASSWORD
-    @PutMapping("/change-password")
-    public ResponseEntity<ChangePasswordResponse> changePassword(
+    @PutMapping("/changePassword")
+    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestParam String userId,
        @Valid @RequestBody ChangePasswordRequest request) {
 
         return ResponseEntity.ok(
-                authService.changePassword(request)
+                authService.changePassword(userId,request)
         );
     }
 
