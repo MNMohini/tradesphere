@@ -7,13 +7,10 @@ import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<User , String> {
 
-    // login using username
-    Optional<User> findByUserName(String userName);
     // forgot password
     Optional<User> findByEmail(String email);
+    // login using userNameOrEmail
     Optional<User> findByUserNameOrEmail(String UserName, String email);
-    Optional<User> findByPhoneNumber(String phoneNumber);
-    Optional<User> findByEmployeeId(String employeeId);
     // duplicate username check
     boolean existsByUserName(String userName);
     // duplicate email check

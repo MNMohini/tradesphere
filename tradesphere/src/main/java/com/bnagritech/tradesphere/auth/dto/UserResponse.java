@@ -8,13 +8,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponse {
-
+    private String id;
     private String userName;
     private String userId;
     private String email;
@@ -25,7 +26,9 @@ public class UserResponse {
     private UserRole role;
     private Boolean verified;
     private String fullName;
-    private Boolean enabled;
+    private Set<String> permissions;
+    private Boolean accountLocked;
+    private Integer failedLoginAttempts;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;
