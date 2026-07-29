@@ -4,6 +4,8 @@ import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -11,14 +13,15 @@ import lombok.*;
 public class LoginResponse {
 
     private String accessToken;
-    private String tokenType;
+    private String refreshToken;
+    private String tokenType = "Bearer";
     private String userName;
+    private String employeeId;
+    private UserStatus userStatus;
     private Long expiresIn;
     private String userId;
-    private String fullName;
     private String email;
-    private String profileImageUrl;
     private UserRole role;
     private UserStatus status;
-    private String message;
+    private LocalDateTime lastLoginAt;
 }
