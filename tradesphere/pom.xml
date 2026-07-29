@@ -89,12 +89,12 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
-			<version>0.12.5</version>
+			<version>0.12.7</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.12.5</version>
+			<version>0.12.7</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -104,9 +104,8 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.twilio.sdk</groupId>
-			<artifactId>twilio</artifactId>
-			<version>11.4.0</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
