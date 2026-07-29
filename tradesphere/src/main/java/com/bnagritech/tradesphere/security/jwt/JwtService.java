@@ -24,12 +24,15 @@ public class JwtService {
         @Value("${jwt.secret}")
         private String secret;
 
-        @Value("${jwt.expiration}")
+        @Value("${jwt.access-token-expiration}")
         private long expiration;
+        @Value("${jwt.refresh-token-expiration}")
+        private long refreshTokenExpiration;
         /**
          * Generate JWT Token
          */
         public String generateToken(UserDetails userDetails) {
+
             return generateToken(new HashMap<>(), userDetails);
         }
         /**
@@ -39,19 +42,17 @@ public class JwtService {
                 Map<String, Object> extraClaims,
                                     UserDetails userDetails) {
 
-            return Jwts.builder()
-                    .claims(extraClaims)
-                    .subject(userDetails.getUsername())
-                    .issuedAt(new Date())
-                    .expiration(new Date(System.currentTimeMillis() + expiration))
-                    .signWith(getSignInKey())
-                    .compact();
+            return buildToken(extraClaims,userDetails,expiration);
+        }
+
+        public String generateRefreshToken(UserDetails userDetails) {
+            return buildToken(new HashMap<>(), userDetails, refreshTokenExpiration);
         }
 
         /**
          * Extract Username
          */
-        public String extractUsername(String token) {
+        public String extractUserName(String token) {
             return extractClaim(token, Claims::getSubject);
         }
 
@@ -59,6 +60,7 @@ public class JwtService {
          * Extract Expiration
          */
         public Date extractExpiration(String token) {
+
             return extractClaim(token, Claims::getExpiration);
         }
 
@@ -78,7 +80,7 @@ public class JwtService {
         public boolean isTokenValid(String token,
                                     UserDetails userDetails) {
 
-            final String username = extractUsername(token);
+            final String username = extractUserName(token);
 
             return username.equals(userDetails.getUsername())
                     && !isTokenExpired(token);
@@ -88,6 +90,7 @@ public class JwtService {
          * Check Token Expired
          */
         private boolean isTokenExpired(String token) {
+
             return extractExpiration(token).before(new Date());
         }
 
@@ -118,6 +121,17 @@ public class JwtService {
          */
         public Long getTokenExpiryTime() {
             return expiration / 1000;
+        }
+
+        private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration)
+        {
+            return Jwts.builder()
+                    .claims(extraClaims)
+                    .subject(userDetails.getUsername())
+                    .issuedAt(new Date())
+                    .expiration(new Date(System.currentTimeMillis() + expiration))
+                    .signWith(getSignInKey())
+                    .compact();
         }
 
 }
