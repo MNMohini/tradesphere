@@ -78,7 +78,7 @@ public class AuthController {
     }
     // ONLY ADMIN GET USER BY ID
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/status/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<UserResponse> getUserById(
             @PathVariable String userId){
          return ResponseEntity.ok(

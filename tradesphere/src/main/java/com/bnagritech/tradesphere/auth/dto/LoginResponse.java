@@ -13,15 +13,12 @@ import java.time.LocalDateTime;
 public class LoginResponse {
 
     private String accessToken;
-    private String refreshToken;
-    private String tokenType = "Bearer";
     private String userName;
     private String employeeId;
     private UserStatus userStatus;
-    private Long expiresIn;
+    private String phoneNumber;
+    private UserRole role;
     private String userId;
     private String email;
-    private UserRole role;
-    private UserStatus status;
     private LocalDateTime lastLoginAt;
 }

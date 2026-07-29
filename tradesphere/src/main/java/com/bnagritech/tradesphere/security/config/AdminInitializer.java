@@ -19,12 +19,12 @@ public class AdminInitializer {
     @Bean
     CommandLineRunner initAdmin() {
         return args -> {
-            if (!userRepository.existsByUserName("Mohini01")) {
+            if (!userRepository.existsByUserName("Akhand02")) {
                 User admin = User.builder()
-                        .userName("Mohini01")
-                        .employeeId("EMP01")
-                        .email("it.intern@bngroupindia.com")
-                        .password(passwordEncoder.encode("mohini@bngroup"))
+                        .userName("Akhand02")
+                        .employeeId("EMP02")
+                        .email("akhand@bngroupindia.com")
+                        .password(passwordEncoder.encode("akhand@bngroup"))
                         .role(UserRole.ADMIN)
                         .status(UserStatus.ACTIVE)
                         .enabled(true)

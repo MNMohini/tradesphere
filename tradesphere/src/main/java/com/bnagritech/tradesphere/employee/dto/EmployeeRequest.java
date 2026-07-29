@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class EmployeeRequest {
-
     private String employeeId;
     private String employeeName;
     private String userName;
@@ -13,6 +12,11 @@ public class EmployeeRequest {
     private String phoneNumber;
     private UserRole role;
     private String territoryId;
+    private String dateOfBirth;
+    private String designation;
     private String joiningDate;
+    private String managerName1;
+    private String managerName2;
+
 
 }

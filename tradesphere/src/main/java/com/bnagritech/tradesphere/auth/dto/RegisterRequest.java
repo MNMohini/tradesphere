@@ -27,7 +27,6 @@ public class RegisterRequest {
     //personal
     @NotBlank(message = "Required")
     private String employeeName;
-    @NotBlank(message = "Required")
     private String profileImageUrl;
     @NotNull(message = "Role is required")
     private UserRole role;

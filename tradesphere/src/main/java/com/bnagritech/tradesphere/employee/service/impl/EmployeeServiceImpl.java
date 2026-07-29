@@ -111,6 +111,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .id(employee.getId())
                 .employeeId(employee.getEmployeeId())
                 .employeeName(employee.getEmployeeName())
+                .userName(employee.getUserName())
                 .email(employee.getEmail())
                 .phoneNumber(employee.getPhoneNumber())
                 .role(employee.getRole())

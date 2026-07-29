@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.security.jwt;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -52,6 +53,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(username);
 
+            System.out.println("Authorization Header: " + authHeader);
+            System.out.println("Extracted Username: " + username);
+            System.out.println("Authorities: " + userDetails.getAuthorities());
+            System.out.println("Token Valid: " + jwtService.isTokenValid(jwt, userDetails));
+
             if (jwtService.isTokenValid(jwt, userDetails)) {
 
                 UsernamePasswordAuthenticationToken authentication =
@@ -64,8 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource()
                                 .buildDetails(request));
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                System.out.println("Authentication set successfully");
             }
         }
 

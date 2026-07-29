@@ -245,12 +245,14 @@ public class AuthServiceImpl implements AuthService {
     private LoginResponse buildLoginResponse(User user, String accessToken) {
         return LoginResponse.builder()
                 .accessToken(accessToken)
-                .tokenType("Bearer")
                 .userId(user.getId())
-                .expiresIn(jwtService.getTokenExpiryTime())
+                .userName(user.getUsername())
+                .phoneNumber(user.getPhoneNumber())
+                .employeeId(user.getEmployeeId())
+                .userStatus(user.getStatus())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .status(user.getStatus())
+                .lastLoginAt(LocalDateTime.now())
                 .build();
 
     }

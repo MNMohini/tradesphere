@@ -29,6 +29,7 @@ public class Employee {
     private String territoryId;
     private EmployeeStatus employeeStatus;
     private String managerName1;
+    private String dateOfBirth;
     private String managerName2;
     private String designation;
     private String joiningDate;
