@@ -136,7 +136,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .profileImageUrl(employee.getProfileImageUrl())
                 .employeeStatus(employee.getEmployeeStatus())
                 .managerName1(employee.getManagerName1())
-                .managerName2(employee.getEmployeeName())
+                .managerName2(employee.getManagerName2())
                 .designation(employee.getDesignation())
                 .email(employee.getEmail())
                 .phoneNumber(employee.getPhoneNumber())
