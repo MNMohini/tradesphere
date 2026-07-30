@@ -32,6 +32,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employeeRepository.existsByUserName(request.getUserName())) {
             throw new UserAlreadyExistsException("User Name already exists");
         }
+        if (employeeRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new EmployeeAlreadyExistsException("Phone Number already exists");
+        }
         Employee employee = Employee.builder()
                 .employeeId(request.getEmployeeId())
                 .employeeName(request.getEmployeeName())

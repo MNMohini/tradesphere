@@ -13,12 +13,12 @@ public class EmployeeRequest {
     private String employeeName;
     private UserRole role;
     private String phoneNumber;
+    private String dateOfBirth;
     private String profileImageUrl;
     private String email;
     private String territoryId;
     private EmployeeStatus employeeStatus;
     private String managerName1;
-    private String dateOfBirth;
     private String managerName2;
     private String designation;
     private String joiningDate;

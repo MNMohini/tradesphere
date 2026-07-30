@@ -23,23 +23,27 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeeResponse>>getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
-    @GetMapping("/empId/{employeeId}")
+    @GetMapping("/id/{employeeId}")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmployeeId(@PathVariable String employeeId){
         return ResponseEntity.ok(employeeService.getEmployeeByEmployeeId(employeeId));
     }
-    @GetMapping("/name/{userName}")
+    @GetMapping("/{userName}")
     public ResponseEntity<EmployeeResponse> getEmployeeByUserName(@PathVariable String userName){
         return ResponseEntity.ok(employeeService.getEmployeeByUserName(userName));
     }
+    @GetMapping("/email/{email}")
+    public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@PathVariable String email){
+        return ResponseEntity.ok(employeeService.getEmployeeByEmail(email));
+    }
 
-    @PutMapping("/empId/{employeeId}")
+    @PutMapping("/update/{employeeId}")
     public ResponseEntity<EmployeeResponse> updateEmployee(
         @PathVariable String employeeId,
         @RequestBody EmployeeRequest request)
     {
         return ResponseEntity.ok(employeeService.updateEmployee(employeeId,request));
     }
-    @DeleteMapping("/empId/{employeeId}")
+    @DeleteMapping("/del/{employeeId}")
     public ResponseEntity<String> deleteEmployee(@PathVariable String employeeId){
         employeeService.deleteEmployee(employeeId);
         return ResponseEntity.ok("Employee details deleted  successfully");
