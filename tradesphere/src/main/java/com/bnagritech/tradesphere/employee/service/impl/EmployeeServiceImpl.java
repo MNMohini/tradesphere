@@ -108,7 +108,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setManagerName2(request.getManagerName2());
         employee.setEmployeeId(request.getEmployeeId());
         employee.setUserName(request.getUserName());
-
         Employee updatedEmployee = employeeRepository.save(employee);
 
         return mapToResponse(updatedEmployee);
