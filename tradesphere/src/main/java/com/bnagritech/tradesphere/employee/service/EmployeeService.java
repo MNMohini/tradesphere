@@ -12,7 +12,7 @@ public interface EmployeeService {
     EmployeeResponse getEmployeeByUserName(String userName);
 
     EmployeeResponse getEmployeeByEmployeeId(String employeeId);
-
+    EmployeeResponse getEmployeeByEmail(String email);
     EmployeeResponse updateEmployee(String employeeId, EmployeeRequest request);
 
     void  deleteEmployee(String employeeId);

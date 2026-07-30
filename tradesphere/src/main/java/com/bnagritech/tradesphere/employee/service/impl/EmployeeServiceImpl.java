@@ -23,7 +23,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResponse createEmployee(EmployeeRequest request) {
-
         if (employeeRepository.existsByEmail(request.getEmail())) {
             throw new EmployeeAlreadyExistsException("Email already exists");
         }
@@ -33,7 +32,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employeeRepository.existsByUserName(request.getUserName())) {
             throw new UserAlreadyExistsException("User Name already exists");
         }
-
         Employee employee = Employee.builder()
                 .employeeId(request.getEmployeeId())
                 .employeeName(request.getEmployeeName())
@@ -41,14 +39,18 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .userName(request.getUserName())
                 .phoneNumber(request.getPhoneNumber())
                 .role(request.getRole())
+                .managerName1(request.getManagerName1())
+                .managerName2(request.getManagerName2())
+                .employeeStatus(request.getEmployeeStatus())
+                .profileImageUrl(request.getProfileImageUrl())
+                .dateOfBirth(request.getDateOfBirth())
+                .designation(request.getDesignation())
                 .territoryId(request.getTerritoryId())
                 .joiningDate(request.getJoiningDate())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-
         Employee savedEmployee = employeeRepository.save(employee);
-
         return mapToResponse(savedEmployee);
     }
 
@@ -78,6 +80,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public EmployeeResponse getEmployeeByEmail(String email) {
+        Employee employee = employeeRepository.findByEmail(email)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+
+        return mapToResponse(employee);
+
+    }
+
+    @Override
     public EmployeeResponse updateEmployee(String employeeId, EmployeeRequest request) {
 
         Employee employee = employeeRepository.findByEmployeeId(employeeId)
@@ -90,6 +101,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setTerritoryId(request.getTerritoryId());
         employee.setJoiningDate(request.getJoiningDate());
         employee.setUpdatedAt(LocalDateTime.now());
+        employee.setDesignation(request.getDesignation());
+        employee.setProfileImageUrl(request.getProfileImageUrl());
+        employee.setEmployeeStatus(request.getEmployeeStatus());
+        employee.setManagerName1(request.getManagerName1());
+        employee.setManagerName2(request.getManagerName2());
+        employee.setEmployeeId(request.getEmployeeId());
+        employee.setUserName(request.getUserName());
 
         Employee updatedEmployee = employeeRepository.save(employee);
 
@@ -110,8 +128,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         return EmployeeResponse.builder()
                 .id(employee.getId())
                 .employeeId(employee.getEmployeeId())
-                .employeeName(employee.getEmployeeName())
                 .userName(employee.getUserName())
+                .employeeName(employee.getEmployeeName())
+                .dateOfBirth(employee.getDateOfBirth())
+                .profileImageUrl(employee.getProfileImageUrl())
+                .employeeStatus(employee.getEmployeeStatus())
+                .managerName1(employee.getManagerName1())
+                .managerName2(employee.getEmployeeName())
+                .designation(employee.getDesignation())
                 .email(employee.getEmail())
                 .phoneNumber(employee.getPhoneNumber())
                 .role(employee.getRole())
