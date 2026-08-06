@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.auth.dto;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,4 +31,5 @@ public class RegisterRequest {
     private String profileImageUrl;
     @NotNull(message = "Role is required")
     private UserRole role;
+    private UserStatus userStatus;
 }

@@ -30,6 +30,7 @@ public class User implements UserDetails {
     private String password;
     //mapping
     private String employeeId;
+    private String employeeName;
     private String email;
     private String phoneNumber;
     private String profileImageUrl;

@@ -30,6 +30,5 @@ public class RegisterResponse {
     private Boolean verified;
     //Role
     private UserRole role;
-    private UserStatus status;
     private LocalDateTime createdAt;
 }
