@@ -45,4 +45,5 @@ public class Retailer {
     private String createdBy;
     private  String updatedBy;
 
+
 }
