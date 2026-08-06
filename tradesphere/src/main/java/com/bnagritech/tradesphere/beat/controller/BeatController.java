@@ -62,6 +62,7 @@ public class BeatController {
     public ResponseEntity<List<BeatsResponse>>getEmployeeDayBeats(
             @PathVariable String employeeId,
             @PathVariable BeatDay beatDay)
+
     {
         return ResponseEntity.ok(beatService.getEmployeeDayBeats(employeeId,beatDay));
     }
