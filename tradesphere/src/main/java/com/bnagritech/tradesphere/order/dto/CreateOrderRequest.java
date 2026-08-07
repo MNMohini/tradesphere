@@ -19,10 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateOrderRequest {
-    private String id;
-    private String orderNumber;
 
-    private String employeeId;
     private String retailerId;
     private String promoterId;
     private String beatId;
@@ -32,25 +29,17 @@ public class CreateOrderRequest {
 
     private Integer totalQuantity;
 
-    private BigDecimal grossAmount;
-    private BigDecimal discountAmount;
-    private BigDecimal schemeDiscount;
-    private BigDecimal taxableAmount;
-    private BigDecimal taxAmount;
-    private BigDecimal netAmount;
-
     private OrderStatus status;
     private PaymentMode paymentMode;
     private PaymentStatus paymentStatus;
 
     private String remarks;
-    private String cancellationReason;
 
     private LocalDate orderDate;
     private LocalDate expectedDeliveryDate;
 
-    private String createdBy;
-    private String updatedBy;
+    private String createdBy = promoterId;
+    private String updatedBy = promoterId;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
