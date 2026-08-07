@@ -1,10 +1,8 @@
 package com.bnagritech.tradesphere.order.model;
 
 import com.bnagritech.tradesphere.common.enums.OrderStatus;
-import com.bnagritech.tradesphere.common.enums.OrderType;
 import com.bnagritech.tradesphere.common.enums.PaymentMode;
 import com.bnagritech.tradesphere.common.enums.PaymentStatus;
-import com.bnagritech.tradesphere.product.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,7 +40,6 @@ public class Order {
     private BigDecimal taxAmount;
     private BigDecimal netAmount;
 
-    private OrderType orderType;
     private OrderStatus status;
     private PaymentMode paymentMode;
     private PaymentStatus paymentStatus;
