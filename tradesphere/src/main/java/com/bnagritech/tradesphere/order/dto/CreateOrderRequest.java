@@ -1,4 +1,4 @@
 package com.bnagritech.tradesphere.order.dto;
 
-public class OrderRequest {
+public class CreateOrderRequest {
 }
