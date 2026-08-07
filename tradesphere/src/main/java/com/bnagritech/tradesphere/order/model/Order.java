@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
@@ -20,13 +21,18 @@ import java.util.List;
 @NoArgsConstructor
 @Document(collection = "orders")
 public class Order {
+    @Id
     private String id;
     private String orderNumber;
 
     private String employeeId;
+    private String employeeName;
     private String retailerId;
+    private String retailerName;
     private String promoterId;
+    private String promoterName;
     private String beatId;
+    private String beatName;
     private String visitId;
 
     private List<OrderItems> items;
