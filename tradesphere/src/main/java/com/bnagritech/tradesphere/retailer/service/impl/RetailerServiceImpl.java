@@ -11,6 +11,7 @@ import com.bnagritech.tradesphere.retailer.service.RetailerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -39,6 +40,7 @@ public class RetailerServiceImpl implements RetailerService {
             Retailer retailer = Retailer.builder()
                     .retailerId(request.getRetailerId())
                     .shopName(request.getShopName())
+                    .employeeId(request.getEmployeeId())
                     .ownerName(request.getOwnerName())
                     .phoneNumber(request.getPhoneNumber())
                     .alternateContactNumber(request.getAlternateContactNumber())
@@ -107,7 +109,7 @@ public class RetailerServiceImpl implements RetailerService {
         retailer.setLatitude(request.getLatitude());
         retailer.setCreditDays(request.getCreditDays());
         retailer.setCreditLimits(request.getCreditLimits());
-        retailer.setUpdatedAt(request.getUpdatedAt());
+        retailer.setUpdatedAt(LocalDateTime.now());
         retailer.setCreatedBy(request.getCreatedBy());
         retailer.setUpdatedBy(request.getUpdatedBy());
 
@@ -256,8 +258,8 @@ public class RetailerServiceImpl implements RetailerService {
         retailerResponse.setLongitude(retailer.getLongitude());
         retailerResponse.setCreditDays(retailer.getCreditDays());
         retailerResponse.setCreditLimits(retailer.getCreditLimits());
-        retailerResponse.setCreatedAt(retailer.getCreatedAt());
-        retailerResponse.setUpdatedAt(retailer.getUpdatedAt());
+        retailerResponse.setCreatedAt(LocalDateTime.now());
+        retailerResponse.setUpdatedAt(LocalDateTime.now());
         retailerResponse.setRetailerStatus(retailer.getRetailerStatus());
         retailerResponse.setCreatedBy(retailer.getCreatedBy());
         retailerResponse.setUpdatedBy(retailer.getUpdatedBy());
