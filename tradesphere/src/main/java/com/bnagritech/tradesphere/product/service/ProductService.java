@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ProductService {
         ProductResponse addProduct(ProductRequest productRequest);
-        ProductResponse updateProduct(String skuCode,ProductRequest productRequest);
+        ProductResponse updateProduct(String productId,ProductRequest productRequest);
         List<ProductResponse> getAllProducts();
         ProductResponse getProductByProductId(String productId);
         ProductResponse getProductByProductName(String productName);

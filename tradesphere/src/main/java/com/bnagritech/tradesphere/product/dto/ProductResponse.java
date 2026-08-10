@@ -10,7 +10,7 @@ public class ProductResponse {
     private String productId;
     private String productName;
     private String skuCode;
-    private String MRP;
-    private String PTR;
+    private String mrp;
+    private String ptr;
     private String imageUrl;
 }

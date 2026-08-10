@@ -13,8 +13,8 @@ public class ProductRequest {
     @NotBlank(message = "SKUCode is required")
     private String skuCode;
     @NotBlank(message = "MRP is required")
-    private String MRP;
+    private String mrp;
     @NotBlank(message = "PTR is required")
-    private String PTR;
+    private String ptr;
     private String imageUrl;
 }

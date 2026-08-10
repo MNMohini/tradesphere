@@ -30,8 +30,8 @@ public class ProductServiceImpl implements ProductService {
                 .productId(productRequest.getProductId())
                 .productName(productRequest.getProductName())
                 .skuCode(productRequest.getSkuCode())
-                .MRP(productRequest.getMRP())
-                .PTR(productRequest.getPTR())
+                .mrp(productRequest.getMrp())
+                .ptr(productRequest.getPtr())
                 .imageUrl(productRequest.getImageUrl())
                 .build();
 
@@ -40,15 +40,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(String skuCode,ProductRequest productRequest) {
+    public ProductResponse updateProduct(String productId,ProductRequest productRequest) {
         Product product= productRepository.findProductByProductId(productRequest.getProductId()).
                 orElseThrow(()->new ResourceNotFoundException
-                        ("Product with id " + skuCode + " not found"));
+                        ("Product not found"));
         product.setProductName(productRequest.getProductName());
         product.setSkuCode(productRequest.getSkuCode());
-        product.setProductId(productRequest.getProductId());
-        product.setMRP(productRequest.getMRP());
-        product.setPTR(productRequest.getPTR());
+        product.setMrp(productRequest.getMrp());
+        product.setPtr(productRequest.getPtr());
         product.setImageUrl(productRequest.getImageUrl());
        Product updatedProduct = productRepository.save(product);
 
@@ -101,8 +100,8 @@ public class ProductServiceImpl implements ProductService {
             .productId(product.getProductId())
             .productName(product.getProductName())
             .skuCode(product.getSkuCode())
-            .MRP(product.getMRP())
-            .PTR(product.getPTR())
+            .mrp(product.getMrp())
+            .ptr(product.getPtr())
             .imageUrl(product.getImageUrl())
             .build() ;
     }
