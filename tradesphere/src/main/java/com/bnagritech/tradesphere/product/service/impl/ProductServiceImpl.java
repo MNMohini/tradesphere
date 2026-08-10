@@ -86,7 +86,16 @@ public class ProductServiceImpl implements ProductService {
                         "Product not found"));
         return mapToResponse(product);
     }
-     public ProductResponse mapToResponse(Product product) {
+
+    @Override
+    public void deleteProduct(String productId) {
+            Product product= productRepository.findProductByProductId(productId)
+                    .orElseThrow(()->new ResourceNotFoundException("product not found"));
+            productRepository.delete(product);
+    }
+
+
+    public ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()
             .id(product.getId())
             .productId(product.getProductId())

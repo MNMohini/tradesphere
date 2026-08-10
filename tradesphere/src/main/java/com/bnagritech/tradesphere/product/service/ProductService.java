@@ -12,5 +12,6 @@ public interface ProductService {
         ProductResponse getProductByProductId(String productId);
         ProductResponse getProductByProductName(String productName);
         ProductResponse getProductByProductSkuCode(String skuCode);
+        void deleteProduct(String productId);
 
 }

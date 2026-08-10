@@ -44,4 +44,9 @@ public class ProductController {
     public ResponseEntity<ProductResponse> getProductBySkuCode(@PathVariable String skuCode){
         return ResponseEntity.ok(productService.getProductByProductSkuCode(skuCode));
     }
+    @DeleteMapping("/del/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable String productId){
+       productService.deleteProduct(productId);
+        return ResponseEntity.ok("Product deleted successfully");
+    }
 }
