@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.promoter.service.impl;
 
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.exception.EmployeeAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.PromoterNotFoundException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
@@ -72,8 +73,8 @@ import java.util.List;
 
             Promoter promoter = promoterRepository.findByPromoterId(promoterId)
                     .orElseThrow(() -> new PromoterNotFoundException("Promoter not found"));
-
             promoter.setPromoterId(request.getPromoterId());
+            promoter.setUserName(request.getUsername());
             promoter.setPromoterName(request.getPromoterName());
             promoter.setPhoneNumber(request.getPhoneNumber());
             promoter.setEmail(request.getEmail());
@@ -130,8 +131,8 @@ import java.util.List;
     }
 
     @Override
-    public List<PromoterResponse> getPromoterByStatus(Boolean status) {
-        List<Promoter> promoters = promoterRepository.findByStatus(String.valueOf(status));
+    public List<PromoterResponse> getPromoterByStatus(UserStatus status) {
+        List<Promoter> promoters = promoterRepository.findByStatus(status);
         return promoters.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -140,8 +141,10 @@ import java.util.List;
 
     private PromoterResponse mapToResponse(Promoter promoter) {
         PromoterResponse response = new PromoterResponse();
+        response.setId(promoter.getId());
         response.setPromoterId(promoter.getPromoterId());
         response.setPromoterName(promoter.getPromoterName());
+        response.setUserName(promoter.getUserName());
         response.setPhoneNumber(promoter.getPhoneNumber());
         response.setEmail(promoter.getEmail());
         response.setAddress(promoter.getAddress());

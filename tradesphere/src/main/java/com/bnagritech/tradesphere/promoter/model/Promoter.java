@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.promoter.model;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class Promoter {
     private String id;
     private String promoterId;
     private String promoterName;
+    private String userName;
     private String address;
     private String employeeId;
     private long phoneNumber;
@@ -27,7 +29,7 @@ public class Promoter {
     private String territoryName;
     private String city;
     private String state;
-    private String status;
+    private UserStatus status;
     private UserRole createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedBy;

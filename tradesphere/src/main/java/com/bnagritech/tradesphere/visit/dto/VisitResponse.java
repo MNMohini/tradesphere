@@ -1,6 +1,6 @@
 package com.bnagritech.tradesphere.visit.dto;
 
-import com.bnagritech.tradesphere.common.VisitType;
+import com.bnagritech.tradesphere.common.enums.VisitType;
 import com.bnagritech.tradesphere.common.enums.VisitOutCome;
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
 import lombok.AllArgsConstructor;

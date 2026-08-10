@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.promoter.dto;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,13 +20,14 @@ public class PromoterResponse {
     private String promoterName;
     private String address;
     private String employeeId;
+    private String userName;
     private long phoneNumber;
     private String email;
     private String territoryId;
     private String territoryName;
     private String city;
     private String state;
-    private String status;
+    private UserStatus status;
     private UserRole createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedBy;

@@ -1,4 +1,4 @@
-package com.bnagritech.tradesphere.common;
+package com.bnagritech.tradesphere.common.enums;
 
 public enum VisitType {
         ROUTINE,

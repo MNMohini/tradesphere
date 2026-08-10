@@ -1,5 +1,5 @@
 package com.bnagritech.tradesphere.visit.dto;
-import com.bnagritech.tradesphere.common.VisitType;
+import com.bnagritech.tradesphere.common.enums.VisitType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,5 @@
 package com.bnagritech.tradesphere.promoter.repository;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.promoter.model.Promoter;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
@@ -12,7 +13,7 @@ public interface PromoterRepository extends MongoRepository<Promoter, String> {
     Optional<Promoter> findByEmail(String email);
 
     List<Promoter> findByTerritoryId(String territoryId);
-    List<Promoter> findByStatus(String status);
+    List<Promoter> findByStatus(UserStatus status);
     //List<Promoter> findByState(String state);
 
 

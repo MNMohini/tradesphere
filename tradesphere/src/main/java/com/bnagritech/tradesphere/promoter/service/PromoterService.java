@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.promoter.service;
 
 
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
 
@@ -16,6 +17,6 @@ public interface PromoterService {
     PromoterResponse getPromoterByPhoneNumber(long phoneNumber);
     PromoterResponse getPromoterByEmail(String email);
     List<PromoterResponse> getPromoterByTerritory(String territoryId);
-    List<PromoterResponse> getPromoterByStatus(Boolean status);
+    List<PromoterResponse> getPromoterByStatus(UserStatus status);
 
 }

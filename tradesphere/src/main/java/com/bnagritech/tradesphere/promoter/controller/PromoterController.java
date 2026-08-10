@@ -1,9 +1,11 @@
 package com.bnagritech.tradesphere.promoter.controller;
+import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
 import com.bnagritech.tradesphere.promoter.service.PromoterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.List;
 public class PromoterController {
     private final PromoterService promoterService;
 
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<PromoterResponse> createPromoter(@RequestBody PromoterRequest request){
         return ResponseEntity.ok(promoterService.createPromoter(request));
@@ -28,8 +32,8 @@ public class PromoterController {
     public ResponseEntity<PromoterResponse> getPromoterById(@PathVariable String promoterId){
         return ResponseEntity.ok(promoterService.getPromoterById(promoterId));
     }
-
-    @PutMapping("/prmId/{promoterId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update/{promoterId}")
     public ResponseEntity<PromoterResponse> updatePromoter(
             @PathVariable String promoterId,
             @RequestBody PromoterRequest request)
@@ -53,12 +57,11 @@ public class PromoterController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<PromoterResponse>> getPromoterByStatus(@PathVariable boolean status) {
+    public ResponseEntity<List<PromoterResponse>> getPromoterByStatus(@PathVariable UserStatus status) {
         return ResponseEntity.ok(promoterService.getPromoterByStatus(status));
     }
 
-
-    @DeleteMapping("/prmId/{promoterId}")
+    @DeleteMapping("/del/{promoterId}")
     public ResponseEntity<String> deletePromoter(@PathVariable String promoterId) {
         promoterService.deletePromoter(promoterId);
         return ResponseEntity.ok("Promoter details deleted successfully");
