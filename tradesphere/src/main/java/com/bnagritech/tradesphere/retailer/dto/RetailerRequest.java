@@ -32,5 +32,5 @@ public class RetailerRequest {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;
-    private  String updatedBy;
+    private String updatedBy;
 }

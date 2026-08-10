@@ -7,6 +7,7 @@ import com.bnagritech.tradesphere.retailer.service.RetailerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class RetailerController {
     private  final RetailerService retailerService;
 
     // create
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<RetailerResponse> createRetailer(
             @RequestBody RetailerRequest request){
@@ -76,6 +78,7 @@ public class RetailerController {
     public ResponseEntity<RetailerResponse> getRetailerByEmail(@PathVariable String email){
         return ResponseEntity.ok(retailerService.getRetailerByEmail(email));
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{retailerId}")
     public ResponseEntity<RetailerResponse> updateRetailer(@PathVariable String retailerId,
                                                            @RequestBody RetailerRequest request){
@@ -91,6 +94,7 @@ public class RetailerController {
                                                            @RequestBody RetailerRequest request){
         return ResponseEntity.ok(retailerService.updateRetailerStatus(retailerId,request));
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/del/{retailerId}")
     public ResponseEntity<String> deleteRetailer(@PathVariable String retailerId){
         retailerService.deleteRetailer(retailerId);
