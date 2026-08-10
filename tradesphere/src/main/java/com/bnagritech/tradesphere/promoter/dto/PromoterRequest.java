@@ -13,7 +13,7 @@ public class PromoterRequest {
     private String promoterName;
     private String address;
     private String employeeId;
-    private String username;
+    private String userName;
     private long phoneNumber;
     private String email;
     private String territoryId;

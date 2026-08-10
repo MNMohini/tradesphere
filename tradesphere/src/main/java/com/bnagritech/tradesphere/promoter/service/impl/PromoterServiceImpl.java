@@ -33,6 +33,7 @@ import java.util.List;
 
             Promoter promoter = Promoter.builder()
                     .promoterId(request.getPromoterId())
+                    .userName(request.getUserName())
                     .promoterName(request.getPromoterName())
                     .phoneNumber(request.getPhoneNumber())
                     .address(request.getAddress())
@@ -74,7 +75,7 @@ import java.util.List;
             Promoter promoter = promoterRepository.findByPromoterId(promoterId)
                     .orElseThrow(() -> new PromoterNotFoundException("Promoter not found"));
             promoter.setPromoterId(request.getPromoterId());
-            promoter.setUserName(request.getUsername());
+            promoter.setUserName(request.getUserName());
             promoter.setPromoterName(request.getPromoterName());
             promoter.setPhoneNumber(request.getPhoneNumber());
             promoter.setEmail(request.getEmail());
