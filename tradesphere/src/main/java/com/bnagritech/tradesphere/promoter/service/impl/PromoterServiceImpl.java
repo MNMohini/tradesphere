@@ -145,7 +145,7 @@ import java.util.List;
         response.setId(promoter.getId());
         response.setPromoterId(promoter.getPromoterId());
         response.setPromoterName(promoter.getPromoterName());
-        response.setUserName(promoter.getUserName());
+        response.setUserName(promoter.getUserName()  );
         response.setPhoneNumber(promoter.getPhoneNumber());
         response.setEmail(promoter.getEmail());
         response.setAddress(promoter.getAddress());
