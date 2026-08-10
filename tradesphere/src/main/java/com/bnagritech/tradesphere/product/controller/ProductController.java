@@ -4,6 +4,7 @@ import com.bnagritech.tradesphere.product.dto.ProductResponse;
 import com.bnagritech.tradesphere.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ProductResponse> addProduct(@RequestBody ProductRequest request){
         return ResponseEntity.ok(productService.addProduct(request));
@@ -22,6 +24,7 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>>getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/Id/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable String productId,
@@ -29,7 +32,7 @@ public class ProductController {
     {
         return ResponseEntity.ok(productService.updateProduct(productId,request));
     }
-    @GetMapping("/Id/{productId}")
+    @GetMapping("/prId/{productId}")
     public ResponseEntity<ProductResponse> getProductByProductId(@PathVariable String productId){
         return ResponseEntity.ok(productService.getProductByProductId(productId));
     }
@@ -37,7 +40,7 @@ public class ProductController {
     public ResponseEntity<ProductResponse> getProductByProductName(@PathVariable String productName){
         return ResponseEntity.ok(productService.getProductByProductName(productName));
     }
-    @GetMapping("/Id/{skuCode}")
+    @GetMapping("/code/{skuCode}")
     public ResponseEntity<ProductResponse> getProductBySkuCode(@PathVariable String skuCode){
         return ResponseEntity.ok(productService.getProductByProductSkuCode(skuCode));
     }

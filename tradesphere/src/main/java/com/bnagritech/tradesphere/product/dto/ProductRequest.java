@@ -16,6 +16,5 @@ public class ProductRequest {
     private String MRP;
     @NotBlank(message = "PTR is required")
     private String PTR;
-    @NotBlank(message = "Image is required")
     private String imageUrl;
 }

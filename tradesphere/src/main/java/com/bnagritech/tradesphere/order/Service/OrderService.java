@@ -1,4 +1,5 @@
 package com.bnagritech.tradesphere.order.Service;
 
-public class OrderService {
+public interface OrderService {
+
 }
