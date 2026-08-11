@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 public class RetailerRequest {
 
     private String retailerId;
-    private String userName;
     private String shopName;
     private String ownerName;
     private String phoneNumber;

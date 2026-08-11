@@ -198,7 +198,10 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public List<RetailerResponse> getRetailerByPromoterId(String promoterId) {
-        Optional<Retailer> retailerList = retailerRepository.findByPromoterId(promoterId);
+        Optional<Retailer> retailerList = Optional.of(retailerRepository.findByPromoterId(promoterId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Promoter Id not found ")));
         return retailerList.stream()
                 .map(this::mapToResponse)
                 .toList();
