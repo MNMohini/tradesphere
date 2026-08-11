@@ -85,6 +85,7 @@ public class RetailerController {
                                                            @RequestBody RetailerRequest request){
         return ResponseEntity.ok(retailerService.updateRetailer(retailerId,request));
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/assign/{retailerId}")
     public ResponseEntity<RetailerResponse> assignRetailer(@PathVariable String retailerId,
                                                            @RequestBody RetailerRequest request){
