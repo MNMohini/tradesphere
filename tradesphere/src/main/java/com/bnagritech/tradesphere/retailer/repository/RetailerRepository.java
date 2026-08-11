@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.retailer.repository;
 
+import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.retailer.model.Retailer;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -19,19 +20,13 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
     boolean existsByRetailerId(String retailerId);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
-    boolean existsByShopNameAndCityAndState(
-            String shopName,
-            String city,
-            String state
-    );
+    boolean existsByShopNameAndCityAndState(String shopName, String city, String state);
 
     //location
-
     List<Retailer>findByCity(String city);
     List<Retailer>findByState(String state);
 
     //territory management
-
     List<Retailer>findByTerritoryId(String territoryId);
     List<Retailer>findRetailerByRetailerStatus(RetailerStatus retailerStatus);
 
@@ -39,6 +34,6 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
 
     List<Retailer> findByShopNameContainingIgnoreCase(String shopName);
     List<Retailer> findByOwnerNameContainingIgnoreCase(String shopName);
-    List<Retailer> findRetailerByEmployeeId(String employeeId);
+    List<Retailer> findRetailerByUserName(User userName);
 
 }

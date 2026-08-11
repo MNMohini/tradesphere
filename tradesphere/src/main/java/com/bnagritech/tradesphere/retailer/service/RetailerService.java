@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.retailer.service;
 
+import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
@@ -19,7 +20,7 @@ public interface RetailerService{
     List<RetailerResponse> getRetailerByTerritory(String territoryId);
     List<RetailerResponse> getRetailerByShopName(String shopName);
     List<RetailerResponse> getRetailerByOwnerName(String ownerName);
-    List<RetailerResponse> getRetailerByEmployeeId(String employeeId);
+    List<RetailerResponse> getRetailerByUserName(User userName);
     List<RetailerResponse> getRetailerByCity(String city);
     List<RetailerResponse> getRetailerByState(String state);
     List<RetailerResponse> getRetailerByRetailerStatus(RetailerStatus status);

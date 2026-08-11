@@ -1,5 +1,7 @@
 package com.bnagritech.tradesphere.retailer.service.impl;
 
+import com.bnagritech.tradesphere.auth.model.User;
+import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
@@ -19,6 +21,7 @@ import java.util.List;
 public class RetailerServiceImpl implements RetailerService {
 
     private final RetailerRepository retailerRepository;
+    private final UserRepository userRepository;
 
     @Override
     public RetailerResponse createRetailer(RetailerRequest request) {
@@ -31,6 +34,9 @@ public class RetailerServiceImpl implements RetailerService {
         if (retailerRepository.existsByRetailerId(request.getRetailerId())){
             throw new ResourceAlreadyExistsException("Resource already exists");
         }
+        if(userRepository.existsByUserName(String.valueOf(request.getUserName()))){
+            throw new ResourceNotFoundException("This user Name isn't exists.");
+        }
         if (retailerRepository.existsByShopNameAndCityAndState(
                 request.getShopName(),
                 request.getCity(),
@@ -40,7 +46,7 @@ public class RetailerServiceImpl implements RetailerService {
             Retailer retailer = Retailer.builder()
                     .retailerId(request.getRetailerId())
                     .shopName(request.getShopName())
-                    .employeeId(request.getEmployeeId())
+                    .userName(request.getUserName())
                     .ownerName(request.getOwnerName())
                     .phoneNumber(request.getPhoneNumber())
                     .alternateContactNumber(request.getAlternateContactNumber())
@@ -102,7 +108,7 @@ public class RetailerServiceImpl implements RetailerService {
         retailer.setPromoterId(request.getPromoterId());
         retailer.setRetailerType(request.getRetailerType());
         retailer.setRetailerStatus(request.getRetailerStatus());
-        retailer.setEmployeeId(request.getEmployeeId());
+        retailer.setUserName(request.getUserName());
         retailer.setGstNumber(request.getGstNumber());
         retailer.setPanNumber(request.getPanNumber());
         retailer.setLongitude(request.getLongitude());
@@ -156,7 +162,7 @@ public class RetailerServiceImpl implements RetailerService {
                 .orElseThrow(
                         ()->
                                 new ResourceNotFoundException("Retailer not found"));
-        retailer.setEmployeeId(request.getEmployeeId());
+        retailer.setUserName(request.getUserName());
 
         return mapToResponse(retailerRepository.save(retailer));
     }
@@ -196,8 +202,8 @@ public class RetailerServiceImpl implements RetailerService {
 
 
     @Override
-    public List<RetailerResponse> getRetailerByEmployeeId(String employeeId) {
-        List<Retailer> retailerList = retailerRepository.findRetailerByEmployeeId(employeeId);
+    public List<RetailerResponse> getRetailerByUserName(User userName) {
+        List<Retailer> retailerList = retailerRepository.findRetailerByUserName(userName);
         return retailerList.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -244,7 +250,7 @@ public class RetailerServiceImpl implements RetailerService {
         retailerResponse.setShopName(retailer.getShopName());
         retailerResponse.setOwnerName(retailer.getOwnerName());
         retailerResponse.setPhoneNumber(retailer.getPhoneNumber());
-        retailerResponse.setEmployeeId(retailer.getEmployeeId());
+        retailerResponse.setUserName(retailer.getUserName());
         retailerResponse.setAlternateContactNumber(retailer.getAlternateContactNumber());
         retailerResponse.setEmail(retailer.getEmail());
         retailerResponse.setAddress(retailer.getAddress());

@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.retailer.model;
 
 
+import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class Retailer {
     @Id
     private String id;
     private String retailerId;
-    private String employeeId;
+    private User userName;
     private String shopName;
     private String ownerName;
     private String phoneNumber;

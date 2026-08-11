@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.retailer.dto;
 
+import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.Data;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 public class RetailerRequest {
 
     private String retailerId;
-    private String employeeId;
+    private User userName;
     private String shopName;
     private String ownerName;
     private String phoneNumber;
