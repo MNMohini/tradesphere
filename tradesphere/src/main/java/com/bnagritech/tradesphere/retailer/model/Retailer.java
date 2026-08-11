@@ -21,7 +21,7 @@ public class Retailer {
     @Id
     private String id;
     private String retailerId;
-    private User userName;
+    private String userName;
     private String shopName;
     private String ownerName;
     private String phoneNumber;

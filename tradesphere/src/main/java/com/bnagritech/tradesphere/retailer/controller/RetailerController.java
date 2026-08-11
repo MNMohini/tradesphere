@@ -58,8 +58,8 @@ public class RetailerController {
         return ResponseEntity.ok(retailerService.getRetailerByRetailerStatus(retailerStatus));
     }
     //get retailer by employeeID
-    @GetMapping("/empId/{employeeId}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByEmployeeId(@PathVariable User userName){
+    @GetMapping("/user/{userName}")
+    public ResponseEntity<List<RetailerResponse>> getRetailerByEmployeeId(@PathVariable String userName){
         return ResponseEntity.ok(retailerService.getRetailerByUserName(userName));
     }
     @GetMapping("/owner/{ownerName}")

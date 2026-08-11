@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.retailer.service.impl;
 
-import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
@@ -33,9 +32,6 @@ public class RetailerServiceImpl implements RetailerService {
         }
         if (retailerRepository.existsByRetailerId(request.getRetailerId())){
             throw new ResourceAlreadyExistsException("Resource already exists");
-        }
-        if(userRepository.existsByUserName(String.valueOf(request.getUserName()))){
-            throw new ResourceNotFoundException("This user Name isn't exists.");
         }
         if (retailerRepository.existsByShopNameAndCityAndState(
                 request.getShopName(),
@@ -159,11 +155,8 @@ public class RetailerServiceImpl implements RetailerService {
     @Override
     public RetailerResponse assignRetailer(String retailerId, RetailerRequest request) {
         Retailer retailer = retailerRepository.findByRetailerId(retailerId)
-                .orElseThrow(
-                        ()->
-                                new ResourceNotFoundException("Retailer not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Retailer not found"));
         retailer.setUserName(request.getUserName());
-
         return mapToResponse(retailerRepository.save(retailer));
     }
 
@@ -202,7 +195,7 @@ public class RetailerServiceImpl implements RetailerService {
 
 
     @Override
-    public List<RetailerResponse> getRetailerByUserName(User userName) {
+    public List<RetailerResponse> getRetailerByUserName(String userName) {
         List<Retailer> retailerList = retailerRepository.findRetailerByUserName(userName);
         return retailerList.stream()
                 .map(this::mapToResponse)

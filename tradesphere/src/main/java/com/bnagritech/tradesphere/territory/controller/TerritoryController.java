@@ -18,13 +18,13 @@ import java.util.List;
 public class TerritoryController {
     private final TerritoryService territoryService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<TerritoryResponse> createTerritory(@Valid @RequestBody TerritoryRequest request) {
         TerritoryResponse territoryResponse = territoryService.createTerritory(request);
 
         return new ResponseEntity<>(territoryResponse, HttpStatus.CREATED);
     }
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<TerritoryResponse>> getAllTerritories() {
         return ResponseEntity.ok(territoryService.getAllTerritories());
     }
