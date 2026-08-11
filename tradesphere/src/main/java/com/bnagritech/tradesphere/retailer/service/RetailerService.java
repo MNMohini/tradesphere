@@ -20,7 +20,8 @@ public interface RetailerService{
     List<RetailerResponse> getRetailerByTerritory(String territoryId);
     List<RetailerResponse> getRetailerByShopName(String shopName);
     List<RetailerResponse> getRetailerByOwnerName(String ownerName);
-    List<RetailerResponse> getRetailerByUserName(String userName);
+    List<RetailerResponse> getRetailerByPromoterId(String promoterId);
+
     List<RetailerResponse> getRetailerByCity(String city);
     List<RetailerResponse> getRetailerByState(String state);
     List<RetailerResponse> getRetailerByRetailerStatus(RetailerStatus status);

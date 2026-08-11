@@ -1,9 +1,10 @@
 package com.bnagritech.tradesphere.retailer.service.impl;
 
-import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
+import com.bnagritech.tradesphere.promoter.model.Promoter;
+import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
 import com.bnagritech.tradesphere.retailer.model.Retailer;
@@ -14,16 +15,20 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RetailerServiceImpl implements RetailerService {
 
     private final RetailerRepository retailerRepository;
-    private final UserRepository userRepository;
+    private final PromoterRepository promoterRepository;
 
     @Override
     public RetailerResponse createRetailer(RetailerRequest request) {
+        Promoter promoter= promoterRepository.findByPromoterId(request.getPromoterId())
+                .orElseThrow(()-> new ResourceNotFoundException("Promoter Id does not exists"));
+
         if(retailerRepository.existsByEmail(request.getEmail())){
             throw new ResourceAlreadyExistsException("Resource already exists");
         }
@@ -42,7 +47,6 @@ public class RetailerServiceImpl implements RetailerService {
             Retailer retailer = Retailer.builder()
                     .retailerId(request.getRetailerId())
                     .shopName(request.getShopName())
-                    .userName(request.getUserName())
                     .ownerName(request.getOwnerName())
                     .phoneNumber(request.getPhoneNumber())
                     .alternateContactNumber(request.getAlternateContactNumber())
@@ -52,9 +56,8 @@ public class RetailerServiceImpl implements RetailerService {
                     .address(request.getAddress())
                     .territoryId(request.getTerritoryId())
                     .beatId(request.getBeatId())
-                    .promoterId(request.getPromoterId())
+                    .promoterId(promoter.getPromoterId())
                     .retailerType(request.getRetailerType())
-                    .retailerStatus(request.getRetailerStatus())
                     .gstNumber(request.getGstNumber())
                     .panNumber(request.getPanNumber())
                     .longitude(request.getLongitude())
@@ -104,7 +107,6 @@ public class RetailerServiceImpl implements RetailerService {
         retailer.setPromoterId(request.getPromoterId());
         retailer.setRetailerType(request.getRetailerType());
         retailer.setRetailerStatus(request.getRetailerStatus());
-        retailer.setUserName(request.getUserName());
         retailer.setGstNumber(request.getGstNumber());
         retailer.setPanNumber(request.getPanNumber());
         retailer.setLongitude(request.getLongitude());
@@ -156,7 +158,7 @@ public class RetailerServiceImpl implements RetailerService {
     public RetailerResponse assignRetailer(String retailerId, RetailerRequest request) {
         Retailer retailer = retailerRepository.findByRetailerId(retailerId)
                 .orElseThrow(()-> new ResourceNotFoundException("Retailer not found"));
-        retailer.setUserName(request.getUserName());
+        retailer.setPromoterId(request.getPromoterId());
         return mapToResponse(retailerRepository.save(retailer));
     }
 
@@ -195,8 +197,8 @@ public class RetailerServiceImpl implements RetailerService {
 
 
     @Override
-    public List<RetailerResponse> getRetailerByUserName(String userName) {
-        List<Retailer> retailerList = retailerRepository.findRetailerByUserName(userName);
+    public List<RetailerResponse> getRetailerByPromoterId(String promoterId) {
+        Optional<Retailer> retailerList = retailerRepository.findByPromoterId(promoterId);
         return retailerList.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -204,7 +206,7 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public List<RetailerResponse> getRetailerByCity(String city) {
-        List<Retailer> retailerList = retailerRepository.findByCity(city);
+        List<Retailer> retailerList = retailerRepository.findByCityContainingIgnoreCase(city);
         return retailerList.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -212,7 +214,7 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public List<RetailerResponse> getRetailerByState(String state) {
-       List<Retailer> retailerList = retailerRepository.findByState(state);
+       List<Retailer> retailerList = retailerRepository.findByStateContainingIgnoreCase(state);
         return retailerList.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -243,7 +245,6 @@ public class RetailerServiceImpl implements RetailerService {
         retailerResponse.setShopName(retailer.getShopName());
         retailerResponse.setOwnerName(retailer.getOwnerName());
         retailerResponse.setPhoneNumber(retailer.getPhoneNumber());
-        retailerResponse.setUserName(retailer.getUserName());
         retailerResponse.setAlternateContactNumber(retailer.getAlternateContactNumber());
         retailerResponse.setEmail(retailer.getEmail());
         retailerResponse.setAddress(retailer.getAddress());

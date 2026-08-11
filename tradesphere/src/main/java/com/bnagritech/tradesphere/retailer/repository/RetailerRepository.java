@@ -15,6 +15,7 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
     Optional<Retailer> findByRetailerId(String retailerId);
     Optional<Retailer> findByPhoneNumber(String phoneNumber);
     Optional<Retailer> findByEmail(String email);
+    Optional<Retailer> findByPromoterId(String promoterId);
 
     //Duplicate checks
     boolean existsByRetailerId(String retailerId);
@@ -23,8 +24,8 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
     boolean existsByShopNameAndCityAndState(String shopName, String city, String state);
 
     //location
-    List<Retailer>findByCity(String city);
-    List<Retailer>findByState(String state);
+    List<Retailer>findByCityContainingIgnoreCase(String city);
+    List<Retailer>findByStateContainingIgnoreCase(String state);
 
     //territory management
     List<Retailer>findByTerritoryId(String territoryId);
@@ -34,6 +35,5 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
 
     List<Retailer> findByShopNameContainingIgnoreCase(String shopName);
     List<Retailer> findByOwnerNameContainingIgnoreCase(String shopName);
-    List<Retailer> findRetailerByUserName(String userName);
 
 }
