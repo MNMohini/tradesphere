@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.retailer.controller;
 
+import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
@@ -58,8 +59,8 @@ public class RetailerController {
     }
     //get retailer by employeeID
     @GetMapping("/empId/{employeeId}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByEmployeeId(@PathVariable String employeeId){
-        return ResponseEntity.ok(retailerService.getRetailerByEmployeeId(employeeId));
+    public ResponseEntity<List<RetailerResponse>> getRetailerByEmployeeId(@PathVariable User userName){
+        return ResponseEntity.ok(retailerService.getRetailerByUserName(userName));
     }
     @GetMapping("/owner/{ownerName}")
     public ResponseEntity<List<RetailerResponse>> getRetailerByOwnerName(@PathVariable String ownerName){
