@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.outlet.service.impl;
 
+import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.outlet.dto.OutletRequest;
@@ -181,18 +182,39 @@ public class OutletServiceImpl implements OutletService {
     }
 
     @Override
-    public List<OutletResponse> getOutletByOutletStatus(String outletStatus) {
-        return List.of();
+    public List<OutletResponse> getOutletByOutletStatus(OutletStatus outletStatus) {
+        List<Outlet> outletList = outletRepository.findOutletByOutletStatus(outletStatus);
+        if(outletList.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    " No Outlets exists with this status. ");
+        }
+        return outletList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
     public List<OutletResponse> getOutletByOutletCity(String city) {
-        return List.of();
+        List<Outlet> outletList = outletRepository.findByCityContainingIgnoreCase(city);
+        if(outletList.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    " No Outlets exists in this city. ");
+        }
+        return outletList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
     public List<OutletResponse> getOutletByOutletState(String state) {
-        return List.of();
+        List<Outlet> outletList = outletRepository.findByStateContainingIgnoreCase(state);
+        if(outletList.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    " No Outlets exists in this state. ");
+        }
+        return outletList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
