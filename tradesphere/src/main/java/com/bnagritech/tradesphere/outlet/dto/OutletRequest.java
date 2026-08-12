@@ -2,8 +2,6 @@ package com.bnagritech.tradesphere.outlet.dto;
 
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.OutletType;
-import com.bnagritech.tradesphere.common.enums.RetailerStatus;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.Data;
 import java.time.LocalDateTime;
 

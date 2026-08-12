@@ -1,8 +1,6 @@
 package com.bnagritech.tradesphere.outlet.service;
 import com.bnagritech.tradesphere.outlet.dto.OutletRequest;
 import com.bnagritech.tradesphere.outlet.dto.OutletResponse;
-import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
-
 import java.util.List;
 
 public interface OutletService {
