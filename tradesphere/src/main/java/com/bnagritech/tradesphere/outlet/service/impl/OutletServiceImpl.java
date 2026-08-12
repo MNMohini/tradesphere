@@ -181,6 +181,21 @@ public class OutletServiceImpl implements OutletService {
     }
 
     @Override
+    public List<OutletResponse> getOutletByOutletStatus(String outletStatus) {
+        return List.of();
+    }
+
+    @Override
+    public List<OutletResponse> getOutletByOutletCity(String city) {
+        return List.of();
+    }
+
+    @Override
+    public List<OutletResponse> getOutletByOutletState(String state) {
+        return List.of();
+    }
+
+    @Override
     public void deleteOutlet(String outletId) {
        Outlet outlet = outletRepository.findByOutletId(outletId)
                 .orElseThrow(

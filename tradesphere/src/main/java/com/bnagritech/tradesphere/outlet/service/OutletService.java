@@ -14,6 +14,9 @@ public interface OutletService {
     List<OutletResponse> getOutletsByTerritoryId(String territoryId);
     List<OutletResponse> getOutletsByOutletName(String outletName);
     List<OutletResponse> getOutletsByPromoterId(String promoterId);
+    List<OutletResponse> getOutletByOutletStatus(String outletStatus);
+    List<OutletResponse> getOutletByOutletCity(String city);
+    List<OutletResponse> getOutletByOutletState(String state);
     void deleteOutlet (String outletId );
     List<OutletResponse> getAllOutlets();
 }
