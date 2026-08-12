@@ -1,5 +1,7 @@
 package com.bnagritech.tradesphere.outlet.dto;
 
+import com.bnagritech.tradesphere.common.enums.OutletStatus;
+import com.bnagritech.tradesphere.common.enums.OutletType;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.AllArgsConstructor;
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OutletResponse {
-    private String retailerId;
+    private String outletId;
     private String outletName;
     private String phoneNumber;
     private String alternateContactNumber;
@@ -23,7 +25,7 @@ public class OutletResponse {
     private String territoryId;
     private String beatId;
     private String promoterId;
-    private RetailerType retailerType;
+    private OutletType outletType;
     private String gstNumber;
     private String City;
     private String State;
@@ -32,7 +34,7 @@ public class OutletResponse {
     private Double longitude;
     private Double creditDays;
     private Double creditLimits;
-    private RetailerStatus retailerStatus;
+    private OutletStatus outletStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;

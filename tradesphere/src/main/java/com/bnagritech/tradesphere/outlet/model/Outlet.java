@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.outlet.model;
 
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
+import com.bnagritech.tradesphere.common.enums.OutletType;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ public class Outlet {
     private String territoryId;
     private String beatId;
     private String promoterId;
-    private RetailerType retailerType;
+    private OutletType outletType;
     private String gstNumber;
     private String panNumber;
     private Double latitude;
