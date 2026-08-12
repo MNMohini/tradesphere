@@ -17,8 +17,8 @@ public interface OutletService {
     List<OutletResponse> getOutletsByOutletName(String outletName);
     List<OutletResponse> getOutletsByPromoterId(String promoterId);
     List<OutletResponse> getOutletByOutletStatus(OutletStatus outletStatus);
-    List<OutletResponse> getOutletByOutletCity(String city);
-    List<OutletResponse> getOutletByOutletState(String state);
+    List<OutletResponse> getOutletByCity(String city);
+    List<OutletResponse> getOutletByState(String state);
     List<OutletResponse> getOutletByOutletType(OutletType outletType);
     void deleteOutlet (String outletId );
     List<OutletResponse> getAllOutlets();

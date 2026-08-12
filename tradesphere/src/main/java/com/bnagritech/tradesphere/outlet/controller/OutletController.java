@@ -1,6 +1,8 @@
 package com.bnagritech.tradesphere.outlet.controller;
 
 
+import com.bnagritech.tradesphere.common.enums.OutletStatus;
+import com.bnagritech.tradesphere.common.enums.OutletType;
 import com.bnagritech.tradesphere.outlet.dto.OutletRequest;
 import com.bnagritech.tradesphere.outlet.dto.OutletResponse;
 import com.bnagritech.tradesphere.outlet.service.OutletService;
@@ -59,8 +61,25 @@ public class OutletController {
     public ResponseEntity<List<OutletResponse>> getOutletByTerritoryId(@PathVariable String territoryId){
         return ResponseEntity.ok(outletService.getOutletsByTerritoryId(territoryId));
     }
+    @GetMapping("/city/{city}")
+    public ResponseEntity<List<OutletResponse>> getOutletByCity(@PathVariable String city){
+        return ResponseEntity.ok(outletService.getOutletByCity(city));
+    }
+    @GetMapping("/state/{state}")
+    public ResponseEntity<List<OutletResponse>> getOutletByState(@PathVariable String state){
+        return ResponseEntity.ok(outletService.getOutletByState(state));
+    }
+    @GetMapping("/type/{outletType}")
+    public ResponseEntity<List<OutletResponse>> getOutletByOutletType(@PathVariable OutletType outletType){
+        return ResponseEntity.ok(outletService.getOutletByOutletType(outletType));
+    }
+    @GetMapping("/status/{outletStatus}")
+    public ResponseEntity<List<OutletResponse>> getOutletByOutletStatus(@PathVariable OutletStatus outletStatus){
+        return ResponseEntity.ok(outletService.getOutletByOutletStatus(outletStatus));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/status/{outletId}")
+    @PatchMapping("/update/{outletId}")
     public ResponseEntity<OutletResponse> updateOutletStatus(@PathVariable String outletId,
                                                                  @RequestBody OutletRequest request){
         return ResponseEntity.ok(outletService.updateOutletStatus(outletId,request));

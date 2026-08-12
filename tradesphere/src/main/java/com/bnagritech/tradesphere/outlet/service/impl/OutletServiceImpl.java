@@ -195,7 +195,7 @@ public class OutletServiceImpl implements OutletService {
     }
 
     @Override
-    public List<OutletResponse> getOutletByOutletCity(String city) {
+    public List<OutletResponse> getOutletByCity(String city) {
         List<Outlet> outletList = outletRepository.findByCityContainingIgnoreCase(city);
         if(outletList.isEmpty()) {
             throw new ResourceNotFoundException(
@@ -207,7 +207,7 @@ public class OutletServiceImpl implements OutletService {
     }
 
     @Override
-    public List<OutletResponse> getOutletByOutletState(String state) {
+    public List<OutletResponse> getOutletByState(String state) {
         List<Outlet> outletList = outletRepository.findByStateContainingIgnoreCase(state);
         if(outletList.isEmpty()) {
             throw new ResourceNotFoundException(
