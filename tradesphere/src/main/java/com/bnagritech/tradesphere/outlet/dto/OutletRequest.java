@@ -10,7 +10,6 @@ public class OutletRequest {
 
     private String outletId;
     private String shopName;
-    private String ownerName;
     private String phoneNumber;
     private String alternateContactNumber;
     private String email;
