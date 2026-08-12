@@ -1,7 +1,6 @@
 package com.bnagritech.tradesphere.retailer.model;
 
 
-import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.AllArgsConstructor;

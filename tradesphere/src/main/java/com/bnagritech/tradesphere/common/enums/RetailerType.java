@@ -1,14 +1,18 @@
 package com.bnagritech.tradesphere.common.enums;
 
 public enum RetailerType {
-    //B TO B
-    HORECA,
-    // B TO C
+    MODERN_TRADE,
     GENERAL_STORE,
-    SUPER_MARKET,
-    DISTRIBUTOR_RETAILER,
     E_COMMERCE,
-    //canteen stores department
-    CSD,
-    CPC
+    SUPER_STORE,
+    GROCERY,
+    KIRANA_STORE,
+    SUPER_MARKET,
+    DEPARTMENTAL_STORE,
+    KEY_ACCOUNT,
+    CONVENIENCE_STORE,
+    DISCOUNT_STORE,
+    SPECIALITY_STORE,
+    MALLS,
+    MEDICAL_STORE
 }
