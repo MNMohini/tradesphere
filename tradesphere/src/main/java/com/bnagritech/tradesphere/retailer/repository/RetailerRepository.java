@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.retailer.repository;
 
-import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.retailer.model.Retailer;
 import org.springframework.data.mongodb.repository.MongoRepository;

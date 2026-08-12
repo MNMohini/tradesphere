@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.outlet.model;
 
+import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ public class Outlet {
     private Double longitude;
     private Double creditDays;
     private Double creditLimits;
-    private RetailerStatus retailerStatus;
+    private OutletStatus outletStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;

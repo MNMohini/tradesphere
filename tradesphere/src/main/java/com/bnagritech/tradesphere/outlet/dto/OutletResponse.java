@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class OutletResponse {
     private String retailerId;
-    private String shopName;
+    private String outletName;
     private String phoneNumber;
     private String alternateContactNumber;
     private String email;

@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.outlet.dto;
 
+import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.Data;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 public class OutletRequest {
 
     private String outletId;
-    private String shopName;
+    private String outletName;
     private String phoneNumber;
     private String alternateContactNumber;
     private String email;
@@ -26,7 +27,7 @@ public class OutletRequest {
     private Double longitude;
     private Double creditDays;
     private Double creditLimits;
-    private RetailerStatus retailerStatus;
+    private OutletStatus outletStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;
