@@ -29,15 +29,15 @@ public class OutletController {
     public ResponseEntity <List<OutletResponse>> getAll(){
         return ResponseEntity.ok(outletService.getAllOutlets());
     }
-    @GetMapping("id/{outletId}")
+    @GetMapping("/id/{outletId}")
     public ResponseEntity<OutletResponse> getOutletByOutletId(@PathVariable String outletId){
         return ResponseEntity.ok(outletService.getOutletByOutletId(outletId));
     }
-    @GetMapping("phn/{phoneNumber}")
+    @GetMapping("/phn/{phoneNumber}")
     public ResponseEntity<OutletResponse> getOutletByPhoneNumber(@PathVariable String phoneNumber) {
         return ResponseEntity.ok(outletService.getOutletByPhoneNumber(phoneNumber));
     }
-    @GetMapping("email/{email}")
+    @GetMapping("/email/{email}")
     public ResponseEntity<OutletResponse> getOutletByEmail(@PathVariable String email) {
         return ResponseEntity.ok(outletService.getOutletByEmail(email));
     }
@@ -47,20 +47,20 @@ public class OutletController {
         outletService.deleteOutlet(outletId);
         return ResponseEntity.ok("Deleted successfully");
     }
-    @GetMapping("/outlet/{promoterId}")
+    @GetMapping("/{promoterId}")
     public ResponseEntity<List<OutletResponse>> getOutletByPromoterId(@PathVariable String promoterId){
         return ResponseEntity.ok(outletService.getOutletsByPromoterId(promoterId));
     }
-    @GetMapping("/outlet/{outletName}")
+    @GetMapping("/list/{outletName}")
     public ResponseEntity<List<OutletResponse>> getOutletByOutletName(@PathVariable String outletName){
         return ResponseEntity.ok(outletService.getOutletsByOutletName(outletName));
     }
-    @GetMapping("/outlet/{territoryId}")
+    @GetMapping("/tr/{territoryId}")
     public ResponseEntity<List<OutletResponse>> getOutletByTerritoryId(@PathVariable String territoryId){
         return ResponseEntity.ok(outletService.getOutletsByTerritoryId(territoryId));
     }
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/status/{outletStatus}")
+    @PatchMapping("/status/{outletId}")
     public ResponseEntity<OutletResponse> updateOutletStatus(@PathVariable String outletId,
                                                                  @RequestBody OutletRequest request){
         return ResponseEntity.ok(outletService.updateOutletStatus(outletId,request));
