@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.outlet.service.impl;
 
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
+import com.bnagritech.tradesphere.common.enums.OutletType;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.outlet.dto.OutletRequest;
@@ -215,6 +216,19 @@ public class OutletServiceImpl implements OutletService {
         return outletList.stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Override
+    public List<OutletResponse> getOutletByOutletType(OutletType outletType) {
+        List<Outlet> outletList = outletRepository.findOutletByOutletType(outletType);
+        if(outletList.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    " we don't have this type of outlets. ");
+        }
+        return outletList.stream()
+                .map(this::mapToResponse)
+                .toList();
+
     }
 
     @Override

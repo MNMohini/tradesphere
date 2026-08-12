@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.outlet.service;
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
+import com.bnagritech.tradesphere.common.enums.OutletType;
 import com.bnagritech.tradesphere.outlet.dto.OutletRequest;
 import com.bnagritech.tradesphere.outlet.dto.OutletResponse;
 import java.util.List;
@@ -18,6 +19,7 @@ public interface OutletService {
     List<OutletResponse> getOutletByOutletStatus(OutletStatus outletStatus);
     List<OutletResponse> getOutletByOutletCity(String city);
     List<OutletResponse> getOutletByOutletState(String state);
+    List<OutletResponse> getOutletByOutletType(OutletType outletType);
     void deleteOutlet (String outletId );
     List<OutletResponse> getAllOutlets();
 }
