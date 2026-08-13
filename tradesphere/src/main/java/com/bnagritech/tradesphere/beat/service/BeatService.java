@@ -5,7 +5,6 @@ import com.bnagritech.tradesphere.beat.dto.BeatsResponse;
 import com.bnagritech.tradesphere.common.enums.ApprovalStatus;
 import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public interface BeatService {
     List<BeatsResponse> searchByState(String state);
     // DASHBOARD FILTERS
     List<BeatsResponse> getByStatus(BeatStatus status);
-    List<BeatsResponse> getByBeatType(RetailerType beatType);
+    List<BeatsResponse> getByBeatType(String beatType);
     List<BeatsResponse> getByApprovalStatus(ApprovalStatus approvalStatus);
 
 }

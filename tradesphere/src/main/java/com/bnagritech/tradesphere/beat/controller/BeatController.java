@@ -6,7 +6,6 @@ import com.bnagritech.tradesphere.beat.service.BeatService;
 import com.bnagritech.tradesphere.common.enums.ApprovalStatus;
 import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -112,7 +111,7 @@ public class BeatController {
     }
     @GetMapping("type/{beatType}")
     public ResponseEntity<List<BeatsResponse>>getAllBeatsByBeatType(
-            @PathVariable RetailerType beatType    )
+            @PathVariable String beatType    )
     {
         return ResponseEntity.ok(beatService.getByBeatType(beatType));
     }

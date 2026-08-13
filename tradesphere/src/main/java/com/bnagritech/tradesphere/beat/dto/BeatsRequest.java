@@ -14,7 +14,7 @@ public class BeatsRequest {
     private String managerId;
     private String beatCode;
     private String description;
-    private RetailerType beatType;
+    private String beatType;
     // Territory
     private String territoryId;
     // Employee Assignment

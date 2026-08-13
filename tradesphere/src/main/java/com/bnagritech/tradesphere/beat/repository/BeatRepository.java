@@ -4,7 +4,6 @@ import com.bnagritech.tradesphere.beat.model.Beat;
 import com.bnagritech.tradesphere.common.enums.ApprovalStatus;
 import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -30,6 +29,6 @@ public interface BeatRepository extends MongoRepository<Beat, String> {
     List<Beat> findByStateIgnoreCase(String state);
     // FILTERS FOR DASHBOARD
     List<Beat> findByStatus(BeatStatus status);
-    List<Beat> findByBeatType(RetailerType beatType);
+    List<Beat> findByBeatType(String beatType);
     List<Beat> findByApprovalStatus(ApprovalStatus approvalStatus);
 }

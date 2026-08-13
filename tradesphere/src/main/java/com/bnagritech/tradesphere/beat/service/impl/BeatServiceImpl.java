@@ -9,7 +9,6 @@ import com.bnagritech.tradesphere.beat.service.BeatService;
 import com.bnagritech.tradesphere.common.enums.ApprovalStatus;
 import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.retailer.repository.RetailerRepository;
@@ -216,7 +215,7 @@ public class BeatServiceImpl implements BeatService {
     }
 
     @Override
-    public List<BeatsResponse> getByBeatType(RetailerType beatType) {
+    public List<BeatsResponse> getByBeatType(String beatType) {
         return beatRepository.findByBeatType(beatType)
                 .stream()
                 .map(this:: mapToResponse)
