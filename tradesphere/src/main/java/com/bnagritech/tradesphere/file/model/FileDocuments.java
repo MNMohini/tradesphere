@@ -20,10 +20,12 @@ public class FileDocuments {
     private String originalFileName;
     private String storedFileName;
     private Long fileSize;
+    private String contentType;
     private String storageKey;
     private String fileUrl;
-    private Modules module;
+    private String module;
     private String referenceId;
+    private String uploadedBy;
     private LocalDateTime uploadedAt;
     private LocalDateTime updatedAt;
 
