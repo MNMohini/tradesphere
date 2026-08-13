@@ -9,7 +9,7 @@ import java.util.List;
 public interface FileDocService {
 
     FileResponse uploadFile(MultipartFile file, String module, String referenceId);
-    Resource downloadFile(String fileId);
+    Resource getFile(String fileId);
     List<FileResponse> getFiles(String module, String referenceId);
     void deleteFile(String fileId);
 }
