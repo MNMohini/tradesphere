@@ -96,7 +96,7 @@ public class RetailerServiceImpl implements RetailerService {
     public RetailerResponse updateOutletIds(String retailerId, RetailerRequest request) {
         Retailer retailer = retailerRepository.findByRetailerId(retailerId)
                 .orElseThrow(()-> new ResourceNotFoundException(
-                                        "Retailer not found with this Number"));
+                                        "Retailer not found with this Id"));
         retailer.setOutletIds(request.getOutletIds());
         Retailer updatedOutletIds= retailerRepository.save(retailer);
 
@@ -105,8 +105,11 @@ public class RetailerServiceImpl implements RetailerService {
 
     @Override
     public RetailerResponse getRetailerByRetailerName(String retailerName) {
-        Retailer retailer = retailerRepository.findByRetailerNameContainingIgnoreCase(retailerName);
-       return mapToResponse(retailer);
+        Retailer retailer = retailerRepository.findByRetailerNameContainingIgnoreCase(retailerName)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException(
+                                "Retailer not found "));
+        return mapToResponse(retailer);
 
     }
 
