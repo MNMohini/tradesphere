@@ -1,6 +1,4 @@
 package com.bnagritech.tradesphere.retailer.controller;
-
-import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
 import com.bnagritech.tradesphere.retailer.service.RetailerService;
@@ -34,26 +32,36 @@ public class RetailerController {
     //get retailer by id
     @GetMapping("/rtId/{retailerId}")
     public ResponseEntity<RetailerResponse> getRetailerById(@PathVariable String retailerId){
-        return ResponseEntity.ok(retailerService.getRetailerById(retailerId));
+        return ResponseEntity.ok(retailerService.getRetailerByRetailerId(retailerId));
     }
     //get retailer by phoneNumber
     @GetMapping("/phn/{phoneNumber}")
     public ResponseEntity<RetailerResponse> getRetailerByPhoneNumber(@PathVariable String phoneNumber){
         return ResponseEntity.ok(retailerService.getRetailerByPhoneNumber(phoneNumber));
     }
-
+    @GetMapping("/byName/{retailerName}")
+    public ResponseEntity<RetailerResponse> getRetailerByRetailerName(@PathVariable String retailerName){
+        return ResponseEntity.ok(retailerService.getRetailerByRetailerName(retailerName));
+    }
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{retailerId}")
     public ResponseEntity<RetailerResponse> updateRetailer(@PathVariable String retailerId,
                                                            @RequestBody RetailerRequest request){
         return ResponseEntity.ok(retailerService.updateRetailer(retailerId,request));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/status/{retailerId}")
     public ResponseEntity<RetailerResponse> updateRetailerStatus(@PathVariable String retailerId,
                                                            @RequestBody RetailerRequest request){
         return ResponseEntity.ok(retailerService.updateRetailerStatus(retailerId,request));
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/outletId/{retailerId}")
+    public ResponseEntity<RetailerResponse> updateOutletList(@PathVariable String retailerId,
+                                                                 @RequestBody RetailerRequest request){
+        return ResponseEntity.ok(retailerService.updateOutletIds(retailerId,request));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/del/{retailerId}")
     public ResponseEntity<String> deleteRetailer(@PathVariable String retailerId){

@@ -1,10 +1,7 @@
 package com.bnagritech.tradesphere.retailer.service.impl;
 
-import com.bnagritech.tradesphere.common.enums.RetailerStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.promoter.model.Promoter;
-import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
 import com.bnagritech.tradesphere.retailer.dto.RetailerRequest;
 import com.bnagritech.tradesphere.retailer.dto.RetailerResponse;
 import com.bnagritech.tradesphere.retailer.model.Retailer;
@@ -21,19 +18,20 @@ import java.util.List;
 public class RetailerServiceImpl implements RetailerService {
 
     private final RetailerRepository retailerRepository;
-    private final PromoterRepository promoterRepository;
 
     @Override
     public RetailerResponse createRetailer(RetailerRequest request) {
 
         if(retailerRepository.existsByPhoneNumber(request.getPhoneNumber())){
-            throw new ResourceAlreadyExistsException("Resource already exists");
+            throw new ResourceAlreadyExistsException("Retailer already exists with this Number.");
         }
         if (retailerRepository.existsByRetailerId(request.getRetailerId())){
-            throw new ResourceAlreadyExistsException("Resource already exists");
+            throw new ResourceAlreadyExistsException("Retailer already exists with this RetailerId.");
         }
             Retailer retailer = Retailer.builder()
                     .retailerId(request.getRetailerId())
+                    .retailerName(request.getRetailerName())
+                    .outletIds(request.getOutletIds())
                     .phoneNumber(request.getPhoneNumber())
                     .address(request.getAddress())
                     .panNumber(request.getPanNumber())
@@ -46,13 +44,10 @@ public class RetailerServiceImpl implements RetailerService {
     }
 
     @Override
-    public RetailerResponse getRetailerById(String retailerId) {
+    public RetailerResponse getRetailerByRetailerId(String retailerId) {
         Retailer retailer = retailerRepository.findByRetailerId(retailerId)
                 .orElseThrow(
-                        ()->
-                                new ResourceNotFoundException(
-                                        "Retailer not found with " +retailerId +" id"));
-
+                        ()-> new ResourceNotFoundException("Retailer not found with " +retailerId +" id"));
         return mapToResponse(retailer);
     }
 
@@ -60,16 +55,18 @@ public class RetailerServiceImpl implements RetailerService {
     public RetailerResponse updateRetailer(String retailerId, RetailerRequest request) {
         Retailer retailer = retailerRepository.findByRetailerId(retailerId)
                 .orElseThrow(
-                        ()->
-                                new ResourceNotFoundException(
+                        ()-> new ResourceNotFoundException(
                                         "Retailer not found with " +retailerId +" id"));
         retailer.setRetailerId(request.getRetailerId());
+        retailer.setRetailerName(request.getRetailerName());
+        retailer.setOutletIds(request.getOutletIds());
         retailer.setRetailerStatus(request.getRetailerStatus());
         retailer.setPhoneNumber(request.getPhoneNumber());
         retailer.setAddress(request.getAddress());
         retailer.setRetailerStatus(request.getRetailerStatus());
         retailer.setPanNumber(request.getPanNumber());
         retailer.setCreatedBy(request.getCreatedBy());
+
             Retailer updatedRetailer = retailerRepository.save(retailer);
             return mapToResponse(updatedRetailer);
     }
@@ -78,8 +75,7 @@ public class RetailerServiceImpl implements RetailerService {
     public RetailerResponse getRetailerByPhoneNumber(String phoneNumber) {
         Retailer retailer = retailerRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(
-                        ()->
-                                 new ResourceNotFoundException(
+                        ()-> new ResourceNotFoundException(
                                          "Retailer not found with " +phoneNumber));
         return mapToResponse(retailer);
     }
@@ -96,14 +92,15 @@ public class RetailerServiceImpl implements RetailerService {
         return mapToResponse(updatedRetailer);
     }
 
-
     @Override
-    public void deleteRetailer(String retailerId) {
+    public RetailerResponse updateOutletIds(String retailerId, RetailerRequest request) {
         Retailer retailer = retailerRepository.findByRetailerId(retailerId)
-                .orElseThrow(
-                        ()-> new ResourceNotFoundException(
-                                "Retailer not found with " +retailerId + " id"));
-        retailerRepository.delete(retailer);
+                .orElseThrow(()-> new ResourceNotFoundException(
+                                        "Retailer not found with this Number"));
+        retailer.setOutletIds(request.getOutletIds());
+        Retailer updatedOutletIds= retailerRepository.save(retailer);
+
+        return mapToResponse(updatedOutletIds);
     }
 
     @Override
@@ -122,9 +119,20 @@ public class RetailerServiceImpl implements RetailerService {
                 .toList();
     }
 
+    @Override
+    public void deleteRetailer(String retailerId) {
+        Retailer retailer = retailerRepository.findByRetailerId(retailerId)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException(
+                                "Retailer not found with " +retailerId + " id"));
+        retailerRepository.delete(retailer);
+    }
+
     private RetailerResponse mapToResponse(Retailer retailer){
         RetailerResponse retailerResponse = new RetailerResponse();
         retailerResponse.setRetailerId(retailer.getRetailerId());
+        retailerResponse.setRetailerName(retailer.getRetailerName());
+        retailerResponse.setOutletIds(retailer.getOutletIds());
         retailerResponse.setPhoneNumber(retailer.getPhoneNumber());
         retailerResponse.setAddress(retailer.getAddress());
         retailerResponse.setPanNumber(retailer.getPanNumber());
