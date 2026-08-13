@@ -41,55 +41,14 @@ public class RetailerController {
     public ResponseEntity<RetailerResponse> getRetailerByPhoneNumber(@PathVariable String phoneNumber){
         return ResponseEntity.ok(retailerService.getRetailerByPhoneNumber(phoneNumber));
     }
-    //get retailers by city
-    @GetMapping("/city/{city}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByCity(@PathVariable String city){
-        return ResponseEntity.ok(retailerService.getRetailerByCity(city));
-    }
-    //get retailers by state
-    @GetMapping("/state/{state}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByState(@PathVariable String state){
-        return ResponseEntity.ok(retailerService.getRetailerByState(state));
-    }
-    //By status
-    @GetMapping("/status/{retailerStatus}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByStatus(@PathVariable RetailerStatus retailerStatus){
-        return ResponseEntity.ok(retailerService.getRetailerByRetailerStatus(retailerStatus));
-    }
-    //get retailer by employeeID
-    @GetMapping("/rt/{promoterId}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByPromoterId(@PathVariable String promoterId){
-        return ResponseEntity.ok(retailerService.getRetailerByPromoterId(promoterId));
-    }
-    @GetMapping("/owner/{ownerName}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByOwnerName(@PathVariable String ownerName){
-        return ResponseEntity.ok(retailerService.getRetailerByOwnerName(ownerName));
-    }
-    @GetMapping("/shop/{shopName}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByShopName(@PathVariable String shopName){
-        return ResponseEntity.ok(retailerService.getRetailerByShopName(shopName));
-    }
-    @GetMapping("/territory/{territoryId}")
-    public ResponseEntity<List<RetailerResponse>> getRetailerByTerritory(@PathVariable String territoryId){
-        return ResponseEntity.ok(retailerService.getRetailerByTerritory(territoryId));
-    }
-    //by email
-    @GetMapping("/email/{email}")
-    public ResponseEntity<RetailerResponse> getRetailerByEmail(@PathVariable String email){
-        return ResponseEntity.ok(retailerService.getRetailerByEmail(email));
-    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{retailerId}")
     public ResponseEntity<RetailerResponse> updateRetailer(@PathVariable String retailerId,
                                                            @RequestBody RetailerRequest request){
         return ResponseEntity.ok(retailerService.updateRetailer(retailerId,request));
     }
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/assign/{retailerId}")
-    public ResponseEntity<RetailerResponse> assignRetailer(@PathVariable String retailerId,
-                                                           @RequestBody RetailerRequest request){
-        return ResponseEntity.ok(retailerService.assignRetailer(retailerId,request));
-    }
+
     @PatchMapping("/status/{retailerId}")
     public ResponseEntity<RetailerResponse> updateRetailerStatus(@PathVariable String retailerId,
                                                            @RequestBody RetailerRequest request){
