@@ -28,6 +28,5 @@ public class FileDocuments {
     private String referenceId;
     private String uploadedBy;
     private LocalDateTime uploadedAt;
-    private LocalDateTime updatedAt;
 
 }
