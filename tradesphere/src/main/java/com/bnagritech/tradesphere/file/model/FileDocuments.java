@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class FileDocuments {
     @Id
     private String id;
+    private String fileId;
     private String originalFileName;
     private String storedFileName;
     private Long fileSize;
