@@ -13,18 +13,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FileResponse {
 
-    private String id;
     private String fileId;
     private String originalFileName;
     private String storedFileName;
     private Long fileSize;
     private String contentType;
-    private String storageKey;
     private String fileUrl;
     private String module;
     private String referenceId;
     private String uploadedBy;
     private LocalDateTime uploadedAt;
-    private LocalDateTime updatedAt;
 
 }
