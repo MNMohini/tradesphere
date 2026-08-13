@@ -2,8 +2,6 @@ package com.bnagritech.tradesphere.outlet.model;
 
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.OutletType;
-import com.bnagritech.tradesphere.common.enums.RetailerStatus;
-import com.bnagritech.tradesphere.common.enums.RetailerType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
