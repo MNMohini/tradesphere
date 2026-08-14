@@ -26,7 +26,12 @@ public class RetailerServiceImpl implements RetailerService {
             throw new ResourceAlreadyExistsException("Retailer already exists with this Number.");
         }
         if (retailerRepository.existsByRetailerId(request.getRetailerId())){
-            throw new ResourceAlreadyExistsException("Retailer already exists with this RetailerId.");
+           throw new ResourceAlreadyExistsException("Retailer already exists with this RetailerId.");
+        }
+        if (retailerRepository.existsByRetailerNameAndRetailerIdAndPhoneNumber(
+                request.getRetailerName(), request.getRetailerId(), request.getPhoneNumber()))
+        {
+            throw new ResourceAlreadyExistsException("Retailer Already Exists");
         }
             Retailer retailer = Retailer.builder()
                     .retailerId(request.getRetailerId())
@@ -74,8 +79,7 @@ public class RetailerServiceImpl implements RetailerService {
     @Override
     public RetailerResponse getRetailerByPhoneNumber(String phoneNumber) {
         Retailer retailer = retailerRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(
-                        ()-> new ResourceNotFoundException(
+                .orElseThrow(()-> new ResourceNotFoundException(
                                          "Retailer not found with " +phoneNumber));
         return mapToResponse(retailer);
     }
@@ -133,6 +137,7 @@ public class RetailerServiceImpl implements RetailerService {
 
     private RetailerResponse mapToResponse(Retailer retailer){
         RetailerResponse retailerResponse = new RetailerResponse();
+        retailerResponse.setId(retailer.getId());
         retailerResponse.setRetailerId(retailer.getRetailerId());
         retailerResponse.setRetailerName(retailer.getRetailerName());
         retailerResponse.setOutletIds(retailer.getOutletIds());
