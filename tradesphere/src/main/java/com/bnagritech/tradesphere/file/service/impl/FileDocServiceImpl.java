@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.UUID;
 @Service
@@ -44,7 +45,7 @@ public class FileDocServiceImpl implements FileDocService {
             if (file == null || file.isEmpty()) {
                 throw new IllegalArgumentException("File is empty");
             }
-            String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             String extension = "";
             int lastDot = originalFileName.lastIndexOf(".");
             if (lastDot > 0) {
