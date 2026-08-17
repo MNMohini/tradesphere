@@ -11,7 +11,6 @@ import java.util.List;
 public interface FileDocService {
 
     FileDocuments uploadFile(MultipartFile file, String module, String referenceId) throws IOException;
-    Resource getFile(String fileId);
     FileDocuments getFileById(String fileId);
     List<FileDocuments> getFilesByModuleAndReferenceId(String module, String referenceId);
     void deleteFile(String fileId) throws IOException;
