@@ -1,6 +1,8 @@
 package com.bnagritech.tradesphere.order.dto;
 
+import com.bnagritech.tradesphere.common.enums.OrderSource;
 import com.bnagritech.tradesphere.common.enums.OrderStatus;
+import com.bnagritech.tradesphere.common.enums.OrderType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,28 +13,13 @@ import java.util.List;
 @Data
 @Builder
 public class OrderResponse {
-    private String id;
-    private String orderNumber;
 
-    private String retailerId;
-    private String retailerName;
-
-    private String distributorId;
-    private String distributorName;
-
+    private OrderType orderType;
+    private OrderSource orderSource;
+    private String outletId;
     private String promoterId;
-    private String promoterName;
-
-    private List<OrderItemResponse> items;
-
-    private Integer totalQuantity;
-    private BigDecimal totalAmount;
-
-    private OrderStatus status;
-
+    private String territoryId;
     private String remarks;
+    private List<OrderItemRequest> items;
 
-    private LocalDateTime orderDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
