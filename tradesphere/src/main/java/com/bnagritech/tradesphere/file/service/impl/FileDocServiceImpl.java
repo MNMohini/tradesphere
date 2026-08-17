@@ -3,6 +3,7 @@ import com.bnagritech.tradesphere.file.dto.FileResponse;
 import com.bnagritech.tradesphere.file.model.FileDocuments;
 import com.bnagritech.tradesphere.file.repository.FileRepository;
 import com.bnagritech.tradesphere.file.service.FileDocService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -10,132 +11,145 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.UUID;
 @Service
+@RequiredArgsConstructor
 public class FileDocServiceImpl implements FileDocService {
 
     private final FileRepository fileRepository;
-    private final Path uploadDirectory;
 
-    public FileDocServiceImpl(FileRepository fileRepository,
-                              @Value("${file.upload-dir:uploads}")String uploadDir) {
-
-        this.fileRepository = fileRepository;
-        this.uploadDirectory = Paths.get(uploadDir).toAbsolutePath().normalize();
-        try {
-            Files.createDirectories(this.uploadDirectory);
-        }
-        catch (IOException ex) {
-            throw new RuntimeException("Could not create upload directory", ex);
-        }
-    }
+    @Value("${file.upload-dir:uploads}")
+    private String uploadDir;
 
     @Override
-    public FileResponse uploadFile(MultipartFile file, String module, String referenceId) {
-        try {
-            if (file == null || file.isEmpty()) {
-                throw new IllegalArgumentException("File is empty");
-            }
-            String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            String extension = "";
-            int lastDot = originalFileName.lastIndexOf(".");
-            if (lastDot > 0) {
-                extension = originalFileName.substring(lastDot);}
-            String storedFileName = UUID.randomUUID() + extension;
-            Path targetDirectory = uploadDirectory.resolve(module.toLowerCase()).resolve(referenceId);
-            Files.createDirectories(targetDirectory);
-            Path targetFile = targetDirectory.resolve(storedFileName);
-            Files.copy(file.getInputStream(), targetFile, StandardCopyOption.REPLACE_EXISTING);
-            String storageKey = module.toLowerCase() + "/" + referenceId + "/" + storedFileName;
+    public FileDocuments uploadFile(
+            MultipartFile file,
+            String module,
+            String referenceId ) throws IOException {
 
+        // 1. Validate file
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty");
+        }
+
+        // 2. Create upload directory
+        Path uploadPath = Paths.get(uploadDir);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        // 3. Get original file name
+        String originalFileName = file.getOriginalFilename();
+
+        if (originalFileName == null || originalFileName.isBlank()) {
+            throw new IllegalArgumentException("Invalid file name");
+        }
+
+        // 4. Generate unique file name
+        String extension = "";
+
+        int lastDotIndex = originalFileName.lastIndexOf(".");
+
+        if (lastDotIndex > 0) {
+            extension = originalFileName.substring(lastDotIndex);
+        }
+
+        String generatedFileName =
+                UUID.randomUUID() + extension;
+
+        // 5. Create physical file path
+        Path filePath = uploadPath.resolve(generatedFileName);
+
+        // 6. Save physical file
+        Files.copy(
+                file.getInputStream(),
+                filePath,
+                StandardCopyOption.REPLACE_EXISTING
+        );
+
+        try {
+
+            // 7. Create MongoDB document
             FileDocuments fileDocument = new FileDocuments();
 
             fileDocument.setFileId(UUID.randomUUID().toString());
             fileDocument.setOriginalFileName(originalFileName);
-            fileDocument.setStoredFileName(storedFileName);
+            fileDocument.setStoredFileName(fileDocument.getStoredFileName());
             fileDocument.setFileSize(file.getSize());
             fileDocument.setContentType(file.getContentType());
-            fileDocument.setStorageKey(storageKey);
+            fileDocument.setStorageKey(fileDocument.getStorageKey());
             fileDocument.setFileUrl("/api/files/" + fileDocument.getFileId());
             fileDocument.setModule(module);
             fileDocument.setReferenceId(referenceId);
             fileDocument.setUploadedAt(LocalDateTime.now());
 
-            FileDocuments savedFile = fileRepository.save(fileDocument);
-            return mapToResponse(savedFile);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to store file", e);
+            // 8. Save metadata in MongoDB
+            return fileRepository.save(fileDocument);
+
+        } catch (Exception exception) {
+
+            // 9. If MongoDB save fails,
+            // delete the physical file
+            Files.deleteIfExists(filePath);
+
+            throw exception;
         }
     }
+
     @Override
     public Resource getFile(String fileId) {
-
-        FileDocuments fileDocument = fileRepository.findByFileId(fileId)
-                        .orElseThrow(() -> new RuntimeException("File not found: " + fileId));
-        try
-        {
-            Path filePath = uploadDirectory.resolve(fileDocument.getStorageKey()).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new RuntimeException("File cannot be read: " + fileId);
-            }
-            return resource;
-        }
-        catch (MalformedURLException ex) {
-            throw new RuntimeException("Could not load file: " + fileId, ex);
-        }
+        return null;
     }
 
     @Override
-    public List<FileResponse> getFiles(
+    public FileDocuments getFileById(String fileId) {
+
+        return fileRepository.findByFileId(fileId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "File not found with ID: " + fileId
+                        )
+                );
+    }
+
+    @Override
+    public List<FileDocuments> getFilesByModuleAndReferenceId(
             String module,
             String referenceId) {
+
         return fileRepository
-                .findByModuleAndReferenceId(module, referenceId)
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .findByModuleAndReferenceId(module, referenceId);
     }
 
     @Override
-    public void deleteFile(String fileId) {
+    public void deleteFile(String fileId) throws IOException {
 
-        FileDocuments fileDocument = fileRepository.findByFileId(fileId)
-                        .orElseThrow(() -> new RuntimeException("File not found: " + fileId));
-        try {
-            Path filePath = uploadDirectory.resolve(fileDocument.getStorageKey()).normalize();
-            Files.deleteIfExists(filePath);
-            fileRepository.delete(fileDocument);
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Failed to delete file: " + fileId, e);
-        }
-    }
-    private FileResponse mapToResponse(
-            FileDocuments fileDocument) {
+        // 1. Find metadata
+        FileDocuments fileDocument =
+                fileRepository.findByFileId(fileId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "File not found with ID: " + fileId
+                                )
+                        );
 
-        return FileResponse.builder()
-                .fileId(fileDocument.getFileId())
-                .originalFileName(fileDocument.getOriginalFileName())
-                .storedFileName(fileDocument.getStoredFileName())
-                .fileSize(fileDocument.getFileSize())
-                .contentType(fileDocument.getContentType())
-                .fileUrl(fileDocument.getFileUrl())
-                .module(fileDocument.getModule())
-                .referenceId(fileDocument.getReferenceId())
-                .uploadedBy(fileDocument.getUploadedBy())
-                .uploadedAt(fileDocument.getUploadedAt())
-                .build();
+        // 2. Get physical file path
+        Path filePath =
+                Paths.get(fileDocument.getFileUrl());
+
+        // 3. Delete physical file
+        Files.deleteIfExists(filePath);
+
+        // 4. Delete MongoDB metadata
+        fileRepository.delete(fileDocument);
     }
+
 }
+
