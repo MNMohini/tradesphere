@@ -13,15 +13,16 @@ public interface OrderRepository extends MongoRepository<Order,String> {
 
     Optional<Order> findByOrderNumber(String orderNumber);
     boolean existsByOrderNumber(String orderNumber);
-    List<Order> findByRetailerId(String retailerId);
     List<Order> findByOutletId(String outletId);
-    List<Order> findByTerritoryId(String territoryId);
-    List<Order> findByOrderStatus(OrderStatus orderStatus);
-    List<Order> findByRetailerIdAndOrderStatus(String retailerId, OrderStatus orderStatus);
-    List<Order> findByPromoterIdAndOrderStatus(String promoterId,OrderStatus orderStatus);
-    List<Order> findByOrderDateBetween(LocalDate fromDate, LocalDate toDate);
-    List<Order> findByRetailerIdAndOrderDateBetween(String retailerId, LocalDate fromDate, LocalDate toDate);
+    List<Order> findByOutletIdOrderByCreatedAtDesc(String outletId);
+    List<Order> findByOutletIdAndOrderStatus(String outletId, OrderStatus orderStatus);
+    List<Order> findByOutletIdAndOrderDateBetween(String outletId, LocalDate fromDate, LocalDate toDate);
+    List<Order> findByPromoterId(String promoterId);
+    List<Order> findByPromoterIdAndOrderStatus(String promoterId, OrderStatus orderStatus);
     List<Order> findByPromoterIdAndOrderDateBetween(String promoterId, LocalDate fromDate, LocalDate toDate);
+    List<Order> findByTerritoryId(String territoryId);
     List<Order> findByTerritoryIdAndOrderStatus(String territoryId, OrderStatus orderStatus);
-
+    List<Order> findByOrderStatus(OrderStatus orderStatus);
+    List<Order> findByOrderDateBetween(LocalDate fromDate, LocalDate toDate);
+    List<Order> findAllByOrderByCreatedAtDesc();
 }
