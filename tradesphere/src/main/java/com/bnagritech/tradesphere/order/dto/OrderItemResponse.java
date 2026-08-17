@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 public class OrderItemResponse {
     private String productId;
     private String productName;
-
+    private BigDecimal mrp;
     private Integer quantity;
-    private BigDecimal unitPrice;
+    private BigDecimal sellingPrice;
     private BigDecimal totalPrice;
 }
