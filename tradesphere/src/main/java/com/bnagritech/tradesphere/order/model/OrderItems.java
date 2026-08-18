@@ -15,22 +15,12 @@ public class OrderItems {
 
     private String skuCode;
     private String productName;
-
-    private Integer orderedQuantity;
-    private Integer approvedQuantity;
-    private Integer deliveredQuantity;
-
+    private Integer quantity;
     private BigDecimal mrp;
-    private BigDecimal unitPrice;
-
-    private BigDecimal discountPercentage;
-    private BigDecimal discountAmount;
-
-    private BigDecimal taxPercentage;
+    private BigDecimal sellingPrice;
+    private BigDecimal discount;
+    private BigDecimal taxableAmount;
     private BigDecimal taxAmount;
-
-    private BigDecimal lineAmount;
-
+    private BigDecimal totalAmount;
     private String schemeId;
-    private String schemeName;
 }
