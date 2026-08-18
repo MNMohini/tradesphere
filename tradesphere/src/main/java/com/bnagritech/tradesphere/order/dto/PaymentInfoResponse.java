@@ -2,12 +2,16 @@ package com.bnagritech.tradesphere.order.dto;
 
 import com.bnagritech.tradesphere.common.enums.PaymentMode;
 import com.bnagritech.tradesphere.common.enums.PaymentStatus;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class PaymentInfoResponse {
     private PaymentStatus paymentStatus;
