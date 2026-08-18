@@ -3,14 +3,15 @@ package com.bnagritech.tradesphere.order.model;
 import com.bnagritech.tradesphere.common.enums.OrderSource;
 import com.bnagritech.tradesphere.common.enums.OrderStatus;
 import com.bnagritech.tradesphere.common.enums.OrderType;
-import com.bnagritech.tradesphere.common.enums.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,16 +24,16 @@ public class Order {
     @Id
     private String id;
     private String orderNumber;
-    private LocalDateTime orderDate;
+    private LocalDate orderDate;
     private OrderType orderType;
     private OrderSource orderSource;
-    private String outletId;
+    private String retailerId;
     private String promoterId;
     private String employeeId;
     private String territoryId;
-    private String outletName;
-    private String phoneNumber;
-    private String address;
+    private String retailerName;
+    private String retailerPhone;
+    private String retailerAddress;
     private List<OrderItems> items;
     private BigDecimal grossAmount;
     private BigDecimal itemDiscount;
@@ -54,4 +55,3 @@ public class Order {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-

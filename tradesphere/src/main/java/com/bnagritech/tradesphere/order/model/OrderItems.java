@@ -13,14 +13,24 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class OrderItems {
 
-    private String productId;
-    private String productName;
     private String skuCode;
-    private Integer quantity;
+    private String productName;
+
+    private Integer orderedQuantity;
+    private Integer approvedQuantity;
+    private Integer deliveredQuantity;
+
     private BigDecimal mrp;
-    private BigDecimal sellingPrice;
-    private BigDecimal discount;
-    private BigDecimal taxableAmount;
+    private BigDecimal unitPrice;
+
+    private BigDecimal discountPercentage;
+    private BigDecimal discountAmount;
+
+    private BigDecimal taxPercentage;
     private BigDecimal taxAmount;
-    private BigDecimal totalAmount;
+
+    private BigDecimal lineAmount;
+
+    private String schemeId;
+    private String schemeName;
 }
