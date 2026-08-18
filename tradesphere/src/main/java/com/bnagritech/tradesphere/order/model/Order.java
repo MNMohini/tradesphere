@@ -27,13 +27,12 @@ public class Order {
     private LocalDate orderDate;
     private OrderType orderType;
     private OrderSource orderSource;
-    private String retailerId;
+    private String outletId;
     private String promoterId;
-    private String employeeId;
     private String territoryId;
-    private String retailerName;
-    private String retailerPhone;
-    private String retailerAddress;
+    private String outletName;
+    private String phoneNumber;
+    private String address;
     private List<OrderItems> items;
     private BigDecimal grossAmount;
     private BigDecimal itemDiscount;
