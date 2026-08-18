@@ -1,13 +1,12 @@
 package com.bnagritech.tradesphere.order.model;
 
 import com.bnagritech.tradesphere.common.enums.OrderStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderStatusHistory {
