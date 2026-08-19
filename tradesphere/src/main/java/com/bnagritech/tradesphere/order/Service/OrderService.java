@@ -7,16 +7,16 @@ import java.util.List;
 public interface OrderService {
 
     OrderResponse createOrder(OrderRequest request);
-    List<OrderResponse> getAllOrders();
-    OrderResponse getOrderById(String id);
+    OrderResponse getOrderById(String orderId);
     OrderResponse getOrderByOrderNumber(String orderNumber);
-    List<OrderResponse> getOrdersByOutletId(String outletId);
-    List<OrderResponse> getOrdersByPromoterId(String promoterId);
-    List<OrderResponse> getOrdersByTerritoryId(String territoryId);
-    List<OrderResponse> getOrdersByStatus(String status);
+    List<OrderSummaryResponse> getAllOrders();
+    List<OrderSummaryResponse> getOrdersByOutletId(String outletId);
+    List<OrderSummaryResponse> getOrdersByPromoterId(String promoterId);
+    List<OrderSummaryResponse> getOrdersByEmployeeId(String employeeId);
+    List<OrderSummaryResponse> getOrdersByTerritoryId(String territoryId);
+    List<OrderSummaryResponse> getOrdersByStatus(String status);
+    List<OrderSummaryResponse> searchOrders(OrderSearchRequest request);
     OrderResponse updateOrderStatus(String orderId, UpdatedOrderStatusRequest request);
-    OrderResponse updateOrder(String id, OrderRequest request);
-    void deleteOrder(String id);
-    List<OrderResponse> searchOrders(OrderSearchRequest request);
-    OrderSummaryResponse getOrderSummary();
+    OrderResponse cancelOrder(String orderId,CancelOrderRequest request);
+    void deleteOrder(String orderId);
 }
