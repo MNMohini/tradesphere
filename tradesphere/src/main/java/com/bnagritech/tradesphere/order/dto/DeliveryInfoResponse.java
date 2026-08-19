@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class DeliveryInfoResponse {
     private String deliveryAddress;
     private DeliveryStatus deliveryStatus;
-    private String deliveredBy;
-    private LocalDateTime deliveredAt;
-    private String deliveryRemark;
+    private LocalDateTime dispatchDate;
+    private LocalDateTime deliveryDate;
+
 }

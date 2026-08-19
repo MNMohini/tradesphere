@@ -16,8 +16,14 @@ public class OrderSearchRequest {
     private String orderNumber;
     private String outletId;
     private String promoterId;
+    private String employeeId;
     private String territoryId;
     private OrderStatus orderStatus;
     private LocalDate fromDate;
-     private LocalDate toDate;
+    private LocalDate toDate;
+    private Integer page=0;
+    private Integer size=20;
+    private String sortBy= "orderDate";
+    private String sortDirection="DESC";
+
 }

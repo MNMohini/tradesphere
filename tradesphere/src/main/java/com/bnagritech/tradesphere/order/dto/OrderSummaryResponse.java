@@ -1,22 +1,30 @@
 package com.bnagritech.tradesphere.order.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.bnagritech.tradesphere.common.enums.DeliveryStatus;
+import com.bnagritech.tradesphere.common.enums.OrderStatus;
+import com.bnagritech.tradesphere.common.enums.PaymentStatus;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderSummaryResponse {
-    private long totalOrders;
-    private long confirmedOrder;
-    private long createdOrders;
-    private long processingOrders;
-    private long dispatchedOrders;
-    private long deliveredOrders;
-    private long cancelledOrders;
-    private double totalSales;
+
+    private String id;
+    private String orderNumber;
+    private String outletId;
+    private String promoterId;
+    private String employeeId;
+    private String territoryId;
+    private LocalDateTime orderDate;
+    private OrderStatus orderStatus;
+    private Integer totalItems;
+    private BigDecimal grandTotal;
+    private PaymentStatus paymentStatus;
+    private DeliveryStatus deliveryStatus;
 
 }

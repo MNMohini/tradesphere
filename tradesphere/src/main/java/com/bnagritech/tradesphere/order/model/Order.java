@@ -1,8 +1,6 @@
 package com.bnagritech.tradesphere.order.model;
 
-import com.bnagritech.tradesphere.common.enums.OrderSource;
-import com.bnagritech.tradesphere.common.enums.OrderStatus;
-import com.bnagritech.tradesphere.common.enums.OrderType;
+import com.bnagritech.tradesphere.common.enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -24,33 +22,33 @@ public class Order {
     @Id
     private String id;
     private String orderNumber;
-    private LocalDate orderDate;
-    private OrderType orderType;
-    private OrderSource orderSource;
     private String outletId;
     private String promoterId;
+    private String employeeId;
     private String territoryId;
-    private String outletName;
-    private String phoneNumber;
-    private String address;
-    private List<OrderItems> items;
-    private BigDecimal grossAmount;
-    private BigDecimal itemDiscount;
-    private BigDecimal orderDiscount;
-    private BigDecimal taxableAmount;
-    private BigDecimal taxAmount;
-    private BigDecimal roundOff;
-    private BigDecimal netAmount;
-    private OrderStatus orderStatus;
-    private List<OrderStatusHistory> statusHistory;
-    private PaymentInfo paymentInfo;
-    private DeliveryInfo deliveryInfo;
+    private LocalDateTime orderDate;
+    private OrderStatus status;
+    private List<OrderItems> items = new ArrayList<>();
+    private BigDecimal subtotal;
+    private BigDecimal totalDiscount;
+    private BigDecimal totalSchemeDiscount;
+    private BigDecimal totalTax;
+    private BigDecimal grandTotal;
+    private PaymentStatus paymentStatus;
+    private PaymentMode paymentMethod;
+    private BigDecimal paidAmount;
+    private BigDecimal pendingAmount;
+    private String paymentReference;
+    private DeliveryStatus deliveryStatus;
+    private String deliveryAddress;
+    private LocalDateTime dispatchDate;
+    private LocalDateTime deliveryDate;
     private String cancellationReason;
-    private String cancelledBy;
     private LocalDateTime cancelledAt;
     private String remarks;
     private String createdBy;
     private String updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 }

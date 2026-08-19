@@ -9,16 +9,14 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderRequest {
 
     private String outletId;
-    private OrderType orderType;
-    private OrderSource orderSource;
+    private String territoryId;
+    private String employeeId;
     private String promoterId;
-    private List<OrderItems> items;
+    private List<OrderItemRequest> items;
     private String remarks;
-
 }

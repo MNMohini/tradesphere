@@ -14,8 +14,12 @@ import java.math.BigDecimal;
 public class OrderItemResponse {
     private String productId;
     private String productName;
-
+    private String skuCode;
     private Integer quantity;
-    private BigDecimal unitPrice;
-    private BigDecimal totalPrice;
+    private BigDecimal sellingPrice;
+    private BigDecimal mrp;
+    private BigDecimal discount;
+    private BigDecimal schemeDiscount;
+    private BigDecimal taxAmount;
+    private BigDecimal lineTotal;
 }

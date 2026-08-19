@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class OrderStatusHistoryResponse {
-    private OrderStatus orderStatus;
+    private OrderStatus fromStatus;
+    private OrderStatus toStatus;
     private String updatedBy;
     private String remarks;
     private LocalDateTime updatedAt;

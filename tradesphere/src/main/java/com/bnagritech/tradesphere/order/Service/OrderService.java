@@ -12,7 +12,6 @@ public interface OrderService {
     OrderResponse getOrderByOrderNumber(String orderNumber);
     List<OrderResponse> getOrdersByOutletId(String outletId);
     List<OrderResponse> getOrdersByPromoterId(String promoterId);
-    List<OrderResponse> getOrdersByEmployeeId(String employeeId);
     List<OrderResponse> getOrdersByTerritoryId(String territoryId);
     List<OrderResponse> getOrdersByStatus(String status);
     OrderResponse updateOrderStatus(String orderId, UpdatedOrderStatusRequest request);
