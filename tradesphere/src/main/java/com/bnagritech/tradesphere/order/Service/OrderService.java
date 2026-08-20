@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.order.Service;
 
+import com.bnagritech.tradesphere.common.enums.OrderStatus;
 import com.bnagritech.tradesphere.order.dto.*;
 
 import java.util.List;
@@ -14,8 +15,6 @@ public interface OrderService {
     List<OrderSummaryResponse> getOrdersByPromoterId(String promoterId);
     List<OrderSummaryResponse> getOrdersByEmployeeId(String employeeId);
     List<OrderSummaryResponse> getOrdersByTerritoryId(String territoryId);
-    List<OrderSummaryResponse> getOrdersByStatus(String status);
-    List<OrderSummaryResponse> searchOrders(OrderSearchRequest request);
     OrderResponse updateOrderStatus(String orderId, UpdatedOrderStatusRequest request);
     OrderResponse cancelOrder(String orderId,CancelOrderRequest request);
     void deleteOrder(String orderId);
