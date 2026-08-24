@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.territory.controller;
 
 
+import com.bnagritech.tradesphere.beat.model.Beat;
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import com.bnagritech.tradesphere.territory.service.TerritoryService;
@@ -43,6 +44,14 @@ public class TerritoryController {
     @GetMapping("/city/{city}")
     public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByCity(@PathVariable String city) {
         return ResponseEntity.ok(territoryService.getTerritoriesByCity(city));
+    }
+    @PatchMapping("/{territoryId}/add/{beatId}")
+    public ResponseEntity<TerritoryResponse> addBeatToTerritory(@PathVariable String territoryId, Beat beatId){
+        return ResponseEntity.ok(territoryService.addBeatToTerritory(territoryId,beatId));
+    }
+    @DeleteMapping("/{territoryId}/remove/{beatId}")
+    public ResponseEntity<TerritoryResponse> removeBeatFromTerritory(@PathVariable String territoryId, Beat beatId){
+        return ResponseEntity.ok(territoryService.removeBeatFromTerritory(territoryId, beatId));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTerritory(@PathVariable String id){
