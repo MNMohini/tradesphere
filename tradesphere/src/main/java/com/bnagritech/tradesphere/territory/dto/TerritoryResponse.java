@@ -4,17 +4,17 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 @Builder
 public class TerritoryResponse {
     private String id;
     private String territoryId;
     private String territoryName;
-    private String territoryType;
-    private String state;
-    private String city;
-    private String description;
-    private Boolean active;
+    private List<String> state;
+    private List<String> city;
     private LocalDateTime updateAt;
     private LocalDateTime createAt;
+    private String updateBy;
 }
