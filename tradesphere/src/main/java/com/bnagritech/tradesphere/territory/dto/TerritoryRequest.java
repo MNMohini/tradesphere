@@ -11,7 +11,7 @@ public class TerritoryRequest {
     private String territoryId;
     @NotBlank(message= "required fields")
     private String territoryName;
-    private List<Beat> beats;
+    private List<Beat> beatId;
     private List<String> state;
     private List<String> city;
 

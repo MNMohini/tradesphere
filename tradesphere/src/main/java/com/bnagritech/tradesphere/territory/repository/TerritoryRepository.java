@@ -10,11 +10,9 @@ import java.util.Optional;
 public interface TerritoryRepository extends MongoRepository<Territory,String> {
 
     boolean existsTerritoryByTerritoryId(String territoryId);
-
-    boolean existsTerritoryByTerritoryNameAndCityAndState(
-            String territoryName, String city, String state);
+    Optional<Territory> findByTerritoryId(String territoryId);
+    Optional<Territory> findByTerritoryNameIgnoreCase(String territoryName);
     List<Territory> findByStateIgnoreCase(String state);
-    Optional<Territory> findByTerritoryId(String promoterId);
     List<Territory> findByCityIgnoreCase(String city);
 
 }
