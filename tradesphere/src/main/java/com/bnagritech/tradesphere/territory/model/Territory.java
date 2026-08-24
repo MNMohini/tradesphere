@@ -21,13 +21,10 @@ public class Territory {
     private String id;
     private String territoryId;
     private String territoryName;
-    private List<Beat> beatId;
-    private String territoryType;
-    private String state;
-    private String city;
-    private String description;
-    private Boolean active;
+    private List<Beat> beats;
+    private List<String> state;
+    private List<String> city;
     private LocalDateTime updateAt;
     private LocalDateTime createAt;
-    private String updatedAt;
+    private String updatedBy;
 }
