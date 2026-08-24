@@ -26,11 +26,11 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public TerritoryResponse createTerritory(TerritoryRequest request) {
 
-            if (territoryRepository
-                    .findByTerritoryNameIgnoreCase(request.getTerritoryName()).isPresent()) {
-
-                throw new ResourceAlreadyExistsException(
-                        "Territory name already exists: " + request.getTerritoryName());
+            if (territoryRepository.findByTerritoryNameIgnoreCase(request.getTerritoryName()).isPresent()) {
+                throw new ResourceAlreadyExistsException("Territory name already exists");
+            }
+            if (territoryRepository.findByTerritoryId(request.getTerritoryId()).isPresent()){
+                throw new ResourceAlreadyExistsException("Territory already Exists");
             }
 
             Territory territory = Territory.builder()
@@ -146,27 +146,26 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public TerritoryResponse addBeatToTerritory(String territoryId, Beat beatId) {
         Territory territory = territoryRepository.findByTerritoryId(territoryId)
-                .orElseThrow(()-> new ResourceNotFoundException("Territory Not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Territory Not found"));
         if (territory.getBeatId() == null) {
             territory.setBeatId(new ArrayList<>());
         }
-
         if (!territory.getBeatId().contains(beatId)) {
             territory.getBeatId().add(beatId);
         }
+            return mapToResponse(territoryRepository.save(territory));
 
-        return null;
     }
-
-    @Override
-    public TerritoryResponse removeBeatFromTerritory(String territoryId, Beat beatId) {
-        Territory territory = territoryRepository.findByTerritoryId(territoryId)
-                .orElseThrow(()-> new ResourceNotFoundException("Territory Not found"));
-        if(territory.getBeatId()!=null){
-            territory.getBeatId().remove(beatId);
+        @Override
+        public TerritoryResponse removeBeatFromTerritory (String territoryId, Beat beatId){
+            Territory territory = territoryRepository.findByTerritoryId(territoryId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Territory Not found"));
+            if (territory.getBeatId() != null) {
+                territory.getBeatId().remove(beatId);
+            }
+            return mapToResponse(territoryRepository.save(territory));
         }
-        return mapToResponse(territoryRepository.save(territory));
-    }
+
     private  TerritoryResponse mapToResponse(Territory territory){
         return TerritoryResponse.builder()
                 .territoryId(territory.getTerritoryId())
