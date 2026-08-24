@@ -3,196 +3,104 @@ package com.bnagritech.tradesphere.beat.service.impl;
 import com.bnagritech.tradesphere.beat.dto.BeatsRequest;
 import com.bnagritech.tradesphere.beat.dto.BeatsResponse;
 import com.bnagritech.tradesphere.beat.model.Beat;
-import com.bnagritech.tradesphere.beat.model.BeatRetailer;
 import com.bnagritech.tradesphere.beat.repository.BeatRepository;
 import com.bnagritech.tradesphere.beat.service.BeatService;
-import com.bnagritech.tradesphere.common.enums.ApprovalStatus;
-import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
-import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.retailer.repository.RetailerRepository;
+import com.bnagritech.tradesphere.promoter.model.Promoter;
+import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
+import com.bnagritech.tradesphere.territory.model.Territory;
+import com.bnagritech.tradesphere.territory.repository.TerritoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BeatServiceImpl implements BeatService {
     private final BeatRepository beatRepository;
-    private final RetailerRepository retailerRepository;
+    private final PromoterRepository promoterRepository;
+    private final TerritoryRepository territoryRepository;
 
     @Override
     public BeatsResponse createBeat(BeatsRequest request) {
-        if (beatRepository.existsByBeatNameAndTerritoryIdAndBeatCode(
-                request.getBeatName(), request.getTerritoryId(), request.getBeatCode())) {
-            throw new ResourceAlreadyExistsException("Beat already exists");
+        Promoter promoter= promoterRepository.findByPromoterId(request.getPromoterId())
+                .orElseThrow(()-> new ResourceNotFoundException("Promoter Id does not Exists"));
+        Territory territory = territoryRepository.findByTerritoryId(request.getTerritoryId())
+                .orElseThrow(()-> new ResourceNotFoundException("Territory Id doesn't Exists"));
+
+        if (beatRepository.existsByTerritoryIdAndBeatId(request.getTerritoryId(), request.getBeatId())) {
+            throw new RuntimeException("Beat already exists for this territory");
         }
-        if (beatRepository.existsByBeatId(request.getBeatId())){
-            throw new ResourceAlreadyExistsException("Beat already exists");
+
+        if (beatRepository.existsByBeatId(request.getBeatId())) {
+            throw new RuntimeException("Beat ID already exists: " + request.getBeatId());
         }
+
         Beat beat = Beat.builder()
-                .beatName(request.getBeatName())
-                .beatCode(request.getBeatCode())
-                .description(request.getDescription())
-                .beatType(request.getBeatType())
-                .territoryId(request.getTerritoryId())
-                .assignedEmployeeId(request.getAssignedEmployeeId())
-                .beatOwnerType(request.getBeatOwnerType())
-                .managerId(request.getManagerId())
+                .beatId(request.getBeatId())
+                .territoryId(territory.getTerritoryId())
+                .promoterId(promoter.getPromoterId())
+                .beatStatus(request.getBeatStatus())
                 .state(request.getState())
                 .city(request.getCity())
-                .area(request.getArea())
-                .pinCode(request.getPinCode())
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .retailers(request.getRetailers())
-                .totalRetailers(request.getTotalRetailers())
+                .outletIds(
+                        request.getOutletIds() != null
+                                ? new ArrayList<>(request.getOutletIds())
+                                : new ArrayList<>()
+                )
                 .beatDays(request.getBeatDays())
                 .frequency(request.getFrequency())
-                .effectiveFrom(request.getEffectiveFrom())
-                .effectiveTo(request.getEffectiveTo())
-                .estimatedDistanceKm(request.getEstimatedDistanceKm())
-                .estimatedTravelTimeMinutes(request.getEstimatedTravelTimeMinutes())
-                .approvalStatus(request.getApprovalStatus())
                 .build();
-        Beat beatSaved = beatRepository.save(beat);
-        return mapToResponse(beatSaved);
-    }
 
-    @Override
-    public BeatsResponse updateBeat(String beatId, BeatsRequest request) {
-        Beat beat = beatRepository.findByBeatId(beatId)
-                .orElseThrow(() -> new ResourceNotFoundException("beat not found"));
+        Beat savedBeat = beatRepository.save(beat);
 
-        beat.setBeatName(request.getBeatName());
-        beat.setBeatCode(request.getBeatCode());
-        beat.setDescription(request.getDescription());
-        beat.setBeatType(request.getBeatType());
-        beat.setTerritoryId(request.getTerritoryId());
-        beat.setAssignedEmployeeId(request.getAssignedEmployeeId());
-        beat.setBeatOwnerType(request.getBeatOwnerType());
-        beat.setManagerId(request.getManagerId());
-        beat.setState(request.getState());
-        beat.setCity(request.getCity());
-        beat.setArea(request.getArea());
-        beat.setPinCode(request.getPinCode());
-        beat.setLatitude(request.getLatitude());
-        beat.setLongitude(request.getLongitude());
-        beat.setRetailers(request.getRetailers());
-        beat.setTotalRetailers(request.getTotalRetailers());
-        beat.setBeatDays(request.getBeatDays());
-        beat.setFrequency(request.getFrequency());
-        beat.setEffectiveFrom(request.getEffectiveFrom());
-        beat.setEffectiveTo(request.getEffectiveTo());
-        beat.setEstimatedDistanceKm(request.getEstimatedDistanceKm());
-        beat.setEstimatedTravelTimeMinutes(request.getEstimatedTravelTimeMinutes());
-        beat.setApprovalStatus(request.getApprovalStatus());
-
-        Beat beatUpdated = beatRepository.save(beat);
-        return mapToResponse(beatUpdated);
+        return mapToResponse(savedBeat);
     }
 
     @Override
     public BeatsResponse getBeatById(String beatId) {
 
-        Beat beat = beatRepository.findByBeatId(beatId)
-                .orElseThrow(() -> new ResourceNotFoundException("beat not found"));
-
+       Beat beat = beatRepository.findByBeatId(beatId).orElseThrow(
+                       ()-> new ResourceNotFoundException("Beat Id isn't exists"));
         return mapToResponse(beat);
     }
 
     @Override
     public List<BeatsResponse> getAllBeats() {
+
         return beatRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteBeat(String beatId) {
-
-        Beat beat = beatRepository.findByBeatId(beatId)
-                .orElseThrow(() -> new RuntimeException("Beat not found"));
-
-        beatRepository.delete(beat);
+                .toList();
     }
 
     @Override
     public List<BeatsResponse> getBeatsByTerritory(String territoryId) {
 
-        return beatRepository.findByTerritoryId(territoryId)
+         territoryRepository.findByTerritoryId(territoryId)
+                .orElseThrow(()-> new ResourceNotFoundException("Territory Id doesn't Exists"));
+
+        List<Beat> beatList = beatRepository.findByTerritoryId(territoryId);
+        if (beatList.isEmpty()){
+            throw new ResourceNotFoundException("No beat is exists");
+        }
+            return beatList
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
-    }
-
-    @Override
-    public List<BeatsResponse> getEmployeeBeats(String employeeId) {
-        return beatRepository.findByAssignedEmployeeId(employeeId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    @Override
-    public List<BeatsResponse> getEmployeeDayBeats(String employeeId, BeatDay beatDay) {
-        return beatRepository.findByAssignedEmployeeIdAndBeatDaysContaining(employeeId, beatDay)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    @Override
-    public BeatsResponse assignRetailerToBeat(String beatId, String retailerId) {
-        Beat beat = getBeatEntity(beatId);
-        retailerRepository.findByRetailerId(retailerId)
-                .orElseThrow(() -> new ResourceNotFoundException("retailer not found"));
-
-        BeatRetailer retailer = BeatRetailer.builder()
-                .retailerId(retailerId)
-                .sequenceNumber(beat.getRetailers().size() + 1)
-                .mandatoryVisit(true)
-                .active(true)
-                .build();
-        beat.getRetailers().add(retailer);
-        return mapToResponse(beatRepository.save(beat));
-    }
-
-    @Override
-    public BeatsResponse removeRetailerFromBeat(String beatId, String retailerId) {
-        Beat beat = getBeatEntity(beatId);
-        beat.getRetailers().removeIf(r->r.getRetailerId().equals(retailerId));
-
-        return mapToResponse(beatRepository.save(beat));
-    }
-
-    @Override
-    public BeatsResponse getBeatByRetailer(String retailerId) {
-        Beat beat = beatRepository.findByRetailersRetailerId(retailerId)
-                .orElseThrow(() -> new ResourceNotFoundException("retailer not found"));
-        return mapToResponse(beat);
-    }
-
-    @Override
-    public BeatsResponse approveBeat(String beatId, String managerId) {
-        Beat beat = getBeatEntity(beatId);
-        beat.setApprovalStatus(ApprovalStatus.APPROVED);
-        return mapToResponse(beatRepository.save(beat));
-    }
-
-    @Override
-    public BeatsResponse rejectBeat(String beatId, String managerId) {
-        Beat beat = getBeatEntity(beatId);
-        beat.setApprovalStatus(ApprovalStatus.REJECTED);
-        return mapToResponse(beatRepository.save(beat));
     }
 
     @Override
     public List<BeatsResponse> searchByCity(String city) {
-        return beatRepository.findByCityIgnoreCase(city)
+        List<Beat> beatList = beatRepository.findByCityIgnoreCase(city);
+        if (beatList.isEmpty()){
+            throw new ResourceNotFoundException("No beat is exists");
+        }
+
+          return beatList
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -200,63 +108,124 @@ public class BeatServiceImpl implements BeatService {
 
     @Override
     public List<BeatsResponse> searchByState(String state) {
-        return beatRepository.findByStateIgnoreCase(state)
+
+        List<Beat> beatList = beatRepository.findByStateIgnoreCase(state);
+        if (beatList.isEmpty()){
+            throw new ResourceNotFoundException("No beat is exists");
+        }
+          return beatList
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
     @Override
-    public List<BeatsResponse> getByStatus(BeatStatus status) {
-        return beatRepository.findByStatus(status)
+    public List<BeatsResponse> getByBeatStatus(BeatStatus beatStatus) {
+
+        List<Beat> beatList = beatRepository.findByBeatStatus(beatStatus);
+        if (beatList.isEmpty()){
+            throw new ResourceNotFoundException("No beat is exists");
+        }
+        return beatList
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
     @Override
-    public List<BeatsResponse> getByBeatType(String beatType) {
-        return beatRepository.findByBeatType(beatType)
-                .stream()
-                .map(this:: mapToResponse)
-                .toList();
+    public BeatsResponse updateBeat(String beatId, BeatsRequest request) {
+       Beat beat = beatRepository.findByBeatId(beatId)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException("Beat Id not found"));
+        beat.setBeatId(request.getBeatId());
+        beat.setTerritoryId(request.getTerritoryId());
+        beat.setPromoterId(request.getPromoterId());
+        beat.setBeatStatus(request.getBeatStatus());
+        beat.setState(request.getState());
+        beat.setCity(request.getCity());
+        beat.setBeatDays(request.getBeatDays());
+        beat.setFrequency(request.getFrequency());
+        if (request.getOutletIds() != null) {
+            beat.setOutletIds(new ArrayList<>(request.getOutletIds()));}
+
+        Beat updatedBeat = beatRepository.save(beat);
+        return mapToResponse(updatedBeat);
     }
 
     @Override
-    public List<BeatsResponse> getByApprovalStatus(ApprovalStatus approvalStatus) {
-        return beatRepository.findByApprovalStatus(approvalStatus)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public BeatsResponse updateBeatStatus(String beatId, BeatStatus beatsStatus) {
+        Beat beat = beatRepository.findByBeatId(beatId)
+                .orElseThrow(()-> new ResourceNotFoundException("Beat Id not found"));
+
+        return mapToResponse(beatRepository.save(beat));
     }
+
+    @Override
+    public BeatsResponse addOutletToBeat(String beatId, String outletId) {
+
+        Beat beat = beatRepository.findByBeatId(beatId)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException("Beat Id not found"));
+
+        if (beat.getOutletIds() == null) {
+            beat.setOutletIds(new ArrayList<>());
+        }
+
+        if (!beat.getOutletIds().contains(outletId)) {
+            beat.getOutletIds().add(outletId);
+        }
+
+        return mapToResponse(
+                beatRepository.save(beat)
+        );
+    }
+    @Override
+    public BeatsResponse removeOutletFromBeat(String beatId, String outletId) {
+
+        Beat beat = beatRepository.findByBeatId(beatId)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException("Beat Id not found"));
+
+        if (beat.getOutletIds() != null) {
+            beat.getOutletIds().remove(outletId);
+        }
+
+        return mapToResponse(
+                beatRepository.save(beat)
+        );
+    }
+
+
+    @Override
+    public void deleteBeat(String beatId) {
+
+        Beat beat = beatRepository.findByBeatId(beatId)
+                .orElseThrow(
+                        ()-> new ResourceNotFoundException("Beat Id not found"));
+        beatRepository.delete(beat);
+    }
+
+
+
     private BeatsResponse mapToResponse(Beat beat) {
 
         return BeatsResponse.builder()
+                .id(beat.getId())
                 .beatId(beat.getBeatId())
-                .beatName(beat.getBeatName())
-                .beatCode(beat.getBeatCode())
-                .description(beat.getDescription())
-                .beatType(beat.getBeatType())
                 .territoryId(beat.getTerritoryId())
-                .assignedEmployeeId(beat.getAssignedEmployeeId())
-                .beatOwnerType(beat.getBeatOwnerType())
+                .promoterId(beat.getPromoterId())
+                .beatStatus(beat.getBeatStatus())
                 .state(beat.getState())
                 .city(beat.getCity())
-                .area(beat.getArea())
-                .retailers(beat.getRetailers())
-                .totalRetailers(beat.getTotalRetailers())
+                .outletIds(beat.getOutletIds())
                 .beatDays(beat.getBeatDays())
                 .frequency(beat.getFrequency())
-                .approvalStatus(beat.getApprovalStatus())
-                .status(beat.getStatus())
                 .createdAt(beat.getCreatedAt())
                 .updatedAt(beat.getUpdatedAt())
+                .createdBy(beat.getCreatedBy())
+                .updatedBy(beat.getUpdatedBy())
                 .build();
+    }
 
 
-    }
-    public Beat getBeatEntity(String beatId) {
-        return beatRepository.findByBeatId(beatId)
-                .orElseThrow(() -> new ResourceNotFoundException("beat not found"));
-    }
 }

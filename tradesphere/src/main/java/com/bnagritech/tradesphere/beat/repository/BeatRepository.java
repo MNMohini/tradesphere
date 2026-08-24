@@ -11,24 +11,17 @@ import java.util.Optional;
 
 public interface BeatRepository extends MongoRepository<Beat, String> {
     // DUPLICATE VALIDATION
-    boolean existsByBeatNameAndTerritoryIdAndBeatCode(String beatName, String territoryId, String beatCode);
+    boolean existsByTerritoryIdAndBeatId(String territoryId, String beatId);
     // Unique beat code validation
     boolean existsByBeatId(String beatId);
     // Get single active beat
     Optional<Beat> findByBeatId(String beatId);
     // TERRITORY BASED OPERATIONS
     List<Beat> findByTerritoryId(String territoryId);
-    // EMPLOYEE BEAT
-    List<Beat> findByAssignedEmployeeId(String employeeId);
-    // Employee day wise route
-    List<Beat> findByAssignedEmployeeIdAndBeatDaysContaining(String employeeId, BeatDay beatDay);
-    // RETAILER BEAT MAPPING
-    Optional<Beat> findByRetailersRetailerId(String retailerId);
     // LOCATION SEARCH
     List<Beat> findByCityIgnoreCase(String city);
     List<Beat> findByStateIgnoreCase(String state);
     // FILTERS FOR DASHBOARD
-    List<Beat> findByStatus(BeatStatus status);
-    List<Beat> findByBeatType(String beatType);
-    List<Beat> findByApprovalStatus(ApprovalStatus approvalStatus);
+    List<Beat> findByBeatStatus(BeatStatus beatStatus);
+
 }

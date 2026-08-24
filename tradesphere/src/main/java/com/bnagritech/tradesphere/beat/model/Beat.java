@@ -1,14 +1,13 @@
 package com.bnagritech.tradesphere.beat.model;
 
 import com.bnagritech.tradesphere.common.enums.*;
+import com.bnagritech.tradesphere.outlet.model.Outlet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,42 +19,19 @@ import java.util.List;
 public class Beat {
 
     @Id
+    private String id;
     private String beatId;
-    // Basic Details
-    private String beatName;
-    private String beatCode;
-    private String description;
-    private String beatType;
-    // Territory
     private String territoryId;
-    // Employee Assignment
-    private String assignedEmployeeId;
-    private BeatOwnerType beatOwnerType;
-    private String managerId;
-    // Location
+    private String promoterId;
+    private BeatStatus beatStatus;
     private String state;
     private String city;
-    private String area;
-    private String pinCode;
-    private Double latitude;
-    private Double longitude;
-    // Retailers in this Beat
-    private List<BeatRetailer> retailers;
-    private Integer totalRetailers;
-    // Schedule
+    private List<String> outletIds;
     private List<BeatDay> beatDays;
     private BeatFrequency frequency;
-    private LocalDate effectiveFrom;
-    private LocalDate effectiveTo;
-    // Route Information
-    private Double estimatedDistanceKm;
-    private Integer estimatedTravelTimeMinutes;
-    // Approval Flow
-    private ApprovalStatus approvalStatus;
-    // Status
-    private BeatStatus status;
-    // Audit
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String createdBy;
+    private String updatedBy;
 
 }
