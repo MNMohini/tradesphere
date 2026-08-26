@@ -2,10 +2,7 @@ package com.bnagritech.tradesphere.beat.controller;
 
 import com.bnagritech.tradesphere.beat.dto.BeatsRequest;
 import com.bnagritech.tradesphere.beat.dto.BeatsResponse;
-import com.bnagritech.tradesphere.beat.model.Beat;
 import com.bnagritech.tradesphere.beat.service.BeatService;
-import com.bnagritech.tradesphere.common.enums.ApprovalStatus;
-import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
