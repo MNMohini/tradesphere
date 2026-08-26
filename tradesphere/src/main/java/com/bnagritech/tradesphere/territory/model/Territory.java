@@ -1,6 +1,6 @@
 package com.bnagritech.tradesphere.territory.model;
 
-import com.bnagritech.tradesphere.beat.model.Beat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,7 @@ public class Territory {
     private String id;
     private String territoryId;
     private String territoryName;
-    private List<Beat> beatId;
+    private List<String> beatId;
     private List<String> state;
     private List<String> city;
     private LocalDateTime updateAt;

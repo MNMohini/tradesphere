@@ -1,7 +1,4 @@
 package com.bnagritech.tradesphere.territory.controller;
-
-
-import com.bnagritech.tradesphere.beat.model.Beat;
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import com.bnagritech.tradesphere.territory.service.TerritoryService;
@@ -9,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +18,7 @@ public class TerritoryController {
     private final TerritoryService territoryService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TerritoryResponse> createTerritory(@Valid @RequestBody TerritoryRequest request) {
         TerritoryResponse territoryResponse = territoryService.createTerritory(request);
 
@@ -29,33 +28,25 @@ public class TerritoryController {
     public ResponseEntity<List<TerritoryResponse>> getAllTerritories() {
         return ResponseEntity.ok(territoryService.getAllTerritories());
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<TerritoryResponse> getTerritoryById(@PathVariable String id){
-        return ResponseEntity.ok(territoryService.getTerritoryById(id));
+    @GetMapping("/id/{territoryId}")
+    public ResponseEntity<TerritoryResponse> getTerritoryById(@PathVariable String territoryId) {
+        return ResponseEntity.ok(territoryService.getTerritoryById(territoryId));
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<TerritoryResponse> updateTerritory(@PathVariable String id, @Valid @RequestBody TerritoryRequest request) {
-        return ResponseEntity.ok(territoryService.updateTerritory(id, request));
+    @PutMapping("/update/{territoryId}")
+    public ResponseEntity<TerritoryResponse> updateTerritory(@PathVariable String territoryId, @Valid @RequestBody TerritoryRequest request) {
+        return ResponseEntity.ok(territoryService.updateTerritory(territoryId, request));
     }
     @GetMapping("/state/{state}")
     public ResponseEntity<List<TerritoryResponse>> getTerritoriesByState(@PathVariable String state) {
         return ResponseEntity.ok(territoryService.getTerritoriesByState(state));
     }
     @GetMapping("/city/{city}")
-    public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByCity(@PathVariable String city) {
+    public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByCity(@PathVariable List<String> city) {
         return ResponseEntity.ok(territoryService.getTerritoriesByCity(city));
     }
-    @PatchMapping("/{territoryId}/add/{beatId}")
-    public ResponseEntity<TerritoryResponse> addBeatToTerritory(@PathVariable String territoryId, Beat beatId){
-        return ResponseEntity.ok(territoryService.addBeatToTerritory(territoryId,beatId));
-    }
-    @DeleteMapping("/{territoryId}/remove/{beatId}")
-    public ResponseEntity<TerritoryResponse> removeBeatFromTerritory(@PathVariable String territoryId, Beat beatId){
-        return ResponseEntity.ok(territoryService.removeBeatFromTerritory(territoryId, beatId));
-    }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTerritory(@PathVariable String id){
-        territoryService.deleteTerritory(id);
+    @DeleteMapping("/del/{territoryId}")
+    public ResponseEntity<String> deleteTerritory(@PathVariable String territoryId){
+        territoryService.deleteTerritory(territoryId);
         return ResponseEntity.ok("Territory deleted successfully");
     }
     

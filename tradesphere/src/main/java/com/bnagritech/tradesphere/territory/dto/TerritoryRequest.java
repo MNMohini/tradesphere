@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.territory.dto;
 
-import com.bnagritech.tradesphere.beat.model.Beat;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import java.util.List;
@@ -11,7 +10,7 @@ public class TerritoryRequest {
     private String territoryId;
     @NotBlank(message= "required fields")
     private String territoryName;
-    private List<Beat> beatId;
+    private List<String> beatId;
     private List<String> state;
     private List<String> city;
 

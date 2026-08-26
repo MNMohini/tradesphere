@@ -1,10 +1,7 @@
 package com.bnagritech.tradesphere.territory.service.impl;
 
-import com.bnagritech.tradesphere.beat.model.Beat;
-import com.bnagritech.tradesphere.beat.repository.BeatRepository;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.common.exception.TerritoryAlreadyExistException;
 import com.bnagritech.tradesphere.common.exception.TerritoryNotFoundException;
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -66,23 +64,22 @@ public class TerritoryServiceImpl implements TerritoryService {
     }
 
     @Override
-    public TerritoryResponse getTerritoryById(String id) {
+    public TerritoryResponse getTerritoryById(String territoryId) {
 
-            Territory territory = territoryRepository.findByTerritoryId(id)
+            Territory territory = territoryRepository.findByTerritoryId(territoryId)
                     .orElseThrow(() -> new TerritoryNotFoundException(
-                                            "Territory not found with ID: " + id));
+                                            "Territory not found with ID: " + territoryId));
 
             return mapToResponse(territory);
 
     }
 
     @Override
-    public TerritoryResponse updateTerritory(String id, TerritoryRequest request) {
+    public TerritoryResponse updateTerritory(String territoryId, TerritoryRequest request) {
 
-            Territory territory = territoryRepository.findByTerritoryId(id)
+            Territory territory = territoryRepository.findByTerritoryId(territoryId)
                             .orElseThrow(() -> new TerritoryNotFoundException(
-                                            "Territory not found with ID: " + id));
-
+                                            "Territory not found with ID: " + territoryId));
             if (!territory.getTerritoryId()
                     .equals(request.getTerritoryId())
                     && territoryRepository.existsTerritoryByTerritoryId(
@@ -92,34 +89,40 @@ public class TerritoryServiceImpl implements TerritoryService {
                         + request.getTerritoryId());
             }
 
+            if (!territory.getTerritoryName()
+                .equals(request.getTerritoryName())
+                && territoryRepository.existsTerritoryByTerritoryName(
+                request.getTerritoryName())) {
+
+            throw new ResourceAlreadyExistsException("Territory Name already exists: "
+                    + request.getTerritoryId());
+        }
             territory.setTerritoryId(request.getTerritoryId());
             territory.setTerritoryName(request.getTerritoryName());
             territory.setBeatId(request.getBeatId() != null
                             ? new ArrayList<>(request.getBeatId())
                             : new ArrayList<>());
-
             territory.setState(new ArrayList<>(request.getState()));
             territory.setCity(new ArrayList<>(request.getCity()));
             territory.setUpdateAt(LocalDateTime.now());
 
             Territory updatedTerritory = territoryRepository.save(territory);
-
             return mapToResponse(updatedTerritory);
 
         }
 
     @Override
-    public void deleteTerritory(String id) {
-            Territory territory = territoryRepository.findByTerritoryId(id)
+    public void deleteTerritory(String territoryId) {
+            Territory territory = territoryRepository.findByTerritoryId(territoryId)
                     .orElseThrow(() -> new TerritoryNotFoundException(
-                                            "Territory not found with ID: " + id));
+                                            "Territory not found with ID: " + territoryId));
             territoryRepository.delete(territory);
     }
 
     @Override
-    public List<TerritoryResponse> getTerritoriesByState(String state) {
+    public List<TerritoryResponse> getTerritoriesByState( String state) {
 
-        List<Territory> territoryList= territoryRepository.findByStateIgnoreCase(state);
+        List<Territory> territoryList= territoryRepository.findByStateIgnoreCase(Collections.singletonList(state));
         if(territoryList.isEmpty()){
             throw new ResourceNotFoundException("Resource Not Found");
         }
@@ -131,7 +134,7 @@ public class TerritoryServiceImpl implements TerritoryService {
         }
 
     @Override
-    public List<TerritoryResponse> getTerritoriesByCity(String city) {
+    public List<TerritoryResponse> getTerritoriesByCity(List<String> city) {
         List<Territory> territoryList= territoryRepository.findByCityIgnoreCase(city);
                 if(territoryList.isEmpty()){
                     throw new ResourceNotFoundException("Resource Not Found");
@@ -142,30 +145,6 @@ public class TerritoryServiceImpl implements TerritoryService {
                     .toList();
 
         }
-
-    @Override
-    public TerritoryResponse addBeatToTerritory(String territoryId, Beat beatId) {
-        Territory territory = territoryRepository.findByTerritoryId(territoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Territory Not found"));
-        if (territory.getBeatId() == null) {
-            territory.setBeatId(new ArrayList<>());
-        }
-        if (!territory.getBeatId().contains(beatId)) {
-            territory.getBeatId().add(beatId);
-        }
-            return mapToResponse(territoryRepository.save(territory));
-
-    }
-        @Override
-        public TerritoryResponse removeBeatFromTerritory (String territoryId, Beat beatId){
-            Territory territory = territoryRepository.findByTerritoryId(territoryId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Territory Not found"));
-            if (territory.getBeatId() != null) {
-                territory.getBeatId().remove(beatId);
-            }
-            return mapToResponse(territoryRepository.save(territory));
-        }
-
     private  TerritoryResponse mapToResponse(Territory territory){
         return TerritoryResponse.builder()
                 .territoryId(territory.getTerritoryId())
@@ -175,7 +154,6 @@ public class TerritoryServiceImpl implements TerritoryService {
                 .city(territory.getCity())
                 .updateAt(LocalDateTime.now())
                 .createAt(LocalDateTime.now())
-                .updateBy(territory.getUpdatedBy())
                 .build();
     }
 }
