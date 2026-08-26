@@ -205,12 +205,9 @@ public class BeatServiceImpl implements BeatService {
         beatRepository.delete(beat);
     }
 
-
-
     private BeatsResponse mapToResponse(Beat beat) {
 
         return BeatsResponse.builder()
-                .id(beat.getId())
                 .beatId(beat.getBeatId())
                 .territoryId(beat.getTerritoryId())
                 .promoterId(beat.getPromoterId())
