@@ -153,48 +153,13 @@ public class BeatServiceImpl implements BeatService {
     }
 
     @Override
-    public BeatsResponse updateBeatStatus(String beatId, BeatStatus beatsStatus) {
+    public BeatsResponse updateBeatStatus(String beatId, BeatsRequest request) {
         Beat beat = beatRepository.findByBeatId(beatId)
                 .orElseThrow(()-> new ResourceNotFoundException("Beat Id not found"));
-
-        return mapToResponse(beatRepository.save(beat));
+        beat.setBeatStatus(request.getBeatStatus());
+        Beat updatedBeat = beatRepository.save(beat);
+        return mapToResponse(updatedBeat);
     }
-
-    @Override
-    public BeatsResponse addOutletToBeat(String beatId, String outletId) {
-
-        Beat beat = beatRepository.findByBeatId(beatId)
-                .orElseThrow(
-                        ()-> new ResourceNotFoundException("Beat Id not found"));
-
-        if (beat.getOutletIds() == null) {
-            beat.setOutletIds(new ArrayList<>());
-        }
-
-        if (!beat.getOutletIds().contains(outletId)) {
-            beat.getOutletIds().add(outletId);
-        }
-
-        return mapToResponse(
-                beatRepository.save(beat)
-        );
-    }
-    @Override
-    public BeatsResponse removeOutletFromBeat(String beatId, String outletId) {
-
-        Beat beat = beatRepository.findByBeatId(beatId)
-                .orElseThrow(
-                        ()-> new ResourceNotFoundException("Beat Id not found"));
-
-        if (beat.getOutletIds() != null) {
-            beat.getOutletIds().remove(outletId);
-        }
-
-        return mapToResponse(
-                beatRepository.save(beat)
-        );
-    }
-
 
     @Override
     public void deleteBeat(String beatId) {

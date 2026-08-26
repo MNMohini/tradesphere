@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,28 +67,17 @@ public class BeatController {
         return ResponseEntity.ok(beatService.searchByState(state));
     }
 
-    @GetMapping("/status/{status}")
+    @GetMapping("/find/{status}")
     public ResponseEntity<List<BeatsResponse>>getAllBeatsByStatus(
             @PathVariable BeatStatus status){
         return ResponseEntity.ok(beatService.getByBeatStatus(status));
     }
 
-    @PatchMapping("/{beatId}/addoutlets/{outletId}")
-    public ResponseEntity<BeatsResponse> addOutletToBeat(
-            @PathVariable String beatId, @PathVariable String outletId) {
-        return ResponseEntity.ok(beatService.addOutletToBeat(beatId, outletId));
-    }
-    @PatchMapping("/{beatId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("status/{beatId}")
     public ResponseEntity<BeatsResponse> updateBeatStatus(
-            @PathVariable String beatId, @RequestParam BeatStatus beatStatus) {
-        return ResponseEntity.ok(beatService.updateBeatStatus(beatId, beatStatus));
+            @PathVariable String beatId, @RequestBody BeatsRequest request) {
+        return ResponseEntity.ok(beatService.updateBeatStatus(beatId, request));
     }
-    // Remove Outlet from Beat
-    @DeleteMapping("/{beatId}/removeoutlets/{outletId}")
-    public ResponseEntity<BeatsResponse> removeOutletFromBeat(
-            @PathVariable String beatId, @PathVariable String outletId) {
-        return ResponseEntity.ok(beatService.removeOutletFromBeat(beatId, outletId));
-    }
-
 
 }

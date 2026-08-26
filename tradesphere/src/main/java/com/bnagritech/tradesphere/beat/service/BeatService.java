@@ -13,7 +13,7 @@ public interface BeatService {
     // BASIC CRUD
     BeatsResponse createBeat(BeatsRequest request);
     BeatsResponse updateBeat(String beatId, BeatsRequest request);
-    BeatsResponse updateBeatStatus(String beatId, BeatStatus beatsStatus);
+    BeatsResponse updateBeatStatus(String beatId, BeatsRequest request);
     BeatsResponse getBeatById(String beatId);
     List<BeatsResponse> getAllBeats();
     // TERRITORY
@@ -22,8 +22,6 @@ public interface BeatService {
     List<BeatsResponse> searchByState(String state);
     // DASHBOARD FILTERS
     List<BeatsResponse> getByBeatStatus(BeatStatus status);
-    BeatsResponse addOutletToBeat(String beatId, String outletId);
-    BeatsResponse removeOutletFromBeat(String beatId, String outletId);
     void deleteBeat(String beatId);
 }
 
