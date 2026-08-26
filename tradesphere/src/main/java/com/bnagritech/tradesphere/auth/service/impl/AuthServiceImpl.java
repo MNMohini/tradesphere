@@ -81,14 +81,10 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginRequest request) {
         authenticationManager .authenticate(new UsernamePasswordAuthenticationToken(
                 request.getUserNameOrEmail(),
-                request.getPassword()
-        ));
+                request.getPassword()));
         User user = userRepository
-                .findByUserNameOrEmail(
-                        request.getUserNameOrEmail(),
-                        request.getUserNameOrEmail())
-                .orElseThrow(() ->
-                        new InvalidCredentialsException("Invalid username/email or password"));
+                .findByUserNameOrEmail(request.getUserNameOrEmail(), request.getUserNameOrEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid username/email"));
         if (user.getStatus() != UserStatus.ACTIVE) {
             throw new UserInactiveException("Your account is not active.");
         }
@@ -96,10 +92,8 @@ public class AuthServiceImpl implements AuthService {
             throw new AccountLockedException(
                     "Your account is locked. please contact your administrator.");
         }
-
         String accessToken = jwtService.generateToken(user);
         String refreshToken =jwtService.generateRefreshToken(user);
-
         user.setRefreshToken(refreshToken);
         user.setLastLoginAt(LocalDateTime.now());
         user.setFailedLoginAttempts(0);
@@ -110,10 +104,10 @@ public class AuthServiceImpl implements AuthService {
         public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request){
             userRepository.findByEmail(request.getEmail()
             ).orElseThrow(
-                    () -> new ResourceNotFoundException("No user found with this phone number"));
+                    () -> new ResourceNotFoundException("No user found with this email"));
             return ForgotPasswordResponse.builder()
                     .success(true)
-                    .message("Password reset link sent to your registered Phone Number.")
+                    .message("Password reset link sent to your registered email.")
                     .requestedAt(LocalDateTime.now())
                     .build();
         }

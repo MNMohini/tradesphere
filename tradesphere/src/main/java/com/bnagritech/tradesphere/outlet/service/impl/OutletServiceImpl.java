@@ -11,7 +11,6 @@ import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.outlet.service.OutletService;
 import com.bnagritech.tradesphere.promoter.model.Promoter;
 import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
-import com.bnagritech.tradesphere.retailer.model.Retailer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
