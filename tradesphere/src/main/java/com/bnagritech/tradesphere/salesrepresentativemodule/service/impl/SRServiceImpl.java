@@ -3,7 +3,6 @@ import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.exception.TerritoryNotFoundException;
-import com.bnagritech.tradesphere.promoter.model.Promoter;
 import com.bnagritech.tradesphere.salesrepresentativemodule.dto.SRRequest;
 import com.bnagritech.tradesphere.salesrepresentativemodule.dto.SRResponse;
 import com.bnagritech.tradesphere.salesrepresentativemodule.model.SalesRepresentative;
