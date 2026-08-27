@@ -10,7 +10,7 @@ public interface SRService {
     SRResponse createSR(SRRequest request);
     List<SRResponse> getAllSRs();
     SRResponse updateSR(String SRId,SRRequest request);
-    SRResponse deleteSR(String SRId);
+    void deleteSR(String SRId);
     SRResponse getSRById(String SRId);
     SRResponse getSRByEmail(String email);
     List<SRResponse> getAllSRsByTerritory(String territoryId);
