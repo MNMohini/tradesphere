@@ -28,8 +28,8 @@ public class SRServiceImpl implements SRService {
                 .orElseThrow(()-> new ResourceNotFoundException(
                         "Territory Id doesn't Exists"));
 
-        if (srRepository.existsBySRId(request.getSRId())) {
-            throw new ResourceAlreadyExistsException("SR ID " + request.getSRId() + " already exists.");
+        if (srRepository.existsBySRId(request.getSrId())) {
+            throw new ResourceAlreadyExistsException("SR ID " + request.getSrId() + " already exists.");
         }
         if(srRepository.existsByEmail(request.getEmail())) {
             throw new ResourceAlreadyExistsException("Email already exists");
@@ -38,8 +38,8 @@ public class SRServiceImpl implements SRService {
             throw new ResourceAlreadyExistsException("Phone number already exists");
         }
         SalesRepresentative salesRepresentative =  SalesRepresentative.builder()
-                .SRId(request.getSRId())
-                .SRName(request.getSRName())
+                .SRId(request.getSrId())
+                .SRName(request.getSrName())
                 .userName(request.getUserName())
                 .phoneNumber(request.getPhoneNumber())
                 .email(request.getEmail())
@@ -48,7 +48,6 @@ public class SRServiceImpl implements SRService {
                 .state(request.getState())
                 .status(request.getStatus())
                 .CreatedAt(LocalDateTime.now())
-                .UpdatedAt(LocalDateTime.now())
                 .build();
        SalesRepresentative savedRepresentative = srRepository.save(salesRepresentative);
         return mapToResponse(savedRepresentative);
@@ -63,8 +62,8 @@ public class SRServiceImpl implements SRService {
     }
 
     @Override
-    public SRResponse updateSR(String SRId, SRRequest request) {
-        SalesRepresentative salesRepresentative = srRepository.findBySRId(SRId)
+    public SRResponse updateSR(String srId, SRRequest request) {
+        SalesRepresentative salesRepresentative = srRepository.findBySRId(srId)
                 .orElseThrow(()-> new ResourceNotFoundException(
                         "Sales Representative doesn't Exists with this Id"));
         salesRepresentative.setEmail(request.getEmail());
@@ -78,16 +77,16 @@ public class SRServiceImpl implements SRService {
     }
 
     @Override
-    public void deleteSR(String SRId) {
-        SalesRepresentative salesRepresentative = srRepository.findBySRId(SRId)
+    public void deleteSR(String srId) {
+        SalesRepresentative salesRepresentative = srRepository.findBySRId(srId)
                 .orElseThrow(()-> new ResourceNotFoundException(
                         "Sales Representative doesn't Exists with this Id"));
         srRepository.delete(salesRepresentative);
     }
 
     @Override
-    public SRResponse getSRById(String SRId) {
-        SalesRepresentative salesRepresentative = srRepository.findBySRId(SRId)
+    public SRResponse getSRById(String srId) {
+        SalesRepresentative salesRepresentative = srRepository.findBySRId(srId)
                 .orElseThrow(()-> new ResourceNotFoundException(
                         "Sales Representative doesn't Exists with this Id"));
         return mapToResponse(salesRepresentative);
@@ -98,6 +97,14 @@ public class SRServiceImpl implements SRService {
         SalesRepresentative salesRepresentative = srRepository.findByEmail(email)
                 .orElseThrow(()-> new ResourceNotFoundException(
                         "Sales Representative doesn't Exists with this email"));
+        return mapToResponse(salesRepresentative);
+    }
+
+    @Override
+    public SRResponse getSRByPhoneNumber(String phoneNumber) {
+        SalesRepresentative salesRepresentative = srRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(()-> new ResourceNotFoundException(
+                        "Not Found Sales Representative with Phone Number " + phoneNumber));
         return mapToResponse(salesRepresentative);
     }
 
@@ -124,8 +131,8 @@ public class SRServiceImpl implements SRService {
     }
     private  SRResponse mapToResponse(SalesRepresentative salesRepresentative) {
         SRResponse response = new SRResponse();
-        response.setSRId(salesRepresentative.getSRId());
-        response.setSRName(salesRepresentative.getSRName());
+        response.setSrId(salesRepresentative.getSRId());
+        response.setSrName(salesRepresentative.getSRName());
         response.setUserName(salesRepresentative.getUserName());
         response.setPhoneNumber(salesRepresentative.getPhoneNumber());
         response.setEmail(salesRepresentative.getEmail());
@@ -133,8 +140,6 @@ public class SRServiceImpl implements SRService {
         response.setCity(salesRepresentative.getCity());
         response.setState(salesRepresentative.getState());
         response.setStatus(salesRepresentative.getStatus());
-        response.setCreatedAt(salesRepresentative.getCreatedAt());
-        response.setUpdatedAt(salesRepresentative.getUpdatedAt());
         return response;
     }
 }
