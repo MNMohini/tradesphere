@@ -4,6 +4,7 @@ import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.exception.EmployeeAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.PromoterNotFoundException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
+import com.bnagritech.tradesphere.common.exception.TerritoryNotFoundException;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
 import com.bnagritech.tradesphere.promoter.model.Promoter;
@@ -94,10 +95,8 @@ import java.util.List;
         @Override
         public void deletePromoter(String promoterId) {
             Promoter promoter = promoterRepository.findByPromoterId(promoterId)
-                    .orElseThrow(
-                            ()->
-                                    new ResourceNotFoundException(
-                                            "Employee not found with " +promoterId +" id"));
+                    .orElseThrow(()-> new ResourceNotFoundException(
+                                    "Employee not found with " +promoterId +" id"));
             promoterRepository.delete(promoter);
 
         }
@@ -126,6 +125,9 @@ import java.util.List;
     @Override
     public List<PromoterResponse> getPromoterByTerritory(String territoryId) {
     List<Promoter> promoters = promoterRepository.findByTerritoryId(territoryId);
+            if (promoters.isEmpty()){
+                throw new TerritoryNotFoundException("Territory not found");
+            }
         return promoters.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -134,6 +136,9 @@ import java.util.List;
     @Override
     public List<PromoterResponse> getPromoterByStatus(UserStatus status) {
         List<Promoter> promoters = promoterRepository.findByStatus(status);
+        if (promoters.isEmpty()){
+            throw new ResourceNotFoundException("Not found any promoter with status " + status);
+        }
         return promoters.stream()
                 .map(this::mapToResponse)
                 .toList();
