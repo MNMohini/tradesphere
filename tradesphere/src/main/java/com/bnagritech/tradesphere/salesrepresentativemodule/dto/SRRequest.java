@@ -1,5 +1,4 @@
 package com.bnagritech.tradesphere.salesrepresentativemodule.dto;
-import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SRRequest {
 
-    private String SRId;
-    private String SRName;
+    private String srId;
+    private String srName;
     private String userName;
     private String phoneNumber;
     private String email;
@@ -21,6 +20,5 @@ public class SRRequest {
     private String city;
     private String state;
     private UserStatus status;
-    private UserRole role;
 
 }
