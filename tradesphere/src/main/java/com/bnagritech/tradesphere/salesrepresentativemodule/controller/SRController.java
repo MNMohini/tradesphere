@@ -28,9 +28,9 @@ public class SRController {
         return ResponseEntity.ok(srService.getAllSRs());
     }
 
-    @GetMapping("/id/{SRId}")
-    public ResponseEntity<SRResponse> getSRById(@PathVariable String SRId) {
-        return ResponseEntity.ok(srService.getSRById(SRId));
+    @GetMapping("/id/{SrId}")
+    public ResponseEntity<SRResponse> getSRById(@PathVariable String SrId) {
+        return ResponseEntity.ok(srService.getSRById(SrId));
     }
 
     @GetMapping("/email/{email}")
@@ -38,12 +38,18 @@ public class SRController {
         return ResponseEntity.ok(srService.getSRByEmail(email));
     }
 
+    @GetMapping("/ph/{phoneNumber}")
+    public ResponseEntity<SRResponse> getSRByPhoneNumber(
+            @PathVariable String phoneNumber) {
+        return ResponseEntity.ok(srService.getSRByPhoneNumber(phoneNumber));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/update/{SRId}")
+    @PutMapping("/update/{SrId}")
     public ResponseEntity<SRResponse> updateSR(
-            @PathVariable String SRId,
+            @PathVariable String SrId,
             @RequestBody SRRequest srRequest) {
-        return ResponseEntity.ok(srService.updateSR(SRId, srRequest));
+        return ResponseEntity.ok(srService.updateSR(SrId, srRequest));
     }
 
     @GetMapping("/territory/{territoryId}")
@@ -58,9 +64,9 @@ public class SRController {
         return ResponseEntity.ok(srService.getAllSRsByStatus(status));
     }
 
-    @DeleteMapping("/del/{SRId}")
-    public ResponseEntity<String> deleteSR(@PathVariable String SRId) {
-        srService.deleteSR(SRId);
+    @DeleteMapping("/del/{SrId}")
+    public ResponseEntity<String> deleteSR(@PathVariable String SrId) {
+        srService.deleteSR(SrId);
         return ResponseEntity.ok("Deleted successfully");
     }
 
