@@ -28,7 +28,6 @@ public class SalesRepresentative {
     private String city;
     private String state;
     private UserStatus status;
-    private UserRole role;
     private LocalDateTime CreatedAt;
     private LocalDateTime UpdatedAt;
 
