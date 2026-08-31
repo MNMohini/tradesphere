@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.salesrepresentativemodule.model;
 
-import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

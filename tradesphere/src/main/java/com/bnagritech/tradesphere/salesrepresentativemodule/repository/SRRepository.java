@@ -13,6 +13,7 @@ public interface SRRepository extends MongoRepository<SalesRepresentative, Strin
     Optional<SalesRepresentative> findBySRId(String SRId);
     Optional<SalesRepresentative> findByEmail(String email);
     Optional<SalesRepresentative> findByPhoneNumber(String phoneNumber);
+    Optional<SalesRepresentative> findByUserName(String userName);
     List<SalesRepresentative> findByTerritoryId(String  territoryId);
     List<SalesRepresentative> findByStatus(UserStatus status);
     boolean existsBySRId(String SRId);
