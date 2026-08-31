@@ -71,6 +71,17 @@ import java.util.List;
         }
 
         @Override
+        public PromoterResponse getPromoterByUserName(String userName) {
+            Promoter promoter = promoterRepository.findByUserName(userName)
+                    .orElseThrow(
+                            ()->
+                                    new ResourceNotFoundException(
+                                            "Not found with " +userName ));
+
+            return mapToResponse(promoter);
+        }
+
+        @Override
         public PromoterResponse updatePromoter(String promoterId, PromoterRequest request) {
 
             Promoter promoter = promoterRepository.findByPromoterId(promoterId)

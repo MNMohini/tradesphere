@@ -30,6 +30,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmployeeRepository employeeRepository;
+//    private final PromoterRepository promoterRepository;
+//    private final SRRepository srRepository;
 
 
     @Override
@@ -37,8 +39,13 @@ public class AuthServiceImpl implements AuthService {
 
          Employee employee= employeeRepository.findByEmployeeId(request.getEmployeeId())
                 .orElseThrow(()-> new ResourceNotFoundException(
-                        "Employee not found with employeeId "
-                                +request.getEmployeeId()));
+                        "Employee not found with employeeId " +request.getEmployeeId()));
+
+//        Promoter promoter = promoterRepository.findByUserName(request.getUserName())
+//                .orElseThrow(()-> new ResourceNotFoundException("User name not found"));
+//
+//        SalesRepresentative sr = srRepository.findByUserName(request.getUserName())
+//                .orElseThrow(()-> new ResourceNotFoundException("User Name not found"));
 
         if (userRepository.existsByUserName(request.getUserName())) {
             throw new UserAlreadyExistsException(
