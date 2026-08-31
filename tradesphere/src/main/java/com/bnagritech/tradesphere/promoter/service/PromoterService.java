@@ -12,6 +12,7 @@ public interface PromoterService {
     PromoterResponse createPromoter(PromoterRequest request);
     List <PromoterResponse> getAllPromoters();
     PromoterResponse getPromoterById(String promoterId);
+    PromoterResponse getPromoterByUserName(String userName);
     PromoterResponse updatePromoter(String promoterId, PromoterRequest request);
     void deletePromoter (String promoterId);
     PromoterResponse getPromoterByPhoneNumber(long phoneNumber);
