@@ -3,6 +3,7 @@ import com.bnagritech.tradesphere.auth.dto.*;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.auth.service.AuthService;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.exception.*;
 import com.bnagritech.tradesphere.employee.model.Employee;
@@ -194,7 +195,15 @@ public class AuthServiceImpl implements AuthService {
             return mapToUserResponse(user);
 
         }
-//        private String existUserName(LoginResponse request){
+
+    @Override
+    public UserResponse getUserByRole(UserRole role) {
+        User user = userRepository
+                .findByRole(role).orElseThrow(() -> new RuntimeException("Role not found"));
+        return mapToUserResponse(user);
+    }
+
+    //        private String existUserName(LoginResponse request){
 //
 //            Promoter promoter = promoterRepository.findByUserName(request.getUserName())
 //                    .orElseThrow(()-> new ResourceNotFoundException("User name not found"));
@@ -206,11 +215,13 @@ public class AuthServiceImpl implements AuthService {
             User user) {
         return UserResponse.builder()
                 .userId(user.getId())
+                .userName(user.getUsername())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .userImageUrl(user.getUserImageUrl())
                 .role(user.getRole())
                 .status(user.getStatus())
+                .lastLoginAt(LocalDateTime.now())
                 .build();
     }
     private RegisterResponse mapToRegisterResponse(

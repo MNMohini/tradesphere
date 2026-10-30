@@ -32,6 +32,8 @@ public class User implements UserDetails {
     private String email;
     private String phoneNumber;
     private String userImageUrl;
+    private String address;
+    private String alternativeNumber;
     //Role
     private UserRole role;
     private Set<String> permissions;

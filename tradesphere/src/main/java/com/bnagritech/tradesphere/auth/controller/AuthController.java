@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.auth.controller;
 
 import com.bnagritech.tradesphere.auth.dto.*;
 import com.bnagritech.tradesphere.auth.service.AuthService;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -83,6 +84,13 @@ public class AuthController {
             @PathVariable String userId){
          return ResponseEntity.ok(
                 authService.getUserByUserId(userId));
+    }
+    // ONLY ADMIN GET USER BY ROLES
+    @GetMapping("/role/{role}")
+    public ResponseEntity<UserResponse> getUserByRole(
+            @PathVariable UserRole role){
+        return ResponseEntity.ok(
+                authService.getUserByRole(role));
     }
     // LOGOUT
     @PostMapping("/logout")

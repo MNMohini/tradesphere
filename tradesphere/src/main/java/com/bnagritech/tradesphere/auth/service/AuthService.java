@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.auth.service;
 
 import com.bnagritech.tradesphere.auth.dto.*;
+import com.bnagritech.tradesphere.common.enums.UserRole;
 
 import java.util.List;
 public interface AuthService {
@@ -23,7 +24,7 @@ public interface AuthService {
     List<UserResponse> getAllUsers();
 
     UserResponse getUserByUserId(String userId);
-
+    UserResponse getUserByRole(UserRole role);
 }
 
 
