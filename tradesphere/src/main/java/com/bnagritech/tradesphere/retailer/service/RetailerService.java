@@ -10,7 +10,6 @@ public interface RetailerService{
     RetailerResponse createRetailer(RetailerRequest request);
     RetailerResponse getRetailerByRetailerId(String retailerId);
     RetailerResponse updateRetailer(String retailerId,RetailerRequest request);
-    RetailerResponse getRetailerByPhoneNumber(String phoneNumber);
     RetailerResponse updateRetailerStatus(String retailerId,RetailerRequest request);
     RetailerResponse updateOutletIds(String retailerId,RetailerRequest request);
     RetailerResponse getRetailerByRetailerName(String retailerName);

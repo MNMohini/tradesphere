@@ -34,11 +34,6 @@ public class RetailerController {
     public ResponseEntity<RetailerResponse> getRetailerById(@PathVariable String retailerId){
         return ResponseEntity.ok(retailerService.getRetailerByRetailerId(retailerId));
     }
-    //get retailer by phoneNumber
-    @GetMapping("/phn/{phoneNumber}")
-    public ResponseEntity<RetailerResponse> getRetailerByPhoneNumber(@PathVariable String phoneNumber){
-        return ResponseEntity.ok(retailerService.getRetailerByPhoneNumber(phoneNumber));
-    }
     @GetMapping("/byName/{retailerName}")
     public ResponseEntity<RetailerResponse> getRetailerByRetailerName(@PathVariable String retailerName){
         return ResponseEntity.ok(retailerService.getRetailerByRetailerName(retailerName));

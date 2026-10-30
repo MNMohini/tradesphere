@@ -7,10 +7,8 @@ public interface RetailerRepository extends MongoRepository<Retailer, String> {
 
     // single retailer search
     Optional<Retailer> findByRetailerNameContainingIgnoreCase(String retailerName);
-    Optional<Retailer> findByPhoneNumber(String phoneNumber);
     Optional<Retailer> findByRetailerId(String retailerId);
-    boolean existsByRetailerNameAndRetailerIdAndPhoneNumber(String retailerName, String retailerId,String phoneNumber);
-    boolean existsByPhoneNumber(String phoneNumber);
+    boolean existsByRetailerNameAndRetailerId(String retailerName, String retailerId);
     boolean existsByRetailerId(String retailerId);
 
 

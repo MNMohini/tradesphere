@@ -18,10 +18,6 @@ public class RetailerResponse {
     private String retailerId;
     private String retailerName;
     private List<String> outletIds;
-    private String phoneNumber;
-    private String address;
-    private String panNumber;
     private RetailerStatus retailerStatus;
     private LocalDateTime createdAt;
-    private String createdBy;
 }

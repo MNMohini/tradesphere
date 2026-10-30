@@ -22,14 +22,11 @@ public class RetailerServiceImpl implements RetailerService {
     @Override
     public RetailerResponse createRetailer(RetailerRequest request) {
 
-        if(retailerRepository.existsByPhoneNumber(request.getPhoneNumber())){
-            throw new ResourceAlreadyExistsException("Retailer already exists with this Number.");
-        }
         if (retailerRepository.existsByRetailerId(request.getRetailerId())){
            throw new ResourceAlreadyExistsException("Retailer already exists with this RetailerId.");
         }
-        if (retailerRepository.existsByRetailerNameAndRetailerIdAndPhoneNumber(
-                request.getRetailerName(), request.getRetailerId(), request.getPhoneNumber()))
+        if (retailerRepository.existsByRetailerNameAndRetailerId(
+                request.getRetailerName(), request.getRetailerId()))
         {
             throw new ResourceAlreadyExistsException("Retailer Already Exists");
         }
@@ -37,11 +34,7 @@ public class RetailerServiceImpl implements RetailerService {
                     .retailerId(request.getRetailerId())
                     .retailerName(request.getRetailerName())
                     .outletIds(request.getOutletIds())
-                    .phoneNumber(request.getPhoneNumber())
-                    .address(request.getAddress())
-                    .panNumber(request.getPanNumber())
                     .createdAt(request.getCreatedAt())
-                    .createdBy(request.getCreatedBy())
                     .retailerStatus(request.getRetailerStatus())
                     .build();
         Retailer savedRetailer = retailerRepository.save(retailer);
@@ -66,23 +59,12 @@ public class RetailerServiceImpl implements RetailerService {
         retailer.setRetailerName(request.getRetailerName());
         retailer.setOutletIds(request.getOutletIds());
         retailer.setRetailerStatus(request.getRetailerStatus());
-        retailer.setPhoneNumber(request.getPhoneNumber());
-        retailer.setAddress(request.getAddress());
         retailer.setRetailerStatus(request.getRetailerStatus());
-        retailer.setPanNumber(request.getPanNumber());
-        retailer.setCreatedBy(request.getCreatedBy());
 
             Retailer updatedRetailer = retailerRepository.save(retailer);
             return mapToResponse(updatedRetailer);
     }
 
-    @Override
-    public RetailerResponse getRetailerByPhoneNumber(String phoneNumber) {
-        Retailer retailer = retailerRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(()-> new ResourceNotFoundException(
-                                         "Retailer not found with " +phoneNumber));
-        return mapToResponse(retailer);
-    }
 
     @Override
     public RetailerResponse updateRetailerStatus(String retailerId, RetailerRequest request) {
@@ -141,12 +123,8 @@ public class RetailerServiceImpl implements RetailerService {
         retailerResponse.setRetailerId(retailer.getRetailerId());
         retailerResponse.setRetailerName(retailer.getRetailerName());
         retailerResponse.setOutletIds(retailer.getOutletIds());
-        retailerResponse.setPhoneNumber(retailer.getPhoneNumber());
-        retailerResponse.setAddress(retailer.getAddress());
-        retailerResponse.setPanNumber(retailer.getPanNumber());
         retailerResponse.setCreatedAt(LocalDateTime.now());
         retailerResponse.setRetailerStatus(retailer.getRetailerStatus());
-        retailerResponse.setCreatedBy(retailer.getCreatedBy());
         return retailerResponse;
     }
 }
