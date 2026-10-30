@@ -2,6 +2,8 @@ package com.bnagritech.tradesphere.territory.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -13,5 +15,7 @@ public class TerritoryRequest {
     private List<String> beatId;
     private List<String> state;
     private List<String> city;
-
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String updatedBy;
 }

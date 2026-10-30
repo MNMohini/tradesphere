@@ -24,7 +24,7 @@ public class Territory {
     private List<String> beatId;
     private List<String> state;
     private List<String> city;
-    private LocalDateTime updateAt;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String updatedBy;
 }

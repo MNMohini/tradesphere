@@ -18,4 +18,5 @@ public class TerritoryResponse {
     private List<String> city;
     private LocalDateTime updateAt;
     private LocalDateTime createAt;
+    private String updatedBy;
 }

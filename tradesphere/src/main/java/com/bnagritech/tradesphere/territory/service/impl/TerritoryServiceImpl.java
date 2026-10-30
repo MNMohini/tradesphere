@@ -24,11 +24,11 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public TerritoryResponse createTerritory(TerritoryRequest request) {
 
-            if (territoryRepository.findByTerritoryNameIgnoreCase(request.getTerritoryName()).isPresent()) {
-                throw new ResourceAlreadyExistsException("Territory name already exists");
+            if (territoryRepository.existsTerritoryByTerritoryName(request.getTerritoryName())) {
+                throw new ResourceAlreadyExistsException("Territory name is already exists");
             }
-            if (territoryRepository.findByTerritoryId(request.getTerritoryId()).isPresent()){
-                throw new ResourceAlreadyExistsException("Territory already Exists");
+            if (territoryRepository.existsTerritoryByTerritoryId(request.getTerritoryId())){
+                throw new ResourceAlreadyExistsException("Territory Id is already exists");
             }
 
             Territory territory = Territory.builder()
@@ -39,8 +39,8 @@ public class TerritoryServiceImpl implements TerritoryService {
                             : new ArrayList<>())
                     .state(new ArrayList<>(request.getState()))
                     .city(new ArrayList<>(request.getCity()))
-                    .createAt(LocalDateTime.now())
-                    .updateAt(LocalDateTime.now())
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
                     .build();
 
             Territory savedTerritory = territoryRepository.save(territory);
@@ -104,7 +104,8 @@ public class TerritoryServiceImpl implements TerritoryService {
                             : new ArrayList<>());
             territory.setState(new ArrayList<>(request.getState()));
             territory.setCity(new ArrayList<>(request.getCity()));
-            territory.setUpdateAt(LocalDateTime.now());
+            territory.setUpdatedAt(LocalDateTime.now());
+            territory.setUpdatedBy(String.valueOf(request.getUpdatedBy()));
 
             Territory updatedTerritory = territoryRepository.save(territory);
             return mapToResponse(updatedTerritory);
@@ -119,32 +120,6 @@ public class TerritoryServiceImpl implements TerritoryService {
             territoryRepository.delete(territory);
     }
 
-    @Override
-    public List<TerritoryResponse> getTerritoriesByState( String state) {
-
-        List<Territory> territoryList= territoryRepository.findByStateIgnoreCase(Collections.singletonList(state));
-        if(territoryList.isEmpty()){
-            throw new ResourceNotFoundException("Resource Not Found");
-        }
-        return territoryList
-                    .stream()
-                    .map(this::mapToResponse)
-                    .toList();
-
-        }
-
-    @Override
-    public List<TerritoryResponse> getTerritoriesByCity(List<String> city) {
-        List<Territory> territoryList= territoryRepository.findByCityIgnoreCase(city);
-                if(territoryList.isEmpty()){
-                    throw new ResourceNotFoundException("Resource Not Found");
-                }
-            return territoryList
-                    .stream()
-                    .map(this::mapToResponse)
-                    .toList();
-
-        }
     private  TerritoryResponse mapToResponse(Territory territory){
         return TerritoryResponse.builder()
                 .territoryId(territory.getTerritoryId())

@@ -21,7 +21,6 @@ public class TerritoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TerritoryResponse> createTerritory(@Valid @RequestBody TerritoryRequest request) {
         TerritoryResponse territoryResponse = territoryService.createTerritory(request);
-
         return new ResponseEntity<>(territoryResponse, HttpStatus.CREATED);
     }
     @GetMapping("/all")
@@ -35,14 +34,6 @@ public class TerritoryController {
     @PutMapping("/update/{territoryId}")
     public ResponseEntity<TerritoryResponse> updateTerritory(@PathVariable String territoryId, @Valid @RequestBody TerritoryRequest request) {
         return ResponseEntity.ok(territoryService.updateTerritory(territoryId, request));
-    }
-    @GetMapping("/state/{state}")
-    public ResponseEntity<List<TerritoryResponse>> getTerritoriesByState(@PathVariable String state) {
-        return ResponseEntity.ok(territoryService.getTerritoriesByState(state));
-    }
-    @GetMapping("/city/{city}")
-    public ResponseEntity<List<TerritoryResponse>> getAllTerritoriesByCity(@PathVariable List<String> city) {
-        return ResponseEntity.ok(territoryService.getTerritoriesByCity(city));
     }
     @DeleteMapping("/del/{territoryId}")
     public ResponseEntity<String> deleteTerritory(@PathVariable String territoryId){
