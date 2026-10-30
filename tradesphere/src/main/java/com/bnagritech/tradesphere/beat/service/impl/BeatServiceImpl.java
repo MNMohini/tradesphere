@@ -7,8 +7,6 @@ import com.bnagritech.tradesphere.beat.repository.BeatRepository;
 import com.bnagritech.tradesphere.beat.service.BeatService;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.promoter.model.Promoter;
-import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
 import com.bnagritech.tradesphere.territory.model.Territory;
 import com.bnagritech.tradesphere.territory.repository.TerritoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +19,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BeatServiceImpl implements BeatService {
     private final BeatRepository beatRepository;
-    private final PromoterRepository promoterRepository;
     private final TerritoryRepository territoryRepository;
 
     @Override
     public BeatsResponse createBeat(BeatsRequest request) {
-        Promoter promoter= promoterRepository.findByPromoterId(request.getPromoterId())
-                .orElseThrow(()-> new ResourceNotFoundException("Promoter Id does not Exists"));
+
         Territory territory = territoryRepository.findByTerritoryId(request.getTerritoryId())
                 .orElseThrow(()-> new ResourceNotFoundException("Territory Id doesn't Exists"));
-
-        if (beatRepository.existsByTerritoryIdAndBeatId(request.getTerritoryId(), request.getBeatId())) {
+                if (beatRepository.existsByTerritoryIdAndBeatId(request.getTerritoryId(), request.getBeatId())) {
             throw new RuntimeException("Beat already exists for this territory");
         }
 
@@ -42,7 +37,7 @@ public class BeatServiceImpl implements BeatService {
         Beat beat = Beat.builder()
                 .beatId(request.getBeatId())
                 .territoryId(territory.getTerritoryId())
-                .promoterId(promoter.getPromoterId())
+                .userName(request.getUserName())
                 .beatStatus(request.getBeatStatus())
                 .state(request.getState())
                 .city(request.getCity())
@@ -95,7 +90,7 @@ public class BeatServiceImpl implements BeatService {
 
     @Override
     public List<BeatsResponse> searchByCity(String city) {
-        List<Beat> beatList = beatRepository.findByCityIgnoreCase(city);
+        List<Beat> beatList = beatRepository.findBeatByCityIgnoreCase(city);
         if (beatList.isEmpty()){
             throw new ResourceNotFoundException("No beat is exists");
         }
@@ -109,7 +104,7 @@ public class BeatServiceImpl implements BeatService {
     @Override
     public List<BeatsResponse> searchByState(String state) {
 
-        List<Beat> beatList = beatRepository.findByStateIgnoreCase(state);
+        List<Beat> beatList = beatRepository.findBeatByStateIgnoreCase(state);
         if (beatList.isEmpty()){
             throw new ResourceNotFoundException("No beat is exists");
         }
@@ -139,7 +134,7 @@ public class BeatServiceImpl implements BeatService {
                         ()-> new ResourceNotFoundException("Beat Id not found"));
         beat.setBeatId(request.getBeatId());
         beat.setTerritoryId(request.getTerritoryId());
-        beat.setPromoterId(request.getPromoterId());
+        beat.setUserName(request.getUserName());
         beat.setBeatStatus(request.getBeatStatus());
         beat.setState(request.getState());
         beat.setCity(request.getCity());
@@ -175,7 +170,7 @@ public class BeatServiceImpl implements BeatService {
         return BeatsResponse.builder()
                 .beatId(beat.getBeatId())
                 .territoryId(beat.getTerritoryId())
-                .promoterId(beat.getPromoterId())
+                .userName(beat.getUserName())
                 .beatStatus(beat.getBeatStatus())
                 .state(beat.getState())
                 .city(beat.getCity())

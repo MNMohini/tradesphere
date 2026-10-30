@@ -22,10 +22,10 @@ public class BeatController {
     @PostMapping("/create")
     public ResponseEntity<BeatsResponse>createBeat(
             @RequestBody @Valid BeatsRequest beatsRequest) {
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(beatService.createBeat(beatsRequest));
     }
+
     @PutMapping("/update/{beatId}")
     public ResponseEntity<BeatsResponse>updateBeat(
             @PathVariable String beatId,
@@ -33,10 +33,12 @@ public class BeatController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(beatService.updateBeat(beatId, beatsRequest));
     }
+
     @GetMapping("/id/{beatId}")
     public ResponseEntity<BeatsResponse>getBeatById(@PathVariable String beatId) {
         return ResponseEntity.ok(beatService.getBeatById(beatId));
     }
+
     @GetMapping("/all")
     public ResponseEntity <List<BeatsResponse>>getAllBeats(){
         return ResponseEntity.ok(beatService.getAllBeats());
@@ -46,6 +48,7 @@ public class BeatController {
         beatService.deleteBeat(beatId);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("territory/{territoryId}")
     public ResponseEntity<List<BeatsResponse>>getBeatsByTerritory(
             @PathVariable String territoryId) {

@@ -14,7 +14,7 @@ import java.util.List;
 public class BeatsRequest {
 
     private String beatId;
-    private String promoterId;
+    private String userName;
     private String territoryId;
     private String state;
     private String city;

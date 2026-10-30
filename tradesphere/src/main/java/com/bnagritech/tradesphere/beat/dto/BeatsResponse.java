@@ -11,7 +11,7 @@ public class BeatsResponse {
 
     private String beatId;
     private String territoryId;
-    private String promoterId;
+    private String userName;
     private String state;
     private String city;
     private List<String> outletIds;

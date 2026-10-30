@@ -19,8 +19,8 @@ public interface BeatRepository extends MongoRepository<Beat, String> {
     // TERRITORY BASED OPERATIONS
     List<Beat> findByTerritoryId(String territoryId);
     // LOCATION SEARCH
-    List<Beat> findByCityIgnoreCase(String city);
-    List<Beat> findByStateIgnoreCase(String state);
+    List<Beat> findBeatByCityIgnoreCase(String city);
+    List<Beat> findBeatByStateIgnoreCase(String state);
     // FILTERS FOR DASHBOARD
     List<Beat> findByBeatStatus(BeatStatus beatStatus);
 
