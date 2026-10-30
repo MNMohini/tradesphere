@@ -22,13 +22,8 @@ public class RegisterRequest {
     private String email;
     @NotNull(message = "Required")
     private String phoneNumber;
-    //mapping
-    @NotBlank(message = "Employee is required")
-    private String employeeId;
-    //personal
-    @NotBlank(message = "Required")
-    private String employeeName;
-    private String profileImageUrl;
+    //@NotNull(message = "Required")
+    private String userImageUrl;
     @NotNull(message = "Role is required")
     private UserRole role;
     private UserStatus userStatus;

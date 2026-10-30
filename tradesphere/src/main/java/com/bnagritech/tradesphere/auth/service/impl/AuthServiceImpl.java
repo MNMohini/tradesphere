@@ -7,6 +7,10 @@ import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.exception.*;
 import com.bnagritech.tradesphere.employee.model.Employee;
 import com.bnagritech.tradesphere.employee.repository.EmployeeRepository;
+import com.bnagritech.tradesphere.promoter.model.Promoter;
+import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
+import com.bnagritech.tradesphere.salesrepresentativemodule.model.SalesRepresentative;
+import com.bnagritech.tradesphere.salesrepresentativemodule.repository.SRRepository;
 import com.bnagritech.tradesphere.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,22 +34,10 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmployeeRepository employeeRepository;
-//    private final PromoterRepository promoterRepository;
-//    private final SRRepository srRepository;
 
 
     @Override
     public RegisterResponse createUserAccount(RegisterRequest request) {
-
-         Employee employee= employeeRepository.findByEmployeeId(request.getEmployeeId())
-                .orElseThrow(()-> new ResourceNotFoundException(
-                        "Employee not found with employeeId " +request.getEmployeeId()));
-
-//        Promoter promoter = promoterRepository.findByUserName(request.getUserName())
-//                .orElseThrow(()-> new ResourceNotFoundException("User name not found"));
-//
-//        SalesRepresentative sr = srRepository.findByUserName(request.getUserName())
-//                .orElseThrow(()-> new ResourceNotFoundException("User Name not found"));
 
         if (userRepository.existsByUserName(request.getUserName())) {
             throw new UserAlreadyExistsException(
@@ -59,28 +51,21 @@ public class AuthServiceImpl implements AuthService {
             throw new UserAlreadyExistsException(
                     "User already exists with this phone number");
         }
-        if (userRepository.existsByEmployeeId(request.getEmployeeId())) {
-            throw new UserAlreadyExistsException(
-                    "User already exists with this employee id");
-        }
-
         User user = User.builder()
                 .userName(request.getUserName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
-                .employeeId(employee.getEmployeeId())
-                .employeeName(employee.getEmployeeName())
-                .phoneNumber(employee.getPhoneNumber())
-                .profileImageUrl(employee.getProfileImageUrl())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .status(UserStatus.ACTIVE)
+                .userImageUrl(request.getUserImageUrl())
                 .lastLoginAt(LocalDateTime.now())
                 .failedLoginAttempts(0)
                 .enabled(true)
                 .permissions(Set.of())
                 .accountLocked(false)
-                .email(employee.getEmail())
                 .build();
         User savedUser = userRepository.save(user);
-
         return mapToRegisterResponse(savedUser);
     }
 
@@ -172,14 +157,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    @Override
-    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
-        // TODO:
-        // Validate refresh token
-        // generate new access token
-        throw new UnsupportedOperationException("Not supported yet.");
 
-    }
 
         @Override
         public UserResponse updateUserStatus (String userId, UpdateUserStatusRequest request){
@@ -216,13 +194,21 @@ public class AuthServiceImpl implements AuthService {
             return mapToUserResponse(user);
 
         }
+//        private String existUserName(LoginResponse request){
+//
+//            Promoter promoter = promoterRepository.findByUserName(request.getUserName())
+//                    .orElseThrow(()-> new ResourceNotFoundException("User name not found"));
+//
+//            SalesRepresentative sr = srRepository.findByUserName(request.getUserName())
+//                    .orElseThrow(()-> new ResourceNotFoundException("User Name not found"));
+//        }
     private UserResponse mapToUserResponse(
             User user) {
         return UserResponse.builder()
                 .userId(user.getId())
-                .employeeId(user.getEmployeeId())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
+                .userImageUrl(user.getUserImageUrl())
                 .role(user.getRole())
                 .status(user.getStatus())
                 .build();
@@ -231,13 +217,12 @@ public class AuthServiceImpl implements AuthService {
             User user) {
         return RegisterResponse.builder()
                 .userId(user.getId())
-                .employeeId(user.getEmployeeId())
                 .userName(user.getUsername())
-                .profileImageUrl(user.getProfileImageUrl())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
-                .userStatus(user.getStatus())
+                .userImageUrl(user.getUserImageUrl())
+                .status(user.getStatus())
                 .createdAt(LocalDateTime.now())
                 .message("User registered successfully")
                 .build();
@@ -247,17 +232,13 @@ public class AuthServiceImpl implements AuthService {
     private LoginResponse buildLoginResponse(User user, String accessToken) {
         return LoginResponse.builder()
                 .accessToken(accessToken)
-                .userId(user.getId())
                 .userName(user.getUsername())
-                .phoneNumber(user.getPhoneNumber())
-                .employeeId(user.getEmployeeId())
-                .userStatus(user.getStatus())
-                .email(user.getEmail())
-                .role(user.getRole())
+                .message("Login successfully")
                 .lastLoginAt(LocalDateTime.now())
                 .build();
 
     }
+
   
 }
 

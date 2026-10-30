@@ -17,8 +17,7 @@ public interface UserRepository extends MongoRepository<User , String> {
     boolean existsByEmail(String email);
     // duplicate phone number check
     boolean existsByPhoneNumber(String phoneNumber);
-    // employee already has login or not
-    boolean existsByEmployeeId(String employeeId);
+
 
 }
 

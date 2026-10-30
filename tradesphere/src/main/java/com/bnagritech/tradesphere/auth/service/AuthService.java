@@ -15,8 +15,6 @@ public interface AuthService {
     ChangePasswordResponse changePassword(String userId,
                                           ChangePasswordRequest request);
 
-    RefreshTokenResponse refreshToken(RefreshTokenRequest request);
-
     UserResponse updateUserStatus(String userId,
                                   UpdateUserStatusRequest request);
 

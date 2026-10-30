@@ -29,11 +29,9 @@ public class User implements UserDetails {
     @NotBlank
     private String password;
     //mapping
-    private String employeeId;
-    private String employeeName;
     private String email;
     private String phoneNumber;
-    private String profileImageUrl;
+    private String userImageUrl;
     //Role
     private UserRole role;
     private Set<String> permissions;

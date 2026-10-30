@@ -19,13 +19,11 @@ public class UserResponse {
     private String userName;
     private String userId;
     private String email;
-    private String employeeId;
     private String phoneNumber;
-    private String profileImageUrl;
+    private String userImageUrl;
     private UserStatus status;
     private UserRole role;
     private Boolean verified;
-    private String fullName;
     private Set<String> permissions;
     private Boolean accountLocked;
     private Integer failedLoginAttempts;

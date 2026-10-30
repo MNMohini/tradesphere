@@ -22,7 +22,6 @@ public class AdminInitializer {
             if (!userRepository.existsByUserName("Mohini01")) {
                 User admin = User.builder()
                         .userName("Mohini01")
-                        .employeeId("BNAL1843")
                         .email("mohini@bngroupindia.com")
                         .password(passwordEncoder.encode("mohini@bn"))
                         .role(UserRole.ADMIN)

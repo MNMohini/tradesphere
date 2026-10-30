@@ -15,20 +15,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RegisterResponse {
     private String userId;
-    //Login
     private String userName;
-    //contact details
     private String email;
     private String phoneNumber;
     private String message;
-    //Personal
-    private String employeeName;
-    private UserStatus userStatus;
-    private String profileImageUrl;
-    //mapping
-    private String employeeId;
-    private Boolean verified;
-    //Role
+    private UserStatus status;
+    private String userImageUrl;
     private UserRole role;
     private LocalDateTime createdAt;
 }
