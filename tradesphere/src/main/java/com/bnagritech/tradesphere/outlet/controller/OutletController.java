@@ -36,8 +36,12 @@ public class OutletController {
         return ResponseEntity.ok(outletService.getOutletByOutletId(outletId));
     }
     @GetMapping("/phn/{phoneNumber}")
-    public ResponseEntity<OutletResponse> getOutletByPhoneNumber(@PathVariable String phoneNumber) {
-        return ResponseEntity.ok(outletService.getOutletByPhoneNumber(phoneNumber));
+    public ResponseEntity<OutletResponse> getOutletByMobileNumber(@PathVariable String mobileNumber) {
+        return ResponseEntity.ok(outletService.getOutletByMobileNumber(mobileNumber));
+    }
+    @GetMapping("/code/{pinCode}")
+    public ResponseEntity<List<OutletResponse>> getOutletByPinCode(@PathVariable String pinCode) {
+        return ResponseEntity.ok(outletService.getOutletsByPinCode(pinCode));
     }
     @GetMapping("/email/{email}")
     public ResponseEntity<OutletResponse> getOutletByEmail(@PathVariable String email) {
@@ -48,10 +52,6 @@ public class OutletController {
     public ResponseEntity<String> deleteOutlet(@PathVariable String outletId) {
         outletService.deleteOutlet(outletId);
         return ResponseEntity.ok("Deleted successfully");
-    }
-    @GetMapping("/{promoterId}")
-    public ResponseEntity<List<OutletResponse>> getOutletByPromoterId(@PathVariable String promoterId){
-        return ResponseEntity.ok(outletService.getOutletsByPromoterId(promoterId));
     }
     @GetMapping("/list/{outletName}")
     public ResponseEntity<List<OutletResponse>> getOutletByOutletName(@PathVariable String outletName){

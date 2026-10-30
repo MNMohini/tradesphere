@@ -147,7 +147,13 @@ public class OutletServiceImpl implements OutletService {
 
     @Override
     public List<OutletResponse> getOutletsByPinCode(String pinCode) {
-        return List.of();
+        List<Outlet> outletList = outletRepository.findByPinCodeContainingIgnoreCase(pinCode);
+        if(outletList.isEmpty()) {
+            throw new ResourceNotFoundException("This PinCode isn't exists in our database.");
+        }
+        return outletList.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
