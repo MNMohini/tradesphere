@@ -10,24 +10,19 @@ public class OutletRequest {
 
     private String outletId;
     private String outletName;
-    private String phoneNumber;
+    private String mobileNumber;
     private String alternateContactNumber;
     private String email;
     private String address;
     private String territoryId;
     private String beatId;
-    private String promoterId;
     private OutletType outletType;
     private OutletStatus outletStatus;
-    private String gstNumber;
     private String City;
     private String State;
-    private String panNumber;
+    private String pinCode;
     private Double latitude;
     private Double longitude;
-    private Double creditDays;
-    private Double creditLimits;
-    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;
     private String updatedBy;

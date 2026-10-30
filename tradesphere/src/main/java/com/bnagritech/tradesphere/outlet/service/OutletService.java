@@ -10,12 +10,12 @@ public interface OutletService {
     OutletResponse createOutlet(OutletRequest request);
     OutletResponse getOutletByOutletId(String outletId);
     OutletResponse updateOutlet(String OutletId,OutletRequest request);
-    OutletResponse getOutletByPhoneNumber(String phoneNumber);
+    OutletResponse getOutletByMobileNumber(String mobileNumber);
     OutletResponse getOutletByEmail(String email);
     OutletResponse updateOutletStatus(String outletId, OutletRequest request);
     List<OutletResponse> getOutletsByTerritoryId(String territoryId);
     List<OutletResponse> getOutletsByOutletName(String outletName);
-    List<OutletResponse> getOutletsByPromoterId(String promoterId);
+    List<OutletResponse> getOutletsByPinCode(String pinCode);
     List<OutletResponse> getOutletByOutletStatus(OutletStatus outletStatus);
     List<OutletResponse> getOutletByCity(String city);
     List<OutletResponse> getOutletByState(String state);

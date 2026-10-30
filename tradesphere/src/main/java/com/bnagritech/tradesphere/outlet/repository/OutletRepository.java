@@ -13,19 +13,30 @@ import java.util.Optional;
 public interface OutletRepository extends MongoRepository<Outlet, String> {
 
     Optional<Outlet> findByOutletId(String outletId);
-    Optional<Outlet> findByPhoneNumber(String phoneNumber);
+
+    Optional<Outlet> findByMobileNumber(String mobileNumber);
+
     Optional<Outlet> findByEmail(String email);
+
     //Duplicate checks
     boolean existsByOutletId(String outletId);
+
     boolean existsByEmail(String email);
-    boolean existsByPhoneNumber(String phoneNumber);
-    boolean existsByOutletNameAndAddress(String outletName, String address);
+
+    boolean existsByMobileNumber(String mobileNumber);
+
     //Search
     List<Outlet> findByOutletNameContainingIgnoreCase(String outletName);
-    List<Outlet>findOutletByOutletType(OutletType outletType);
-    List<Outlet>findByCityContainingIgnoreCase(String city);
-    List<Outlet>findByStateContainingIgnoreCase(String state);
-    List<Outlet>findByTerritoryId(String territoryId);
-    List<Outlet>findOutletByOutletStatus(OutletStatus outletStatus);
-    List<Outlet> findOutletByPromoterId(String promoterId);
-};
+
+    List<Outlet> findOutletByOutletType(OutletType outletType);
+
+    List<Outlet> findByCityContainingIgnoreCase(String city);
+
+    List<Outlet> findByStateContainingIgnoreCase(String state);
+
+    List<Outlet> findByPinCodeContainingIgnoreCase(String pinCode);
+
+    List<Outlet> findByTerritoryId(String territoryId);
+
+    List<Outlet> findOutletByOutletStatus(OutletStatus outletStatus);
+}

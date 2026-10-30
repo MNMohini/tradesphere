@@ -14,27 +14,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OutletResponse {
+
     private String outletId;
     private String outletName;
-    private String phoneNumber;
+    private String mobileNumber;
     private String alternateContactNumber;
     private String email;
     private String address;
     private String territoryId;
     private String beatId;
-    private String promoterId;
     private OutletType outletType;
-    private String gstNumber;
     private String City;
     private String State;
-    private String panNumber;
+    private String pinCode;
     private Double latitude;
     private Double longitude;
-    private Double creditDays;
-    private Double creditLimits;
-    private OutletStatus outletStatus;
-    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private OutletStatus outletStatus;
     private String createdBy;
     private  String updatedBy;
 }
