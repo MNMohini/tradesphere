@@ -18,7 +18,6 @@ import java.util.List;
 
 /**
  * Sent by the mobile app / web panel to create an order.
- *
  * Deliberately NOT included (the server sets these): id, orderNumber, status,
  * createdBy, userPath, all amounts and totals, timestamps.
  */
@@ -49,6 +48,11 @@ public class CreateOrderRequest {
     @NotEmpty(message = "At least one item is required")
     @Valid
     private List<OrderItemRequest> items;
+
+    // The total the rep saw on screen. The server never uses it for billing;
+    // it only compares it with its own total and flags a price change.
+    @DecimalMin(value = "0.00")
+    private BigDecimal expectedGrandTotal;
 
     // Payment collected at the time of order (optional)
     private PaymentMode paymentMode;
