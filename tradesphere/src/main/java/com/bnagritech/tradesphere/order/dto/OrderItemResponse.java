@@ -8,18 +8,21 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderItemResponse {
+
     private String productId;
-    private String productName;
     private String skuCode;
+    private String productName;
+    private String unit;
     private Integer quantity;
-    private BigDecimal sellingPrice;
     private BigDecimal mrp;
+    private BigDecimal sellingPrice;
     private BigDecimal discount;
-    private BigDecimal schemeDiscount;
+    private BigDecimal taxableAmount;
     private BigDecimal taxAmount;
-    private BigDecimal lineTotal;
+    private BigDecimal totalAmount;
+    private String schemeId;
 }

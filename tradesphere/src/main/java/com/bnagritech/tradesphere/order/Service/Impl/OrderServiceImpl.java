@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
 
     @Override
-    public OrderResponse createOrder(OrderRequest request) {
+    public OrderResponse createOrder(CreateOrderRequest request) {
         outletRepository.findByOutletId(request.getOutletId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Outlet not found: " + request.getOutletId()));
