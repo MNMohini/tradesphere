@@ -5,20 +5,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeliveryInfo {
+
     private String deliveryAddress;
     private DeliveryStatus deliveryStatus;
+
+    // Calendar dates (no time zone needed)
     private LocalDate expectedDeliveryDate;
     private LocalDate actualDeliveryDate;
-    private String deliveredBy;
-    private LocalDateTime deliveredAt;
-    private String deliveryRemark;
 
+    private Instant dispatchedAt;
+    private String deliveredBy;
+    private Instant deliveredAt;
+    private String deliveryRemark;
 }
