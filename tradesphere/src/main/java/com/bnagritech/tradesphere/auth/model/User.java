@@ -5,12 +5,14 @@ import com.bnagritech.tradesphere.common.enums.UserStatus;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +59,14 @@ public class User implements UserDetails {
     private String createdBy;
     @LastModifiedBy
     private String updatedBy;
+    @Indexed
+    private String managerId;
+    @Indexed
+    @Builder.Default
+    private List<String> path = new ArrayList<>();
+    @Builder.Default
+    private List<String> territoryIds = new ArrayList<>();
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -72,4 +82,6 @@ public class User implements UserDetails {
     public String getUsername() {
         return userName;
     }
+
+
 }

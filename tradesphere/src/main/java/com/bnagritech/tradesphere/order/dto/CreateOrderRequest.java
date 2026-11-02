@@ -69,4 +69,8 @@ public class CreateOrderRequest {
 
     @Size(max = 500)
     private String remarks;
+
+    // true = keep the order as DRAFT (editable); false = submit it straight away
+    private boolean saveAsDraft;
+
 }

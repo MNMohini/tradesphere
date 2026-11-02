@@ -34,9 +34,4 @@ public interface OrderRepository extends MongoRepository<Order, String>, OrderRe
     /** For example a rep's own DRAFT orders. */
     List<Order> findByCreatedByAndStatusOrderByOrderDateDesc(String createdBy, OrderStatus status);
 
-    // ---- Counts ----
-
-    long countByStatus(OrderStatus status);
-
-    long countByOutletId(String outletId);
 }
