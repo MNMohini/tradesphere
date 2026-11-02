@@ -619,12 +619,8 @@ public class OrderServiceImpl implements OrderService {
             grandTotal = grandTotal.add(lineTotal);
         }
 
-        if (items.isEmpty()) {
-            throw badRequest("The order has no valid items");
-        }
+        throw badRequest("The order has no valid items");
 
-        return new PricedBasket(items, money(subtotal), money(totalDiscount), money(totalScheme),
-                money(totalTax), money(grandTotal));
     }
 
     private void applyBasket(Order order, PricedBasket basket) {

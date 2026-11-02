@@ -31,11 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * REST endpoints of the order module. The controller only receives the request,
- * validates it and hands it to OrderService; business and permission rules
- * live in the service.
- */
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -43,8 +38,8 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // POST /api/orders
-    @PostMapping
+    // POST /api/orders/create
+    @PostMapping("/create")
     public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody CreateOrderRequest request,
             @AuthenticationPrincipal User currentUser) {
