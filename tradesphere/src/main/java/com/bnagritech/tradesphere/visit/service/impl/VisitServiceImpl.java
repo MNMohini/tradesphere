@@ -21,8 +21,6 @@ public class VisitServiceImpl implements VisitService {
         if(visitRepository.existsByVisitCode(request.getVisitCode()))
             throw new ResourceAlreadyExistsException("Visit code already exists");
         Visit visit = Visit.builder()
-                .visitCode(request.getVisitCode())
-                .remarks(request.getRemarks())
                 .build();
         Visit savedVisit = visitRepository.save(visit);
         return mapToResponse(savedVisit);
@@ -32,10 +30,7 @@ public class VisitServiceImpl implements VisitService {
     public VisitResponse updateVisit(String visitCode, VisitRequest request) {
         Visit visit = visitRepository.findByVisitCode(visitCode)
                 .orElseThrow(()-> new ResourceNotFoundException("Visit code not found"));
-        visit.setVisitCode(request.getVisitCode());
-        visit.setRemarks(request.getRemarks());
         visit.setBeatId(request.getBeatId());
-        visit.setVisitType(request.getVisitType());
         Visit updatedVisit = visitRepository.save(visit);
         return mapToResponse(updatedVisit);
     }
@@ -82,8 +77,6 @@ public class VisitServiceImpl implements VisitService {
 
     private VisitResponse mapToResponse(Visit visitRequest) {
         VisitResponse visitResponse = new VisitResponse();
-        visitResponse.setVisitCode(visitRequest.getVisitCode());
-        visitResponse.setRemarks(visitRequest.getRemarks());
         visitResponse.setBeatId(visitRequest.getBeatId());
         visitResponse.setCheckInTime(LocalDateTime.now());
         return visitResponse;
