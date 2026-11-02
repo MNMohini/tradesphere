@@ -16,11 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Sent by the mobile app / web panel to create an order.
- * Deliberately NOT included (the server sets these): id, orderNumber, status,
- * createdBy, userPath, all amounts and totals, timestamps.
- */
+
 @Data
 @Builder
 @AllArgsConstructor

@@ -6,12 +6,6 @@ import com.bnagritech.tradesphere.auth.service.AuthService;
 import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.exception.*;
-import com.bnagritech.tradesphere.employee.model.Employee;
-import com.bnagritech.tradesphere.employee.repository.EmployeeRepository;
-import com.bnagritech.tradesphere.promoter.model.Promoter;
-import com.bnagritech.tradesphere.promoter.repository.PromoterRepository;
-import com.bnagritech.tradesphere.salesrepresentativemodule.model.SalesRepresentative;
-import com.bnagritech.tradesphere.salesrepresentativemodule.repository.SRRepository;
 import com.bnagritech.tradesphere.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +28,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final EmployeeRepository employeeRepository;
 
 
     @Override
@@ -203,14 +196,6 @@ public class AuthServiceImpl implements AuthService {
         return mapToUserResponse(user);
     }
 
-    //        private String existUserName(LoginResponse request){
-//
-//            Promoter promoter = promoterRepository.findByUserName(request.getUserName())
-//                    .orElseThrow(()-> new ResourceNotFoundException("User name not found"));
-//
-//            SalesRepresentative sr = srRepository.findByUserName(request.getUserName())
-//                    .orElseThrow(()-> new ResourceNotFoundException("User Name not found"));
-//        }
     private UserResponse mapToUserResponse(
             User user) {
         return UserResponse.builder()

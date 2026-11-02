@@ -25,4 +25,5 @@ public class Retailer {
     private List<String> outletIds;
     private RetailerStatus retailerStatus;
     private LocalDateTime createdAt;
+
 }
