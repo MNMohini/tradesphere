@@ -1,7 +1,7 @@
 package com.bnagritech.tradesphere.visit.dto;
 
 import com.bnagritech.tradesphere.common.enums.VisitType;
-import com.bnagritech.tradesphere.common.enums.VisitOutCome;
+import com.bnagritech.tradesphere.common.enums.VisitOutcome;
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +29,7 @@ public class VisitResponse {
 
     private VisitStatus status;
     private VisitType visitType;
-    private VisitOutCome visitOutcome;
+    private VisitOutcome visitOutcome;
 
     private Integer durationInMinutes;
 
