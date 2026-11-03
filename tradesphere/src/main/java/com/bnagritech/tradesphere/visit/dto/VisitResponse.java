@@ -1,48 +1,53 @@
 package com.bnagritech.tradesphere.visit.dto;
 
-import com.bnagritech.tradesphere.common.enums.VisitType;
 import com.bnagritech.tradesphere.common.enums.VisitOutcome;
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
+import com.bnagritech.tradesphere.visit.model.VisitStatusHistory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+
+/** Full visit details: the whole story of one visit. */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class VisitResponse {
+
     private String id;
-    private String visitCode;
+    private String clientVisitId;
 
-    private String employeeId;
-    private String retailerId;
+    private String userId;
+    private String userName;
+
+    private String outletId;
+    private String outletName;
+    private GeoPointDto outletLocation;
     private String beatId;
-    private String territoryId;
 
-    private LocalDateTime plannedDate;
-
-    private LocalDateTime checkInTime;
-    private LocalDateTime checkOutTime;
-
+    private LocalDate visitDay;
+    private boolean planned;
     private VisitStatus status;
-    private VisitType visitType;
-    private VisitOutcome visitOutcome;
 
-    private Integer durationInMinutes;
+    private PunchResponse checkIn;
+    private PunchResponse checkOut;
+    private Long durationMinutes;
 
-    private Boolean orderBooked;
-    private Boolean stockVerified;
-    private Boolean merchandisingDone;
-    private Boolean paymentCollected;
+    private VisitOutcome outcome;
+    private String outcomeRemarks;
+    private String cancellationReason;
 
-    private String remarks;
+    // Orders (not cancelled or rejected) taken during this visit
+    private int orderCount;
 
-    private String createdBy;
-    private String updatedBy;
+    private List<TrackPointDto> trackPoints;
+    private List<VisitStatusHistory> statusHistory;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }
