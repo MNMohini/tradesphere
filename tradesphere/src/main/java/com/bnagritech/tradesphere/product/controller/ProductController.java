@@ -1,5 +1,5 @@
 package com.bnagritech.tradesphere.product.controller;
-import com.bnagritech.tradesphere.product.dto.ProductRequest;
+import com.bnagritech.tradesphere.product.dto.CreateProductRequest;
 import com.bnagritech.tradesphere.product.dto.ProductResponse;
 import com.bnagritech.tradesphere.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
-    public ResponseEntity<ProductResponse> addProduct(@RequestBody ProductRequest request){
+    public ResponseEntity<ProductResponse> addProduct(@RequestBody CreateProductRequest request){
         return ResponseEntity.ok(productService.addProduct(request));
     }
     @GetMapping("/all")
@@ -28,7 +28,7 @@ public class ProductController {
     @PutMapping("/Id/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable String productId,
-            @RequestBody ProductRequest request)
+            @RequestBody CreateProductRequest request)
     {
         return ResponseEntity.ok(productService.updateProduct(productId,request));
     }

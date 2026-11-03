@@ -51,15 +51,6 @@ public class PromoterController {
         return ResponseEntity.ok(promoterService.getPromoterByEmail(email));
     }
 
-    @GetMapping("/territory/{territoryId}")
-    public ResponseEntity<List<PromoterResponse>> getPromoterByTerritory(@PathVariable String territoryId) {
-        return ResponseEntity.ok(promoterService.getPromoterByTerritory(territoryId));
-    }
-
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<PromoterResponse>> getPromoterByStatus(@PathVariable UserStatus status) {
-        return ResponseEntity.ok(promoterService.getPromoterByStatus(status));
-    }
 
     @DeleteMapping("/del/{promoterId}")
     public ResponseEntity<String> deletePromoter(@PathVariable String promoterId) {

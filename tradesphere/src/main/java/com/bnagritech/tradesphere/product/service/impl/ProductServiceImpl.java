@@ -1,7 +1,7 @@
 package com.bnagritech.tradesphere.product.service.impl;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.product.dto.ProductRequest;
+import com.bnagritech.tradesphere.product.dto.CreateProductRequest;
 import com.bnagritech.tradesphere.product.dto.ProductResponse;
 import com.bnagritech.tradesphere.product.model.Product;
 import com.bnagritech.tradesphere.product.repository.ProductRepository;
@@ -18,7 +18,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public ProductResponse addProduct(ProductRequest productRequest) {
+    public ProductResponse addProduct(CreateProductRequest productRequest) {
         if(productRepository.existsProductByProductId(productRequest.getProductId()))
             throw new ResourceAlreadyExistsException(" already Exists");
         if (productRepository.existsProductByProductName(productRequest.getProductName()))
@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(String productId,ProductRequest productRequest) {
+    public ProductResponse updateProduct(String productId, CreateProductRequest productRequest) {
         Product product= productRepository.findProductByProductId(productRequest.getProductId()).
                 orElseThrow(()->new ResourceNotFoundException
                         ("Product not found"));
