@@ -3,7 +3,7 @@ package com.bnagritech.tradesphere.outlet.controller;
 
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.OutletType;
-import com.bnagritech.tradesphere.outlet.dto.OutletRequest;
+import com.bnagritech.tradesphere.outlet.dto.OutletSearchRequest;
 import com.bnagritech.tradesphere.outlet.dto.OutletResponse;
 import com.bnagritech.tradesphere.outlet.service.OutletService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class OutletController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<OutletResponse> addOutlet(
-            @RequestBody OutletRequest request){
+            @RequestBody OutletSearchRequest request){
         OutletResponse response = outletService.createOutlet(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -81,13 +81,13 @@ public class OutletController {
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/update/{outletId}")
     public ResponseEntity<OutletResponse> updateOutletStatus(@PathVariable String outletId,
-                                                                 @RequestBody OutletRequest request){
+                                                                 @RequestBody OutletSearchRequest request){
         return ResponseEntity.ok(outletService.updateOutletStatus(outletId,request));
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{outletId}")
     public ResponseEntity<OutletResponse> updateOutlet(@PathVariable String outletId,
-                                                           @RequestBody OutletRequest request) {
+                                                           @RequestBody OutletSearchRequest request) {
         return ResponseEntity.ok(outletService.updateOutlet(outletId, request));
     }
 }

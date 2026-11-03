@@ -1,36 +1,50 @@
 package com.bnagritech.tradesphere.outlet.dto;
 
+import com.bnagritech.tradesphere.common.enums.OutletGrade;
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.OutletType;
+import com.bnagritech.tradesphere.outlet.model.OutletStatusHistory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.List;
 
+/** Full outlet details. */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class OutletResponse {
 
-    private String outletId;
-    private String outletName;
-    private String mobileNumber;
-    private String alternateContactNumber;
+    private String id;
+    private String outletCode;
+    private String externalCode;
+
+    private String name;
+    private String ownerName;
+    private String phoneNumber;
+    private String alternatePhoneNumber;
     private String email;
-    private String address;
+    private String gstNumber;
+    private OutletType type;
+    private OutletGrade grade;
+
+    private OutletAddressDto address;
+    private OutletLocationDto location;
+
     private String territoryId;
     private String beatId;
-    private OutletType outletType;
-    private String City;
-    private String State;
-    private String pinCode;
-    private Double latitude;
-    private Double longitude;
-    private LocalDateTime updatedAt;
-    private OutletStatus outletStatus;
+    private String distributorId;
+
+    private OutletStatus status;
+    private String statusReason;
+    private List<OutletStatusHistory> statusHistory;
+
     private String createdBy;
-    private  String updatedBy;
+    private String createdByName;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

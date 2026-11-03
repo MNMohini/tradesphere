@@ -42,7 +42,6 @@ public class VisitResponse {
     private String outcomeRemarks;
     private String cancellationReason;
 
-    // Orders (not cancelled or rejected) taken during this visit
     private int orderCount;
 
     private List<TrackPointDto> trackPoints;

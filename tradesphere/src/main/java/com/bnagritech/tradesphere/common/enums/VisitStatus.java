@@ -5,5 +5,6 @@ public enum VisitStatus {
     CHECK_IN,
     COMPLETED,
     MISSED,
-    CANCELED
+    CANCELLED,
+    IN_PROGRESS,
 }

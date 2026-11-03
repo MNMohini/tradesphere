@@ -17,7 +17,7 @@ import java.util.List;
  * Lifecycle of a visit:  PLANNED -> IN_PROGRESS -> COMPLETED
  *                        PLANNED -> MISSED (nightly job) or CANCELLED
  *                        IN_PROGRESS -> CANCELLED (wrong check-in, only if no order was taken)
- * Every change is stored with who, when and where, so a visit can be traced end to end.
+ * Every change is stored with whom, when and where, so a visit can be traced end to end.
  */
 public interface VisitService {
 

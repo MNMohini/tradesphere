@@ -4,7 +4,7 @@ import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.OutletType;
 import com.bnagritech.tradesphere.common.exception.ResourceAlreadyExistsException;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
-import com.bnagritech.tradesphere.outlet.dto.OutletRequest;
+import com.bnagritech.tradesphere.outlet.dto.OutletSearchRequest;
 import com.bnagritech.tradesphere.outlet.dto.OutletResponse;
 import com.bnagritech.tradesphere.outlet.model.Outlet;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
@@ -21,7 +21,7 @@ public class OutletServiceImpl implements OutletService {
     private final OutletRepository outletRepository;
 
     @Override
-    public OutletResponse createOutlet(OutletRequest request) {
+    public OutletResponse createOutlet(OutletSearchRequest request) {
 
         if(outletRepository.existsByEmail(request.getEmail()))
         {
@@ -68,7 +68,7 @@ public class OutletServiceImpl implements OutletService {
     }
 
     @Override
-    public OutletResponse updateOutlet(String outletId, OutletRequest request) {
+    public OutletResponse updateOutlet(String outletId, OutletSearchRequest request) {
         Outlet outlet = outletRepository.findByOutletId(outletId)
                 .orElseThrow(()->new ResourceNotFoundException("Outlet not found"));
         outlet.setOutletName(request.getOutletName());
@@ -110,7 +110,7 @@ public class OutletServiceImpl implements OutletService {
     }
 
     @Override
-    public OutletResponse updateOutletStatus(String outletId, OutletRequest request) {
+    public OutletResponse updateOutletStatus(String outletId, OutletSearchRequest request) {
         Outlet outlet = outletRepository.findByOutletId(outletId)
                 .orElseThrow(
                         ()-> new ResourceNotFoundException("outlet is not exists"));

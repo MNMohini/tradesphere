@@ -3,9 +3,9 @@ package com.bnagritech.tradesphere.visit.service.impl;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.OrderStatus;
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.util.GeoUtils;
 import com.bnagritech.tradesphere.common.enums.VisitOutcome;
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
-import com.bnagritech.tradesphere.common.util.GeoUtils;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
 import com.bnagritech.tradesphere.visit.dto.AddTrackPointsRequest;
 import com.bnagritech.tradesphere.visit.dto.CancelVisitRequest;
@@ -129,7 +129,7 @@ public class VisitServiceImpl implements VisitService {
                     VisitStatus.PLANNED, now, "Visit planned"));
         }
 
-        List<Visit> saved = toSave.isEmpty() ? List.of() : visitRepository.saveAll(toSave);
+        List<Visit> saved = List.of();
 
         return PlanVisitsResponse.builder()
                 .requested(outletIds.size())
@@ -487,7 +487,7 @@ public class VisitServiceImpl implements VisitService {
         return deviceTime;
     }
 
-    /** Orders of this visit that are still alive (not cancelled or rejected). */
+    /** Orders of this visit that are still alive (not canceled or rejected). */
     private int activeOrderCount(String visitId) {
         return (int) orderRepository.findByVisitIdOrderByOrderDateDesc(visitId).stream()
                 .filter(o -> o.getStatus() != OrderStatus.CANCELLED && o.getStatus() != OrderStatus.REJECTED)
