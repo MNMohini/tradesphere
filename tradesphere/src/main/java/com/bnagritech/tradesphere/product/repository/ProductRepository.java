@@ -5,12 +5,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
 
-public interface ProductRepository extends MongoRepository<Product, String> {
-    Optional<Product> findProductByProductId(String productId);
-    Optional<Product> findProductByProductName(String productName);
-    Optional<Product> findProductBySkuCode(String skuCode);
+public interface ProductRepository extends MongoRepository<Product, String>, ProductRepositoryCustom {
 
-    boolean existsProductBySkuCode(String skuCode);
-    boolean existsProductByProductName(String productName);
-    boolean existsProductByProductId(String productId);
+    Optional<Product> findBySkuCode(String skuCode);
+
+    /**
+     * SKU codes must not repeat.
+     */
+    boolean existsBySkuCode(String skuCode);
 }
