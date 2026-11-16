@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.outlet.dto;
 
 import com.bnagritech.tradesphere.common.enums.OutletGrade;
 import com.bnagritech.tradesphere.common.enums.OutletType;
+import com.bnagritech.tradesphere.outlet.model.OutletFeedbackAndStock;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -60,7 +61,7 @@ public class CreateOutletRequest {
     @NotNull(message = "address is required")
     @Valid
     private OutletAddressDto address;
-
+    private OutletFeedbackAndStock feedbackAndStock;
     @NotNull(message = "location is required")
     @Valid
     private OutletLocationDto location;

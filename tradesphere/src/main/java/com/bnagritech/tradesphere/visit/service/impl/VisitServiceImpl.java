@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.visit.service.impl;
 
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.*;
+import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.util.GeoUtils;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
@@ -118,7 +119,7 @@ public class VisitServiceImpl implements VisitService {
                     currentUser.getId(), outletId, visitDay, VisitStatus.PLANNED);
             OutletInfo outlet = alreadyPlanned ? null : loadOutlet(outletId);
 
-            if (alreadyPlanned || outlet == null || !outlet.active()) {
+            if (alreadyPlanned || !outlet.active()) {
                 skipped.add(outletId);
                 continue;
             }
@@ -130,7 +131,7 @@ public class VisitServiceImpl implements VisitService {
 
         return PlanVisitsResponse.builder()
                 .requested(outletIds.size())
-                .created(saved.size())
+                .created(0)
                 .visits(saved.stream().map(this::toSummary).toList())
                 .skippedOutletIds(skipped)
                 .build();
@@ -162,7 +163,8 @@ public class VisitServiceImpl implements VisitService {
 
         if (visitId != null) {
             // Starting a planned visit
-            visit = visitRepository.findById(visitId).orElseThrow(() -> notFound("Visit not found"));
+            visit = visitRepository.findById(visitId)
+                    .orElseThrow( ()-> new ResourceNotFoundException("Not found" ));
             if (!isOwner(visit, currentUser)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This visit belongs to another user");
             }
@@ -185,7 +187,7 @@ public class VisitServiceImpl implements VisitService {
                 throw badRequest("visitId or outletId is required");
             }
             OutletInfo outlet = loadOutlet(outletId);
-            if (outlet == null || !outlet.active()) {
+            if (!outlet.active()) {
                 throw badRequest("Outlet not found or inactive: " + outletId);
             }
             visit = newVisit(currentUser, outlet, request.getBeatId(), checkInDay.toString(), false,
@@ -386,10 +388,6 @@ public class VisitServiceImpl implements VisitService {
         return overdue.size();
     }
 
-    // =====================================================================
-    // TODO: connect to the Outlet module once it exists.
-    // Only this method needs to change.
-    // =====================================================================
 
     /** What the visit module needs to know about an outlet. */
     private record OutletInfo(String outletId, String name, GeoJsonPoint location, boolean active) {
@@ -400,7 +398,7 @@ public class VisitServiceImpl implements VisitService {
         return outletRepository.findById(outletId)
                 .map(o -> new OutletInfo(o.getId(), o.getName(), o.getLocation(),
                         o.getStatus() == OutletStatus.ACTIVE))
-                .orElse(null);
+                .orElseThrow( ()-> new ResourceNotFoundException("Null" ));
     }
 
     // =====================================================================
@@ -527,14 +525,14 @@ public class VisitServiceImpl implements VisitService {
     private Visit loadVisibleVisit(String visitId, User user) {
         return visitRepository.findById(visitId)
                 .filter(visit -> canView(visit, user))
-                .orElseThrow(() -> notFound("Visit not found"));
+                .orElseThrow( ()-> new ResourceNotFoundException("Not found" ));
     }
 
     /** Only the person who owns the visit may change it (track, check out). */
     private Visit loadOwnedVisit(String visitId, User user) {
         return visitRepository.findById(visitId)
                 .filter(visit -> isOwner(visit, user))
-                .orElseThrow(() -> notFound("Visit not found"));
+                .orElseThrow( ()-> new ResourceNotFoundException("Not found" ));
     }
 
     private Visit ownedOrConflict(Visit visit, User user) {
@@ -649,7 +647,4 @@ public class VisitServiceImpl implements VisitService {
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
 
-    private ResponseStatusException notFound(String message) {
-        return new ResponseStatusException(HttpStatus.NOT_FOUND, message);
-    }
 }

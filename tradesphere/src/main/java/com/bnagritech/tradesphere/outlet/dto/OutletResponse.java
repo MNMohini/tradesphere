@@ -3,6 +3,7 @@ package com.bnagritech.tradesphere.outlet.dto;
 import com.bnagritech.tradesphere.common.enums.OutletGrade;
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
 import com.bnagritech.tradesphere.common.enums.OutletType;
+import com.bnagritech.tradesphere.outlet.model.OutletFeedbackAndStock;
 import com.bnagritech.tradesphere.outlet.model.OutletStatusHistory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,7 @@ public class OutletResponse {
     private String gstNumber;
     private OutletType type;
     private OutletGrade grade;
-
+    private OutletFeedbackAndStock feedbackAndStock;
     private OutletAddressDto address;
     private OutletLocationDto location;
 
