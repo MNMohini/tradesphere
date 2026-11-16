@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OutletFeedback {
+public class OutletFeedbackAndStock {
     private String feedback;
     private String rating;
     private Product  skuCode;

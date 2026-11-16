@@ -66,7 +66,7 @@ public class Outlet {
     private OutletGrade grade;
 
     private OutletAddress address;
-    private OutletFeedback outletFeedbackAndStock;
+    private OutletFeedbackAndStock feedbackAndStock;
     // ---- Location (2dsphere index for nearby searches) ----
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private GeoJsonPoint location;
