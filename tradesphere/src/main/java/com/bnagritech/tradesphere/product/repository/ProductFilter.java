@@ -6,7 +6,6 @@ import java.time.Instant;
 
 /**
  * Parameters for searching products. Every field except activeOnly and limit is optional.
- *
  * keyword:      matched, ignoring case, against name, SKU code and brand.
  * activeOnly:   true = only ACTIVE products (what field users normally get).
  * updatedAfter: only products changed after this moment (used by the app to download just the changes).

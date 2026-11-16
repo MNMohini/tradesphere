@@ -219,8 +219,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<String> getBrands(User currentUser) {
-        return productRepository.findActiveBrands();
-    }
+        return productRepository.findActiveBrands() ;  }
 
     // =====================================================================
     // Rules and permissions

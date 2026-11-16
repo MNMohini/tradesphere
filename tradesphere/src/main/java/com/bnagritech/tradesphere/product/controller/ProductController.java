@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-
 /**
  * REST endpoints of the product module. The controller only receives the request,
  * validates it and hands it to ProductService; the rules live in the service.
@@ -36,15 +34,13 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-
     // POST /api/products
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<ProductResponse> createProduct(
             @Valid @RequestBody CreateProductRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request, currentUser));
     }
-
     // GET /api/products?keyword=urea&category=Fertilizer&limit=50
     // GET /api/products?updatedAfter=2026-11-01T00:00:00Z     (catalogue sync for the app)
     @GetMapping
@@ -53,16 +49,14 @@ public class ProductController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(productService.searchProducts(request, currentUser));
     }
-
     // GET /api/products/categories
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getCategories(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(productService.getCategories(currentUser));
     }
-
     // GET /api/products/brands
-    @GetMapping("/brands")
-    public ResponseEntity<List<String>> getBrands(@AuthenticationPrincipal User currentUser) {
+    @GetMapping("/products" )
+    public ResponseEntity<List<String>> getProducts(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(productService.getBrands(currentUser));
     }
 

@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateOutletRequest {
-
     // UUID created by the app so a retried request never creates a second outlet
     @Size(max = 64)
     private String clientOutletId;
@@ -68,7 +67,6 @@ public class CreateOutletRequest {
 
     private String territoryId;
     private String beatId;
-    private String distributorId;
 
     // Set to true after the user confirms that a similar outlet nearby is a different shop
     private boolean ignoreDuplicateWarning;

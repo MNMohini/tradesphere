@@ -1,6 +1,8 @@
 package com.bnagritech.tradesphere.product.dto;
 
+import com.bnagritech.tradesphere.common.enums.ProductStatus;
 import com.bnagritech.tradesphere.common.enums.ProductUnit;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -41,4 +43,9 @@ public class UpdateProductRequest {
 
     @Size(max = 500)
     private String imageUrl;
+
+    @NotNull(message = "status is required")
+    private ProductStatus status;
+
+
 }
