@@ -1,12 +1,10 @@
 package com.bnagritech.tradesphere.visit.service.impl;
 
 import com.bnagritech.tradesphere.auth.model.User;
-import com.bnagritech.tradesphere.common.enums.OrderStatus;
-import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.enums.*;
 import com.bnagritech.tradesphere.common.util.GeoUtils;
-import com.bnagritech.tradesphere.common.enums.VisitOutcome;
-import com.bnagritech.tradesphere.common.enums.VisitStatus;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
+import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.visit.dto.AddTrackPointsRequest;
 import com.bnagritech.tradesphere.visit.dto.CancelVisitRequest;
 import com.bnagritech.tradesphere.visit.dto.CheckInRequest;
@@ -79,10 +77,9 @@ public class VisitServiceImpl implements VisitService {
             VisitStatus.MISSED, EnumSet.noneOf(VisitStatus.class),
             VisitStatus.CANCELLED, EnumSet.noneOf(VisitStatus.class)
     );
-
     private final VisitRepository visitRepository;
     private final OrderRepository orderRepository;
-
+    private final OutletRepository outletRepository;
     // application.yml:  app.visit.checkin-radius-meters / app.visit.enforce-geofence
     @Value("${app.visit.checkin-radius-meters:100}")
     private double checkInRadiusMeters = 100.0;
@@ -400,7 +397,10 @@ public class VisitServiceImpl implements VisitService {
 
     /** Return the outlet, or null if it does not exist. */
     private OutletInfo loadOutlet(String outletId) {
-        throw new UnsupportedOperationException("Outlet module is not connected yet");
+        return outletRepository.findById(outletId)
+                .map(o -> new OutletInfo(o.getId(), o.getName(), o.getLocation(),
+                        o.getStatus() == OutletStatus.ACTIVE))
+                .orElse(null);
     }
 
     // =====================================================================

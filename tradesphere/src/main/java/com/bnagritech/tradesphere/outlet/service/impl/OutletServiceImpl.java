@@ -138,7 +138,6 @@ public class OutletServiceImpl implements OutletService {
                 .locationAccuracyMeters(request.getLocation().getAccuracyMeters())
                 .territoryId(request.getTerritoryId())
                 .beatId(request.getBeatId())
-                .distributorId(request.getDistributorId())
                 .status(status)
                 .createdBy(currentUser.getId())
                 .createdByName(currentUser.getUsername())

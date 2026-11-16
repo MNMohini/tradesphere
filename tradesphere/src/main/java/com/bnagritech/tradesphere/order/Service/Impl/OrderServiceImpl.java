@@ -1,8 +1,6 @@
 package com.bnagritech.tradesphere.order.Service.Impl;
 
-import com.bnagritech.tradesphere.common.enums.DeliveryStatus;
-import com.bnagritech.tradesphere.common.enums.OrderStatus;
-import com.bnagritech.tradesphere.common.enums.PaymentStatus;
+import com.bnagritech.tradesphere.common.enums.*;
 import com.bnagritech.tradesphere.order.dto.CreateOrderRequest;
 import com.bnagritech.tradesphere.order.dto.LocationDto;
 import com.bnagritech.tradesphere.order.dto.OrderItemRequest;
@@ -28,7 +26,9 @@ import com.bnagritech.tradesphere.order.repository.OrderFilter;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
 import com.bnagritech.tradesphere.order.service.OrderService;
 import com.bnagritech.tradesphere.auth.model.User;
-import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.outlet.model.Outlet;
+import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
+import com.bnagritech.tradesphere.product.repository.ProductRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -83,7 +83,8 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final Validator validator;
-
+    private final OutletRepository outletRepository;
+    private final ProductRepository productRepository;
     // =====================================================================
     // Create / preview / update
     // =====================================================================
@@ -423,8 +424,8 @@ public class OrderServiceImpl implements OrderService {
                 .status(SyncOrderResult.Status.REJECTED)
                 .errorMessage(message)
                 .build();
-    }
 
+    }
     // =====================================================================
     // Order creation (shared by createOrder and syncOrders)
     // =====================================================================
@@ -639,7 +640,11 @@ public class OrderServiceImpl implements OrderService {
 
     /** Return the current price and tax of the product, or null if it does not exist. */
     private ProductPricing loadProductPricing(String productId) {
-        throw new UnsupportedOperationException("Product module is not connected yet");
+        return productRepository.findById(productId)
+                .map(p -> new ProductPricing(p.getId(), p.getSkuCode(), p.getName(), p.getUnit().name(),
+                        p.getMrp(), p.getSellingPrice(), p.getTaxPercent(),
+                        p.getStatus() == ProductStatus.ACTIVE))
+                .orElse(null);
     }
 
     /** Return the total scheme discount for this line (zero if no scheme applies). */
@@ -647,15 +652,16 @@ public class OrderServiceImpl implements OrderService {
         return BigDecimal.ZERO;   // schemes are not implemented yet
     }
 
-    /** Return the outlet's name, or throw 404 if the outlet does not exist. */
-    private String loadOutletName(String outletId) {
-        throw new UnsupportedOperationException("Outlet module is not connected yet");
-    }
 
     /** What the order module needs to know about a visit. */
     private record VisitInfo(String visitId, String outletId, String userId, String beatId) {
     }
-
+    private String loadOutletName(String outletId) {
+        return outletRepository.findById(outletId)
+                .filter(o -> o.getStatus() == OutletStatus.ACTIVE)
+                .map(Outlet::getName)
+                .orElseThrow(() -> notFound("Outlet not found or not active: " + outletId));
+    }
     /** Return the visit, or null if it does not exist. */
     private VisitInfo loadVisit(String visitId) {
         throw new UnsupportedOperationException("Visit module is not connected yet");

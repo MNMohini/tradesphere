@@ -26,7 +26,7 @@ public class Beat {
     private BeatStatus beatStatus;
     private String state;
     private String city;
-    private List<String> outletIds;
+    private List<String> outletCodes;
     private List<BeatDay> beatDays;
     private BeatFrequency frequency;
     private LocalDateTime createdAt;

@@ -41,7 +41,7 @@ public class BeatServiceImpl implements BeatService {
                 .beatStatus(request.getBeatStatus())
                 .state(request.getState())
                 .city(request.getCity())
-                .outletIds(
+                .outletCodes(
                         request.getOutletIds() != null
                                 ? new ArrayList<>(request.getOutletIds())
                                 : new ArrayList<>()
@@ -141,7 +141,7 @@ public class BeatServiceImpl implements BeatService {
         beat.setBeatDays(request.getBeatDays());
         beat.setFrequency(request.getFrequency());
         if (request.getOutletIds() != null) {
-            beat.setOutletIds(new ArrayList<>(request.getOutletIds()));}
+            beat.setOutletCodes(new ArrayList<>(request.getOutletIds()));}
 
         Beat updatedBeat = beatRepository.save(beat);
         return mapToResponse(updatedBeat);
@@ -174,7 +174,7 @@ public class BeatServiceImpl implements BeatService {
                 .beatStatus(beat.getBeatStatus())
                 .state(beat.getState())
                 .city(beat.getCity())
-                .outletIds(beat.getOutletIds())
+                .outletIds(beat.getOutletCodes())
                 .beatDays(beat.getBeatDays())
                 .frequency(beat.getFrequency())
                 .createdAt(beat.getCreatedAt())

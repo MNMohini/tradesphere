@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.auth.model;
 
 import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
+import com.bnagritech.tradesphere.outlet.model.Outlet;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.annotation.*;
@@ -66,7 +67,6 @@ public class User implements UserDetails {
     private List<String> path = new ArrayList<>();
     @Builder.Default
     private List<String> territoryIds = new ArrayList<>();
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

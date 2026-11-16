@@ -1,5 +1,4 @@
 package com.bnagritech.tradesphere.promoter.controller;
-import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.promoter.dto.PromoterRequest;
 import com.bnagritech.tradesphere.promoter.dto.PromoterResponse;
 import com.bnagritech.tradesphere.promoter.service.PromoterService;
