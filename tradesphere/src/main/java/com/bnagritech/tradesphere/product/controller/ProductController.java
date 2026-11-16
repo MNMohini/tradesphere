@@ -3,8 +3,6 @@ package com.bnagritech.tradesphere.product.controller;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.product.dto.CreateProductRequest;
 import com.bnagritech.tradesphere.product.dto.ProductResponse;
-import com.bnagritech.tradesphere.product.dto.ProductSearchRequest;
-import com.bnagritech.tradesphere.product.dto.ProductSummaryResponse;
 import com.bnagritech.tradesphere.product.dto.UpdateProductPriceRequest;
 import com.bnagritech.tradesphere.product.dto.UpdateProductRequest;
 import com.bnagritech.tradesphere.product.dto.UpdateProductStatusRequest;
@@ -15,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,14 +38,7 @@ public class ProductController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request, currentUser));
     }
-    // GET /api/products?keyword=urea&category=Fertilizer&limit=50
-    // GET /api/products?updatedAfter=2026-11-01T00:00:00Z     (catalogue sync for the app)
-    @GetMapping
-    public ResponseEntity<List<ProductSummaryResponse>> searchProducts(
-            @Valid @ModelAttribute ProductSearchRequest request,
-            @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(productService.searchProducts(request, currentUser));
-    }
+
     // GET /api/products/categories
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getCategories(@AuthenticationPrincipal User currentUser) {

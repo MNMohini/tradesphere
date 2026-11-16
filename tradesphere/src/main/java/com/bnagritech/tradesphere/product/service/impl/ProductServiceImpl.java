@@ -5,7 +5,6 @@ import com.bnagritech.tradesphere.common.enums.ProductStatus;
 import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.product.dto.CreateProductRequest;
 import com.bnagritech.tradesphere.product.dto.ProductResponse;
-import com.bnagritech.tradesphere.product.dto.ProductSearchRequest;
 import com.bnagritech.tradesphere.product.dto.ProductSummaryResponse;
 import com.bnagritech.tradesphere.product.dto.UpdateProductPriceRequest;
 import com.bnagritech.tradesphere.product.dto.UpdateProductRequest;
@@ -191,25 +190,6 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProductBySku(String skuCode, User currentUser) {
         Product product = productRepository.findBySkuCode(normalizeSku(skuCode)).orElse(null);
         return toResponse(loadVisibleProduct(product, currentUser), canManage(currentUser));
-    }
-
-    @Override
-    public List<ProductSummaryResponse> searchProducts(ProductSearchRequest request, User currentUser) {
-        // Field users see only ACTIVE products, unless they ask for changes since a moment (catalogue sync),
-        // in which case they also get deactivated products so the app can hide them.
-        boolean includeInactive = canManage(currentUser) || request.getUpdatedAfter() != null;
-        int limit = request.getLimit() != null ? request.getLimit() : DEFAULT_SEARCH_LIMIT;
-
-        ProductFilter filter = new ProductFilter(
-                request.getKeyword(),
-                request.getCategory(),
-                request.getBrand(),
-                request.getStatus(),
-                !includeInactive,
-                request.getUpdatedAfter(),
-                limit);
-
-        return productRepository.search(filter).stream().map(this::toSummary).toList();
     }
 
     @Override

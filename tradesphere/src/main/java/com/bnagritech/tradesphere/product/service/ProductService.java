@@ -3,7 +3,6 @@ package com.bnagritech.tradesphere.product.service;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.product.dto.CreateProductRequest;
 import com.bnagritech.tradesphere.product.dto.ProductResponse;
-import com.bnagritech.tradesphere.product.dto.ProductSearchRequest;
 import com.bnagritech.tradesphere.product.dto.ProductSummaryResponse;
 import com.bnagritech.tradesphere.product.dto.UpdateProductPriceRequest;
 import com.bnagritech.tradesphere.product.dto.UpdateProductRequest;
@@ -35,8 +34,6 @@ public interface ProductService {
         /** One product found by SKU code. */
         ProductResponse getProductBySku(String skuCode, User currentUser);
 
-        /** Products the caller may see, narrowed by the filters, sorted by name. */
-        List<ProductSummaryResponse> searchProducts(ProductSearchRequest request, User currentUser);
 
         /** Categories of ACTIVE products. */
         List<String> getCategories(User currentUser);
