@@ -16,5 +16,4 @@ public interface PromoterService {
     void deletePromoter (String promoterId);
     PromoterResponse getPromoterByPhoneNumber(long phoneNumber);
     PromoterResponse getPromoterByEmail(String email);
-    List<PromoterResponse> getPromotersByCity(String city);
 }

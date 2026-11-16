@@ -13,8 +13,6 @@ public interface PromoterRepository extends MongoRepository<Promoter, String> {
     Optional<Promoter> findByPromoterId(String promoterId);
     Optional<Promoter> findByPhoneNumber(long phoneNumber);
     Optional<Promoter> findByEmail(String email);
-    Optional<Promoter> findByUserName(String userName);
-    List<Promoter> findByOutletId(String outletId);
     List<Promoter> findByCity(String city);
     boolean existsByPromoterId(String promoterId);
     boolean existsByEmail(String email);

@@ -91,16 +91,6 @@ import java.util.List;
         return mapToResponse(promoter);
     }
 
-        @Override
-        public List<PromoterResponse> getPromotersByCity(String city) {
-            List<Promoter> promoters = promoterRepository.findByCity(city);
-            if (promoters.isEmpty()){
-                throw new ResourceNotFoundException("City not found");
-            }
-            return promoters.stream()
-                    .map(this::mapToResponse)
-                    .toList();
-        }
 
     private PromoterResponse mapToResponse(Promoter promoter) {
         PromoterResponse response = new PromoterResponse();

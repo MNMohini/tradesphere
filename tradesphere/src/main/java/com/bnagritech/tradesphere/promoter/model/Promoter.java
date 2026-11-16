@@ -1,7 +1,4 @@
 package com.bnagritech.tradesphere.promoter.model;
-
-import com.bnagritech.tradesphere.common.enums.UserRole;
-import com.bnagritech.tradesphere.common.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
