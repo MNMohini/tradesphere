@@ -13,7 +13,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-
 /** Creates a product. Not accepted from the client: id, status, price history, timestamps. */
 @Data
 @Builder
@@ -65,4 +64,5 @@ public class CreateProductRequest {
     @DecimalMin("0.0")
     @DecimalMax("100.0")
     private BigDecimal taxPercent;
+
 }

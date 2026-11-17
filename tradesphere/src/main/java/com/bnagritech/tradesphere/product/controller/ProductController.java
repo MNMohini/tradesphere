@@ -45,29 +45,29 @@ public class ProductController {
         return ResponseEntity.ok(productService.getCategories(currentUser));
     }
     // GET /api/products/brands
-    @GetMapping("/products" )
+    @GetMapping("/brands" )
     public ResponseEntity<List<String>> getProducts(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(productService.getBrands(currentUser));
     }
 
     // GET /api/products/sku/{skuCode}
-    @GetMapping("/sku/{skuCode}")
+    @GetMapping("/{skuCode}")
     public ResponseEntity<ProductResponse> getProductBySku(
             @PathVariable String skuCode,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(productService.getProductBySku(skuCode, currentUser));
     }
 
-    // GET /api/products/{productId}
-    @GetMapping("/{productId}")
+    // GET /api/products//details/{productId}
+    @GetMapping("/details/{productId}")
     public ResponseEntity<ProductResponse> getProductById(
             @PathVariable String productId,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(productService.getProductById(productId, currentUser));
     }
 
-    // PUT /api/products/{productId}
-    @PutMapping("/{productId}")
+    // PUT /api/products/update
+    @PutMapping("/update/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable String productId,
             @Valid @RequestBody UpdateProductRequest request,
@@ -75,8 +75,8 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(productId, request, currentUser));
     }
 
-    // PATCH /api/products/{productId}/price
-    @PatchMapping("/{productId}/price")
+    // PATCH /api/products/price
+    @PatchMapping("/price/{productId}")
     public ResponseEntity<ProductResponse> updateProductPrice(
             @PathVariable String productId,
             @Valid @RequestBody UpdateProductPriceRequest request,
@@ -84,8 +84,8 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProductPrice(productId, request, currentUser));
     }
 
-    // PATCH /api/products/{productId}/status
-    @PatchMapping("/{productId}/status")
+    // PATCH /api/products/status
+    @PatchMapping("/status/{productId}")
     public ResponseEntity<ProductResponse> updateProductStatus(
             @PathVariable String productId,
             @Valid @RequestBody UpdateProductStatusRequest request,
