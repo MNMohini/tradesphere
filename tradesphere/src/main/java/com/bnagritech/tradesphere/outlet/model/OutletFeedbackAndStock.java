@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class OutletFeedbackAndStock {
     private String feedback;
     private String rating;
-    private Product  skuCode;
+    private List<Product> skuCodeWithQuantity;
     private Product  quantity;
 
 }

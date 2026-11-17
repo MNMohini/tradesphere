@@ -74,11 +74,10 @@ public class OrderServiceImpl implements OrderService {
     // Allowed status changes. Anything not listed is rejected.
     private static final Map<OrderStatus, Set<OrderStatus>> TRANSITIONS = Map.of(
             OrderStatus.DRAFT, EnumSet.of(OrderStatus.SUBMITTED, OrderStatus.CANCELLED),
-            OrderStatus.SUBMITTED, EnumSet.of(OrderStatus.APPROVED, OrderStatus.REJECTED, OrderStatus.CANCELLED),
-            OrderStatus.APPROVED, EnumSet.of(OrderStatus.COMPLETED, OrderStatus.CANCELLED),
-            OrderStatus.REJECTED, EnumSet.noneOf(OrderStatus.class),
+            OrderStatus.PENDING_APPROVAL, EnumSet.of(OrderStatus.APPROVED, OrderStatus.CANCELLED),
+            OrderStatus.APPROVED, EnumSet.of(OrderStatus.DELIVERED, OrderStatus.CANCELLED),
             OrderStatus.CANCELLED, EnumSet.noneOf(OrderStatus.class),
-            OrderStatus.COMPLETED, EnumSet.noneOf(OrderStatus.class)
+            OrderStatus.DELIVERED, EnumSet.noneOf(OrderStatus.class)
     );
 
     private final OrderRepository orderRepository;
@@ -172,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
 
         switch (to) {
             case SUBMITTED -> require(creator, "Only the person who created the order can submit it");
-            case APPROVED, REJECTED, COMPLETED ->
+            case APPROVED,DELIVERED ->
                     require(approver, "Only a manager above the order creator can set status " + to);
             case CANCELLED -> require((creator && from != OrderStatus.APPROVED) || approver,
                     "You are not allowed to cancel this order");
@@ -180,7 +179,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         String reason = firstNonBlank(request.getCancellationReason(), request.getRemarks());
-        if ((to == OrderStatus.CANCELLED || to == OrderStatus.REJECTED) && reason == null) {
+        if (to == OrderStatus.CANCELLED && reason == null) {
             throw badRequest("A reason is required when an order is " + to);
         }
 
@@ -210,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
                 "You are not allowed to record a payment on this order");
 
         if (order.getStatus() == OrderStatus.DRAFT
-                || order.getStatus() == OrderStatus.REJECTED
+                || order.getStatus() == OrderStatus.RETURNED
                 || order.getStatus() == OrderStatus.CANCELLED) {
             throw badRequest("Payments cannot be recorded on an order with status " + order.getStatus());
         }
@@ -244,7 +243,7 @@ public class OrderServiceImpl implements OrderService {
         require(isCreator(order, currentUser) || isApprover(order, currentUser),
                 "You are not allowed to update delivery on this order");
 
-        if (order.getStatus() != OrderStatus.APPROVED && order.getStatus() != OrderStatus.COMPLETED) {
+        if (order.getStatus() != OrderStatus.APPROVED && order.getStatus() != OrderStatus.DELIVERED) {
             throw badRequest("Delivery can be updated only for APPROVED or COMPLETED orders");
         }
 

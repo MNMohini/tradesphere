@@ -1,7 +1,0 @@
-package com.bnagritech.tradesphere.common.enums;
-
-public enum OrderType {
-    PRIMARY,
-    SECONDARY,
-    RETURN
-}

@@ -48,9 +48,8 @@ public class OutletServiceImpl implements OutletService {
     private static final int DEFAULT_NEARBY_RADIUS_METERS = 500;
     private static final int DEFAULT_NEARBY_LIMIT = 20;
 
-    // Roles that may create outlets (promoters may not)
+    // Roles that may create outlets
     private static final Set<UserRole> CREATE_ROLES = EnumSet.of(
-            UserRole.SALES_REPRESENTATIVE, UserRole.SUPERVISOR, UserRole.SALES_OFFICER,
             UserRole.AREA_MANAGER, UserRole.REGIONAL_MANAGER, UserRole.NATIONAL_HEAD, UserRole.ADMIN);
 
     // Outlets created by these roles are ACTIVE immediately, with no approval step
@@ -59,14 +58,15 @@ public class OutletServiceImpl implements OutletService {
             UserRole.NATIONAL_HEAD, UserRole.ADMIN);
 
     // Roles that may see every outlet in every status
-    private static final Set<UserRole> SEE_ALL_ROLES = EnumSet.of(UserRole.ADMIN, UserRole.NATIONAL_HEAD);
+    private static final Set<UserRole> SEE_ALL_ROLES = EnumSet.of(UserRole.ADMIN, UserRole.NATIONAL_HEAD,
+            UserRole.REGIONAL_MANAGER, UserRole.SALES_OFFICER, UserRole.AREA_MANAGER);
 
     // Allowed status changes. Anything not listed is rejected.
     private static final Map<OutletStatus, Set<OutletStatus>> TRANSITIONS = Map.of(
-            OutletStatus.PENDING_APPROVAL, EnumSet.of(OutletStatus.ACTIVE, OutletStatus.REJECTED),
+            OutletStatus.PENDING_APPROVAL, EnumSet.of(OutletStatus.ACTIVE, OutletStatus.BLOCKED),
             OutletStatus.ACTIVE, EnumSet.of(OutletStatus.INACTIVE),
             OutletStatus.INACTIVE, EnumSet.of(OutletStatus.ACTIVE),
-            OutletStatus.REJECTED, EnumSet.of(OutletStatus.PENDING_APPROVAL)
+            OutletStatus.BLOCKED, EnumSet.of(OutletStatus.PENDING_APPROVAL)
     );
 
     private final OutletRepository outletRepository;
@@ -177,7 +177,7 @@ public class OutletServiceImpl implements OutletService {
 
         // The creator may change sensitive fields only while the outlet is not yet live
         boolean notYetLive = outlet.getStatus() == OutletStatus.PENDING_APPROVAL
-                || outlet.getStatus() == OutletStatus.REJECTED;
+                || outlet.getStatus() == OutletStatus.BLOCKED;
         boolean privileged = approver || (creator && notYetLive);
         if (!privileged && touchesPrivilegedFields(request)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -261,19 +261,19 @@ public class OutletServiceImpl implements OutletService {
         boolean approver = isApprover(outlet, currentUser);
 
         switch (to) {
-            case ACTIVE, REJECTED, INACTIVE ->
+            case ACTIVE, BLOCKED, INACTIVE ->
                     require(approver, "Only a manager above the outlet's creator can set status " + to);
             case PENDING_APPROVAL ->
                     require(creator, "Only the person who created the outlet can resubmit it");
         }
 
         String reason = blankToNull(request.getRemarks());
-        if ((to == OutletStatus.REJECTED || to == OutletStatus.INACTIVE) && reason == null) {
+        if ((to == OutletStatus.BLOCKED || to == OutletStatus.INACTIVE) && reason == null) {
             throw badRequest("remarks (the reason) are required when an outlet is " + to);
         }
 
         outlet.setStatus(to);
-        outlet.setStatusReason((to == OutletStatus.REJECTED || to == OutletStatus.INACTIVE) ? reason : null);
+        outlet.setStatusReason((to == OutletStatus.BLOCKED || to == OutletStatus.INACTIVE) ? reason : null);
         outlet.setUpdatedBy(currentUser.getId());
         outlet.getStatusHistory().add(OutletStatusHistory.builder()
                 .fromStatus(from)
@@ -300,7 +300,7 @@ public class OutletServiceImpl implements OutletService {
         return outletRepository.findByOutletCode(outletCode)
                 .filter(outlet -> canView(outlet, currentUser))
                 .map(this::toResponse)
-                .orElseThrow(() -> notFound("Outlet not found"));
+                .orElseThrow(this::notFound);
     }
 
     @Override
@@ -389,7 +389,7 @@ public class OutletServiceImpl implements OutletService {
     private Outlet loadVisibleOutlet(String outletId, User user) {
         return outletRepository.findById(outletId)
                 .filter(outlet -> canView(outlet, user))
-                .orElseThrow(() -> notFound("Outlet not found"));
+                .orElseThrow(this::notFound);
     }
 
     private Outlet ownedOrConflict(Outlet outlet, User user) {
@@ -529,7 +529,7 @@ public class OutletServiceImpl implements OutletService {
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
 
-    private ResponseStatusException notFound(String message) {
-        return new ResponseStatusException(HttpStatus.NOT_FOUND, message);
+    private ResponseStatusException notFound() {
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, "Outlet not found");
     }
 }

@@ -488,7 +488,7 @@ public class VisitServiceImpl implements VisitService {
     /** Orders of this visit that are still alive (not canceled or rejected). */
     private int activeOrderCount(String visitId) {
         return (int) orderRepository.findByVisitIdOrderByOrderDateDesc(visitId).stream()
-                .filter(o -> o.getStatus() != OrderStatus.CANCELLED && o.getStatus() != OrderStatus.REJECTED)
+                .filter(o -> o.getStatus() != OrderStatus.CANCELLED && o.getStatus() != OrderStatus.RETURNED)
                 .count();
     }
 

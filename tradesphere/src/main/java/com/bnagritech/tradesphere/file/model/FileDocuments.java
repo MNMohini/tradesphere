@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.file.model;
 
-import com.bnagritech.tradesphere.common.enums.Modules;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
