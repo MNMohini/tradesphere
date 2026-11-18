@@ -25,10 +25,4 @@ public class ChangePasswordRequest {
     @NotBlank(message = "confirmPassword is required")
     private String confirmPassword;
 
-    // Identifies the phone, so a fresh session can be created for it after the change
-    @Size(max = 100)
-    private String deviceId;
-
-    @Size(max = 100)
-    private String deviceName;
 }

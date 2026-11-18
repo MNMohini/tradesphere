@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ForgotPasswordRequest {
 
-    // User name or registered mobile number
+    // Username or registered mobile number
     @NotBlank(message = "username is required")
     @Size(max = 100)
     private String username;

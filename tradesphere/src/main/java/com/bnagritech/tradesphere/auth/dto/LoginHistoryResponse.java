@@ -16,8 +16,5 @@ public class LoginHistoryResponse {
 
     private Instant attemptedAt;
     private String userName;
-    private LoginResult result;
-    private String ipAddress;
-    private String deviceId;
-    private String userAgent;
+
 }

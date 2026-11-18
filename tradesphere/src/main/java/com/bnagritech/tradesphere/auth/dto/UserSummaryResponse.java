@@ -19,7 +19,6 @@ public class UserSummaryResponse {
     private String id;
     private String userName;
     private String fullName;
-    private String employeeId;
     private String phoneNumber;
     private UserRole role;
     private String managerId;
