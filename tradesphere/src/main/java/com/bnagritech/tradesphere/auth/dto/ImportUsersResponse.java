@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ResetPasswordResponse {
-    private String message;
-    private boolean success;
-    private LocalDateTime resetAt;
+@NoArgsConstructor
+public class ImportUsersResponse {
+
+    private int total;
+    private int created;
+    private int failed;
+    private List<ImportRowResult> rows;
 }

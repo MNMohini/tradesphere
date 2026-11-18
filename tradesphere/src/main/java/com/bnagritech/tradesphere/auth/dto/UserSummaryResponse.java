@@ -7,20 +7,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
+/** One row in a user list. */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
-    private String userId;
+@NoArgsConstructor
+public class UserSummaryResponse {
+
+    private String id;
     private String userName;
-    private String email;
+    private String fullName;
+    private String employeeId;
     private String phoneNumber;
-    private String message;
-    private UserStatus status;
-    private String userImageUrl;
     private UserRole role;
-    private LocalDateTime createdAt;
+    private String managerId;
+    private UserStatus status;
+    private Instant lastLoginAt;
 }

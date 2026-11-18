@@ -28,10 +28,11 @@ public class SecurityConfig {
                         .csrf(AbstractHttpConfigurer::disable)
                         .authorizeHttpRequests(auth ->auth
                         .requestMatchers("/api/auth/login",
-                                         "/api/auth/logout",
-                                         "/api/auth/changePassword",
-                                         "/api/auth/forgotPassword",
-                                         "/api/auth/resetPassword")
+                                "/api/auth/refresh",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
+                                "/api/auth/register",
+                                "/actuator/health")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

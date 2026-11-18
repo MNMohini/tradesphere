@@ -7,21 +7,34 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.Instant;
+import java.util.List;
 
+/** Full user details. The password hash and tokens are never included. */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserResponse {
+
+    private String id;
     private String userName;
-    private String userId;
+    private String fullName;
+    private String employeeId;
     private String email;
     private String phoneNumber;
-    private String userImageUrl;
-    private UserStatus status;
-    private UserRole role;
-    private LocalDateTime lastLoginAt;
+    private String profileImageUrl;
 
+    private UserRole role;
+    private String managerId;
+    private List<String> territoryIds;
+
+    private UserStatus status;
+    private String statusReason;
+    private boolean mustChangePassword;
+    private boolean deviceRegistered;
+
+    private Instant lastLoginAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }
