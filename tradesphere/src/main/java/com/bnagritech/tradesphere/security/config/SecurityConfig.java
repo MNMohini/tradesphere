@@ -1,4 +1,4 @@
-package com.bnagritech.tradesphere.common.config;
+package com.bnagritech.tradesphere.security.config;
 
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.auth.service.JwtService;
@@ -64,7 +64,7 @@ public class SecurityConfig {
                                 writeJson(response, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized", "Authentication required"))
                         .accessDeniedHandler((request, response, ex) ->
                                 writeJson(response, HttpServletResponse.SC_FORBIDDEN, "Forbidden", "Access denied")))
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userRepository),
+                .addFilterBefore(new com.bnagritech.tradesphere.security.config.JwtAuthenticationFilter(jwtService, userRepository),
                         UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -80,8 +80,6 @@ public class SecurityConfig {
         return username -> userRepository.findByUserName(username.toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
-
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         List<String> origins = Arrays.stream(allowedOrigins.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();

@@ -33,7 +33,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
             conditions.add(new Criteria().orOperator(
                     Criteria.where("userName").regex(p),
                     Criteria.where("fullName").regex(p),
-                    Criteria.where("employeeId").regex(p),
                     Criteria.where("phoneNumber").regex(p),
                     Criteria.where("email").regex(p)));
         }

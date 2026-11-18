@@ -16,8 +16,6 @@ public interface UserRepository extends MongoRepository<User, String>, UserRepos
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByEmployeeId(String employeeId);
-
     /** True if at least one user has this role (used to create the first admin only once). */
     boolean existsByRole(UserRole role);
 

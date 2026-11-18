@@ -46,14 +46,7 @@ import java.io.InputStream;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -177,8 +170,7 @@ public class UserServiceImpl implements UserService {
 
         String userName = normalize(r.getUserName());
         String email = r.getEmail() == null || r.getEmail().isBlank() ? null : r.getEmail().trim().toLowerCase(Locale.ROOT);
-        String employeeId = blankToNull(r.getEmployeeId());
-        requireUnique(userName, r.getPhoneNumber(), email, employeeId, null);
+        requireUnique(userName, r.getPhoneNumber(), email, null);
 
         String temporaryPassword = generateTemporaryPassword();
         User user = User.builder()
@@ -229,8 +221,10 @@ public class UserServiceImpl implements UserService {
             throw badRequest("The password must not contain your user name");
         }
         String email = r.getEmail() == null || r.getEmail().isBlank() ? null : r.getEmail().trim().toLowerCase(Locale.ROOT);
-        String employeeId = blankToNull(r.getEmployeeId());
-        requireUnique(userName, r.getPhoneNumber(), email, employeeId, null);
+        requireUnique(  userName,
+                r.getPhoneNumber(),
+                email,
+                null);
 
         List<String> path = new ArrayList<>(manager.getPath());
         path.add(manager.getId());
@@ -324,7 +318,6 @@ public class UserServiceImpl implements UserService {
                             .fullName(fullName)
                             .phoneNumber(phone)
                             .email(cellText(row, columns, "email", formatter))
-                            .employeeId(cellText(row, columns, "employeeid", formatter))
                             .role(role)
                             .managerId(manager.getId())
                             .build();
@@ -417,10 +410,8 @@ public class UserServiceImpl implements UserService {
             }
             target.setFullName(r.getFullName().trim());
         }
-
-        String employeeId = r.getEmployeeId() == null ? null : blankToNull(r.getEmployeeId());
         String email = r.getEmail() == null || r.getEmail().isBlank() ? null : r.getEmail().trim().toLowerCase(Locale.ROOT);
-        requireUnique(null, r.getPhoneNumber(), email, employeeId, target.getId());
+        requireUnique(null, r.getPhoneNumber(), email, target.getId());
 
         if (r.getEmail() != null) target.setEmail(email);
         if (r.getPhoneNumber() != null) target.setPhoneNumber(r.getPhoneNumber());
@@ -603,18 +594,34 @@ public class UserServiceImpl implements UserService {
     }
 
     /** excludeId: the user being edited, so they do not clash with themselves (null when creating). */
-    private void requireUnique(String userName, String phoneNumber, String email, String employeeId, String excludeId) {
-        if (userName != null && userRepository.findByUserName(userName).filter(u -> !u.getId().equals(excludeId)).isPresent()) {
+    private void requireUnique(
+            String userName,
+            String phoneNumber,
+            String email,
+            String excludeId) {
+
+        if (userName != null &&
+                userRepository.findByUserName(userName)
+                        .filter(user -> !Objects.equals(user.getId(), excludeId))
+                        .isPresent()) {
+
             throw conflict("This user name is already taken");
         }
-        if (phoneNumber != null && userRepository.findByPhoneNumber(phoneNumber).filter(u -> !u.getId().equals(excludeId)).isPresent()) {
+
+        if (phoneNumber != null &&
+                userRepository.findByPhoneNumber(phoneNumber)
+                        .filter(user -> !Objects.equals(user.getId(), excludeId))
+                        .isPresent()) {
+
             throw conflict("This phone number is already used by another user");
         }
-        if (email != null && userRepository.findByEmail(email).filter(u -> !u.getId().equals(excludeId)).isPresent()) {
+
+        if (email != null &&
+                userRepository.findByEmail(email)
+                        .filter(user -> !Objects.equals(user.getId(), excludeId))
+                        .isPresent()) {
+
             throw conflict("This email is already used by another user");
-        }
-        if (employeeId != null && userRepository.findByEmployeeId(employeeId).filter(u -> !u.getId().equals(excludeId)).isPresent()) {
-            throw conflict("This employee id is already used by another user");
         }
     }
 

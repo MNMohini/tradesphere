@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserSearchRequest {
 
-    // Matched against user name, full name, employee id, phone and email
+    // Matched against username, full name, employee id, phone and email
     private String keyword;
     private UserRole role;
     private UserStatus status;

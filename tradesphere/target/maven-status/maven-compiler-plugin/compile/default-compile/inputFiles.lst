@@ -166,14 +166,11 @@ C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradespher
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\retailer\repository\RetailerRepository.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\retailer\service\impl\RetailerServiceImpl.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\retailer\service\RetailerService.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\config\AdminInitializer.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\config\CorsConfig.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\config\FileConfig.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\config\JwtAuthenticationFilter.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\config\MongoConfig.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\config\SecurityBeanConfig.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\config\SecurityConfig.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\jwt\JwtAuthenticationFilter.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\jwt\JwtService.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\security\package-info.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\territory\controller\TerritoryController.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\territory\dto\TerritoryRequest.java

@@ -1,4 +1,4 @@
-package com.bnagritech.tradesphere.common.config;
+package com.bnagritech.tradesphere.security.config;
 
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.auth.service.JwtService;
