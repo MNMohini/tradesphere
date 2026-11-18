@@ -20,6 +20,7 @@ public class UserResponse {
     private String id;
     private String userName;
     private String fullName;
+    private String employeeId;
     private String email;
     private String phoneNumber;
     private String profileImageUrl;
@@ -31,6 +32,7 @@ public class UserResponse {
     private UserStatus status;
     private String statusReason;
     private boolean mustChangePassword;
+    private boolean deviceRegistered;
 
     private Instant lastLoginAt;
     private Instant createdAt;

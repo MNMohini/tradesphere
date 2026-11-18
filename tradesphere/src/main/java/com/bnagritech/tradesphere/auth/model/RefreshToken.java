@@ -27,6 +27,11 @@ public class RefreshToken {
     @Indexed(unique = true)
     private String tokenHash;
 
+    private String deviceId;
+    private String deviceName;
+    private String ipAddress;
+    private String userAgent;
+
     private Instant createdAt;
 
     // MongoDB deletes the document automatically when this moment passes

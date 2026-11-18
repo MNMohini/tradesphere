@@ -23,6 +23,9 @@ public class UpdateUserRequest {
     @Size(max = 100)
     private String fullName;
 
+    @Size(max = 50)
+    private String employeeId;
+
     @Email(message = "email is not valid")
     @Size(max = 150)
     private String email;

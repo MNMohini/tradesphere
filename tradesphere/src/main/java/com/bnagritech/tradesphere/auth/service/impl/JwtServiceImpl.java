@@ -44,7 +44,7 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
                 .subject(user.getId())
                 .claim("role", user.getRole().name())
-                .claim("userName", user.getUserName())
+                .claim("userName", user.getUsername())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(accessTokenMinutes, ChronoUnit.MINUTES)))
                 .signWith(key)

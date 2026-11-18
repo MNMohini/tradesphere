@@ -23,6 +23,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * An employee account. This class replaces your earlier User entity. It is also the Spring Security
+ * principal, so controllers can receive it with @AuthenticationPrincipal.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -38,7 +42,7 @@ public class User implements UserDetails {
 
     // ---- Login ----
     @Indexed(unique = true)
-    private String userName;
+    private String userName;             // stored in lower case
 
     private String passwordHash;
 
@@ -85,6 +89,11 @@ public class User implements UserDetails {
 
     // Access tokens issued before this moment are rejected (set on logout-all, password change, deactivation)
     private Instant tokensValidFrom;
+
+    // ---- Device (optional single-device rule, push notifications) ----
+    private String deviceId;
+    private String deviceName;
+    private String fcmToken;
 
     // ---- Audit ----
     private Instant lastLoginAt;

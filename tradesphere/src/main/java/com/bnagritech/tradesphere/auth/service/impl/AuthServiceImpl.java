@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
         String identifier = r.getUsername().trim().toLowerCase(Locale.ROOT);
         User user = findByIdentifier(identifier);
         if (user == null) {
-            record(null, identifier, LoginResult.UNKNOWN_USER, ipAddress, r.getDeviceId(), userAgent);
+            record(null, identifier, LoginResult.USER_NOT_FOUND, ipAddress, r.getDeviceId(), userAgent);
             throw invalidCredentials();
         }
 
@@ -118,13 +118,13 @@ public class AuthServiceImpl implements AuthService {
             }
             user.setFailedLoginAttempts(attempts);
             userRepository.save(user);
-            record(user, identifier, LoginResult.WRONG_PASSWORD, ipAddress, r.getDeviceId(), userAgent);
+            record(user, identifier, LoginResult.INVALID_CREDENTIALS, ipAddress, r.getDeviceId(), userAgent);
             throw invalidCredentials();
         }
 
         // The password is right, so it is now safe to say why the account cannot be used
         if (user.getStatus() != UserStatus.ACTIVE) {
-            record(user, identifier, LoginResult.ACCOUNT_NOT_ACTIVE, ipAddress, r.getDeviceId(), userAgent);
+            record(user, identifier, LoginResult.ACCOUNT_LOCKED, ipAddress, r.getDeviceId(), userAgent);
             String message = user.getStatus() == UserStatus.PENDING_APPROVAL
                     ? "Your account is waiting for approval by your manager."
                     : "Your account is not active. Contact your manager.";
@@ -256,10 +256,10 @@ public class AuthServiceImpl implements AuthService {
                 boolean sent = emailService.sendPasswordResetCode(
                         user.getEmail(), user.getFullName(), code, RESET_CODE_VALID_MINUTES);
                 if (!sent) {
-                    log.warn("The reset code for {} could not be emailed", user.getUserName());
+                    log.warn("The reset code for {} could not be emailed", user.getUsername());
                 }
                 if (logResetCodes) {
-                    log.warn("TESTING ONLY: the reset code for {} is {}", user.getUserName(), code);
+                    log.warn("TESTING ONLY: the reset code for {} is {}", user.getUsername(), code);
                 }
             }
         }
@@ -394,7 +394,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void requirePasswordWithoutUserName(String password, User user) {
-        if (password.toLowerCase(Locale.ROOT).contains(user.getUserName().toLowerCase(Locale.ROOT))) {
+        if (password.toLowerCase(Locale.ROOT).contains(user.getUsername().toLowerCase(Locale.ROOT))) {
             throw badRequest("The password must not contain your user name");
         }
     }

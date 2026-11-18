@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         userRepository.save(admin);
         log.info("The first admin '{}' was created. Log in, change the password, then remove "
-                + "app.auth.admin.password from your settings.", admin.getUserName());
+                + "app.auth.admin.password from your settings.", admin.getUsername());
     }
 
     // =====================================================================
@@ -185,7 +185,6 @@ public class UserServiceImpl implements UserService {
                 .userName(userName)
                 .passwordHash(passwordEncoder.encode(temporaryPassword))
                 .fullName(r.getFullName().trim())
-                .employeeId(employeeId)
                 .email(email)
                 .phoneNumber(r.getPhoneNumber())
                 .role(role)
@@ -200,7 +199,7 @@ public class UserServiceImpl implements UserService {
 
         User saved = saveUnique(user);
         boolean emailSent = email != null
-                && emailService.sendTemporaryPassword(email, saved.getFullName(), saved.getUserName(), temporaryPassword);
+                && emailService.sendTemporaryPassword(email, saved.getFullName(), saved.getUsername(), temporaryPassword);
 
         return TempPasswordResponse.builder()
                 .user(toResponse(saved))
@@ -240,7 +239,6 @@ public class UserServiceImpl implements UserService {
                 .userName(userName)
                 .passwordHash(passwordEncoder.encode(r.getPassword()))
                 .fullName(r.getFullName().trim())
-                .employeeId(employeeId)
                 .email(email)
                 .phoneNumber(r.getPhoneNumber())
                 .role(r.getRole())
@@ -251,7 +249,7 @@ public class UserServiceImpl implements UserService {
                 .createdBy("self-registration")
                 .build());
 
-        log.info("Registration request from '{}' is waiting for approval by '{}'", userName, manager.getUserName());
+        log.info("Registration request from '{}' is waiting for approval by '{}'", userName, manager.getUsername());
         return MessageResponse.builder()
                 .message("Your request has been sent. Your manager must approve it before you can log in.")
                 .build();
@@ -424,7 +422,6 @@ public class UserServiceImpl implements UserService {
         String email = r.getEmail() == null || r.getEmail().isBlank() ? null : r.getEmail().trim().toLowerCase(Locale.ROOT);
         requireUnique(null, r.getPhoneNumber(), email, employeeId, target.getId());
 
-        if (r.getEmployeeId() != null) target.setEmployeeId(employeeId);
         if (r.getEmail() != null) target.setEmail(email);
         if (r.getPhoneNumber() != null) target.setPhoneNumber(r.getPhoneNumber());
         if (r.getTerritoryIds() != null) target.setTerritoryIds(new ArrayList<>(r.getTerritoryIds()));
@@ -513,7 +510,7 @@ public class UserServiceImpl implements UserService {
         userRepository.saveAll(changed);
 
         log.info("User '{}' and {} team members were moved under '{}'",
-                target.getUserName(), changed.size() - 1, newManager.getUserName());
+                target.getUsername(), changed.size() - 1, newManager.getUsername());
         return toResponse(target);
     }
 
@@ -531,7 +528,7 @@ public class UserServiceImpl implements UserService {
         revokeAllSessions(target);   // saves the user
 
         boolean emailSent = target.getEmail() != null
-                && emailService.sendTemporaryPassword(target.getEmail(), target.getFullName(), target.getUserName(), temporaryPassword);
+                && emailService.sendTemporaryPassword(target.getEmail(), target.getFullName(), target.getUsername(), temporaryPassword);
 
         return TempPasswordResponse.builder()
                 .user(toResponse(target))
@@ -638,9 +635,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse toResponse(User u) {
         return UserResponse.builder()
                 .id(u.getId())
-                .userName(u.getUserName())
+                .userName(u.getUsername())
                 .fullName(u.getFullName())
-                .employeeId(u.getEmployeeId())
                 .email(u.getEmail())
                 .phoneNumber(u.getPhoneNumber())
                 .profileImageUrl(u.getProfileImageUrl())
@@ -660,9 +656,8 @@ public class UserServiceImpl implements UserService {
     private UserSummaryResponse toSummary(User u) {
         return UserSummaryResponse.builder()
                 .id(u.getId())
-                .userName(u.getUserName())
+                .userName(u.getUsername())
                 .fullName(u.getFullName())
-                .employeeId(u.getEmployeeId())
                 .phoneNumber(u.getPhoneNumber())
                 .role(u.getRole())
                 .managerId(u.getManagerId())
