@@ -18,6 +18,6 @@ public class TerritoryResponse {
     private List<String> state;
     private List<String> city;
     private Instant updateAt;
-    private Instant createAt;
+    private LocalDateTime createAt;
 
 }

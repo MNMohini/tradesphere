@@ -16,6 +16,6 @@ public class TerritoryRequest {
     private List<String> beatId;
     private List<String> state;
     private List<String> city;
-    private Instant createdAt;
+    private LocalDateTime createdAt;
     private Instant updatedAt;
 }

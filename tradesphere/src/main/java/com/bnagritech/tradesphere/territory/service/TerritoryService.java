@@ -1,4 +1,5 @@
 package com.bnagritech.tradesphere.territory.service;
+import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.territory.dto.TerritoryRequest;
 import com.bnagritech.tradesphere.territory.dto.TerritoryResponse;
 import java.util.List;
