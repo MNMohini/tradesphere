@@ -10,11 +10,11 @@ import com.bnagritech.tradesphere.territory.repository.TerritoryRepository;
 import com.bnagritech.tradesphere.territory.service.TerritoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,29 +24,61 @@ public class TerritoryServiceImpl implements TerritoryService {
     @Override
     public TerritoryResponse createTerritory(TerritoryRequest request) {
 
-            if (territoryRepository.existsTerritoryByTerritoryName(request.getTerritoryName())) {
-                throw new ResourceAlreadyExistsException("Territory name is already exists");
-            }
-            if (territoryRepository.existsTerritoryByTerritoryId(request.getTerritoryId())){
-                throw new ResourceAlreadyExistsException("Territory Id is already exists");
-            }
-
-            Territory territory = Territory.builder()
-                    .territoryId(request.getTerritoryId())
-                    .territoryName(request.getTerritoryName())
-                    .beatId(request.getBeatId() != null
-                            ? new ArrayList<>(request.getBeatId())
-                            : new ArrayList<>())
-                    .state(new ArrayList<>(request.getState()))
-                    .city(new ArrayList<>(request.getCity()))
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-
-            Territory savedTerritory = territoryRepository.save(territory);
-            return mapToResponse(savedTerritory);
-
+        if (territoryRepository.existsTerritoryByTerritoryName(
+                request.getTerritoryName())) {
+            throw new ResourceAlreadyExistsException(
+                    "Territory name already exists"
+            );
         }
+
+        if (territoryRepository.existsTerritoryByTerritoryId(
+                request.getTerritoryId())) {
+            throw new ResourceAlreadyExistsException(
+                    "Territory ID already exists"
+            );
+        }
+
+        List<String> beatIds = request.getBeatId() != null
+                ? request.getBeatId()
+                : new ArrayList<>();
+
+        // Check duplicate beats inside the request
+        Set<String> uniqueBeatIds = new HashSet<>();
+
+        for (String beatId : beatIds) {
+
+            if (!uniqueBeatIds.add(beatId)) {
+                throw new ResourceAlreadyExistsException(
+                        "Duplicate beat ID in request: " + beatId
+                );
+            }
+
+            // Check whether beat is already assigned to another territory
+            if (territoryRepository.existsByBeatIdContaining(beatId)) {
+                throw new ResourceAlreadyExistsException(
+                        "Beat ID " + beatId +
+                                " is already assigned to another territory"
+                );
+            }
+        }
+
+        Territory territory = Territory.builder()
+                .territoryId(request.getTerritoryId())
+                .territoryName(request.getTerritoryName())
+                .beatId(new ArrayList<>(beatIds))
+                .state(request.getState() != null
+                        ? new ArrayList<>(request.getState())
+                        : new ArrayList<>())
+                .city(request.getCity() != null
+                        ? new ArrayList<>(request.getCity())
+                        : new ArrayList<>())
+                .build();
+
+        Territory savedTerritory =
+                territoryRepository.save(territory);
+
+        return mapToResponse(savedTerritory);
+    }
 
     @Override
     public List<TerritoryResponse> getAllTerritories() {
@@ -104,8 +136,7 @@ public class TerritoryServiceImpl implements TerritoryService {
                             : new ArrayList<>());
             territory.setState(new ArrayList<>(request.getState()));
             territory.setCity(new ArrayList<>(request.getCity()));
-            territory.setUpdatedAt(LocalDateTime.now());
-            territory.setUpdatedBy(String.valueOf(request.getUpdatedBy()));
+
 
             Territory updatedTerritory = territoryRepository.save(territory);
             return mapToResponse(updatedTerritory);
@@ -127,8 +158,6 @@ public class TerritoryServiceImpl implements TerritoryService {
                 .state(territory.getState())
                 .beatId(territory.getBeatId())
                 .city(territory.getCity())
-                .updateAt(LocalDateTime.now())
-                .createAt(LocalDateTime.now())
                 .build();
     }
 }

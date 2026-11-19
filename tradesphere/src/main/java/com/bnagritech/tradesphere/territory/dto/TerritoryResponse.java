@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class TerritoryResponse {
     private List<String> beatId;
     private List<String> state;
     private List<String> city;
-    private LocalDateTime updateAt;
-    private LocalDateTime createAt;
-    private String updatedBy;
+    private Instant updateAt;
+    private Instant createAt;
+
 }
