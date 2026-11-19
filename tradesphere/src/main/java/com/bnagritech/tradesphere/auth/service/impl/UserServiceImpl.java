@@ -211,8 +211,8 @@ public class UserServiceImpl implements UserService {
                 .territoryIds(r.getTerritoryIds() == null ? new ArrayList<>() : new ArrayList<>(r.getTerritoryIds()))
                 .status(UserStatus.ACTIVE)
                 .mustChangePassword(true)
-                .createdBy(actor.getId())
-                .updatedBy(actor.getId())
+                .createdBy(actor.getUsername())
+                .updatedBy(actor.getUsername())
                 .build();
 
         User saved = saveUnique(user);
@@ -443,7 +443,7 @@ public class UserServiceImpl implements UserService {
         if (r.getPhoneNumber() != null) target.setPhoneNumber(r.getPhoneNumber());
         if (r.getTerritoryIds() != null) target.setTerritoryIds(new ArrayList<>(r.getTerritoryIds()));
 
-        target.setUpdatedBy(actor.getId());
+        target.setUpdatedBy(actor.getUsername());
         return toResponse(saveUnique(target));
     }
 
@@ -522,7 +522,7 @@ public class UserServiceImpl implements UserService {
         }
         target.setManagerId(newManager.getId());
         target.setPath(newPrefix);
-        target.setUpdatedBy(actor.getId());
+        target.setUpdatedBy(actor.getUsername());
         changed.add(target);
         userRepository.saveAll(changed);
 
@@ -541,7 +541,7 @@ public class UserServiceImpl implements UserService {
         target.setMustChangePassword(true);
         target.setFailedLoginAttempts(0);
         target.setLockedUntil(null);
-        target.setUpdatedBy(actor.getId());
+        target.setUpdatedBy(actor.getUsername());
         revokeAllSessions(target);   // saves the user
 
         boolean emailSent = target.getEmail() != null
@@ -559,7 +559,7 @@ public class UserServiceImpl implements UserService {
         User target = loadManaged(userId, actor);
         target.setDeviceId(null);
         target.setDeviceName(null);
-        target.setUpdatedBy(actor.getId());
+        target.setUpdatedBy(actor.getUsername());
         userRepository.save(target);
         return MessageResponse.builder().message("The registered device was cleared. The next login registers a new one.").build();
     }
