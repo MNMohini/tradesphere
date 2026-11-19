@@ -24,7 +24,7 @@ import java.util.List;
 public interface UserService {
 
     /** Creates a user with a generated temporary password. The creator must be the manager or above. */
-    TempPasswordResponse createUser(CreateUserRequest request, User actor);
+    TempPasswordResponse createUser(CreateUserRequest request);
 
     /** An employee asks for an account. Works only when app.auth.self-registration=true. */
     MessageResponse selfRegister(RegisterRequest request);

@@ -41,12 +41,12 @@ public class UserController {
 
     private final UserService userService;
 
-    // POST /api/users
-    @PostMapping
+    // POST /api/users/
+    @PostMapping("/create")
     public ResponseEntity<TempPasswordResponse> createUser(
             @Valid @RequestBody CreateUserRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request, currentUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
     // POST /api/users/import    (multipart form with a file field named "file", an .xlsx sheet)

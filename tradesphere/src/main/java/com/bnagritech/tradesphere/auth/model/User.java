@@ -44,7 +44,7 @@ public class User implements UserDetails {
     @Indexed(unique = true)
     private String userName;             // stored in lower case
 
-    private String passwordHash;
+    private String passwordHash;         // BCrypt hash, never returned by any API
 
     // ---- Employee details ----
     private String fullName;

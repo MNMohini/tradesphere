@@ -36,6 +36,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -130,9 +133,32 @@ public class UserServiceImpl implements UserService {
     // =====================================================================
     // Create / register / import
     // =====================================================================
-
     @Override
-    public TempPasswordResponse createUser(CreateUserRequest request, User actor) {
+    public TempPasswordResponse createUser(CreateUserRequest request) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authentication is required"
+            );
+        }
+
+        String userName = authentication.getName();
+
+        User actor = userRepository.findByUserName(userName)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.UNAUTHORIZED,
+                                "Authenticated user was not found"
+                        )
+                );
+
         return createUserInternal(request, actor);
     }
 

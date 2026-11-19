@@ -20,13 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 /** Replaces the temporary open SecurityConfig. Stateless JWT security: no sessions, no cookies. */
@@ -57,6 +51,7 @@ public class SecurityConfig {
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
                                 "/api/auth/register",
+                                "/api/users/create",
                                 "/actuator/health").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
@@ -79,18 +74,6 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUserName(username.toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        List<String> origins = Arrays.stream(allowedOrigins.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
-        config.setAllowedOriginPatterns(origins);
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 
     private static void writeJson(HttpServletResponse response, int status, String error, String message) throws IOException {

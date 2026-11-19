@@ -31,6 +31,7 @@ public class CreateUserRequest {
     @Size(max = 100)
     private String fullName;
 
+
     @Email(message = "email is not valid")
     @Size(max = 150)
     private String email;
