@@ -3,65 +3,155 @@ package com.bnagritech.tradesphere.auth.service.impl;
 import com.bnagritech.tradesphere.auth.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-/**
- * Sends plain-text emails through Spring's JavaMailSender. If no mail server is configured
- * (spring.mail.host is empty), nothing is sent and a warning is logged, so the app still starts.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    private final ObjectProvider<JavaMailSender> mailSender;
+    private final JavaMailSender mailSender;
 
-    @Value("${app.mail.from:no-reply@localhost}")
-    private String from;
+    @Value("${app.mail.from}")
+    private String fromEmail;
 
     @Override
-    public boolean sendPasswordResetCode(String to, String fullName, String code, int validMinutes) {
-        String body = "Hello " + safe(fullName) + ",\n\n"
-                + "Your password reset code is " + code + ".\n"
-                + "It is valid for " + validMinutes + " minutes. If you did not ask for it, ignore this email.\n";
-        return send(to, "Your password reset code", body);
+    public boolean sendPasswordResetCode(
+            String to,
+            String fullName,
+            String code,
+            int validMinutes) {
+
+        String subject = "TradeSphere Password Reset Code";
+
+        String body = """
+                Hello %s,
+
+                We received a request to reset your TradeSphere password.
+
+                Your password reset verification code is:
+
+                %s
+
+                This code is valid for %d minutes.
+
+                Please do not share this code with anyone.
+
+                If you did not request a password reset, you can safely ignore this email.
+
+                Regards,
+                TradeSphere Team
+                """.formatted(
+                safeName(fullName),
+                code,
+                validMinutes
+        );
+
+        return sendEmail(to, subject, body);
     }
 
     @Override
-    public boolean sendTemporaryPassword(String to, String fullName, String userName, String temporaryPassword) {
-        String body = "Hello " + safe(fullName) + ",\n\n"
-                + "An account has been created for you.\n"
-                + "User name: " + userName + "\n"
-                + "Temporary password: " + temporaryPassword + "\n\n"
-                + "You must change this password the first time you log in.\n";
-        return send(to, "Your account details", body);
+    public boolean sendTemporaryPassword(
+            String to,
+            String fullName,
+            String userName,
+            String temporaryPassword) {
+
+        String subject = "Your TradeSphere Account Credentials";
+
+        String body = """
+                Hello %s,
+
+                Your TradeSphere account has been created successfully.
+
+                Username: %s
+                Temporary Password: %s
+
+                Please sign in using the above credentials.
+
+                For security reasons, you must change your temporary
+                password after your first login.
+
+                Please do not share your password with anyone.
+
+                Regards,
+                TradeSphere Team
+                """.formatted(
+                safeName(fullName),
+                userName,
+                temporaryPassword
+        );
+
+        return sendEmail(to, subject, body);
     }
 
-    private boolean send(String to, String subject, String body) {
-        JavaMailSender sender = mailSender.getIfAvailable();
-        if (sender == null) {
-            log.warn("Mail is not configured, so the email \"{}\" to {} was not sent", subject, to);
+    private boolean sendEmail(
+            String to,
+            String subject,
+            String body) {
+
+        if (to == null || to.isBlank()) {
+            log.error(
+                    "Email '{}' could not be sent because recipient is blank",
+                    subject
+            );
             return false;
         }
+
+        if (fromEmail == null || fromEmail.isBlank()) {
+            log.error(
+                    "Email '{}' could not be sent because app.mail.from is blank",
+                    subject
+            );
+            return false;
+        }
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(from);
-            message.setTo(to);
+
+            message.setFrom(fromEmail.trim());
+            message.setTo(to.trim());
             message.setSubject(subject);
             message.setText(body);
-            sender.send(message);
+
+            log.info(
+                    "Sending email '{}' from '{}' to '{}'",
+                    subject,
+                    fromEmail,
+                    to
+            );
+
+            mailSender.send(message);
+
+            log.info(
+                    "Email '{}' sent successfully to '{}'",
+                    subject,
+                    to
+            );
+
             return true;
+
         } catch (Exception e) {
-            log.error("Could not send the email \"{}\" to {}", subject, to, e);
+            log.error(
+                    "Email send failed. Subject='{}', recipient='{}', "
+                            + "exceptionType='{}', message='{}'",
+                    subject,
+                    to,
+                    e.getClass().getName(),
+                    e.getMessage(),
+                    e
+            );
+
             return false;
         }
     }
 
-    private String safe(String name) {
-        return name == null || name.isBlank() ? "" : name;
+    private String safeName(String fullName) {
+        return fullName == null || fullName.isBlank()
+                ? "User"
+                : fullName.trim();
     }
 }

@@ -74,11 +74,9 @@ public class UserServiceImpl implements UserService {
 
     private final SecureRandom random = new SecureRandom();
 
-    // application.properties:  app.auth.self-registration=false
     @Value("${app.auth.self-registration:false}")
     private boolean selfRegistrationEnabled = false;
 
-    // First admin, created once at startup when no admin exists. Set these as environment variables.
     @Value("${app.auth.admin.username:}")
     private String adminUserName = "";
 
@@ -93,10 +91,6 @@ public class UserServiceImpl implements UserService {
 
     @Value("${app.auth.admin.phone:}")
     private String adminPhone = "";
-
-    // =====================================================================
-    // First admin
-    // =====================================================================
 
     /** Runs once the app has started. Creates the first admin only if there is no admin yet. */
     @EventListener(ApplicationReadyEvent.class)
@@ -129,10 +123,7 @@ public class UserServiceImpl implements UserService {
         log.info("The first admin '{}' was created. Log in, change the password, then remove "
                 + "app.auth.admin.password from your settings.", admin.getUsername());
     }
-
-    // =====================================================================
     // Create / register / import
-    // =====================================================================
     @Override
     public TempPasswordResponse createUser(CreateUserRequest request) {
 
@@ -145,8 +136,7 @@ public class UserServiceImpl implements UserService {
 
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
-                    "Authentication is required"
-            );
+                    "Authentication is required");
         }
 
         String userName = authentication.getName();
@@ -379,11 +369,7 @@ public class UserServiceImpl implements UserService {
                 .rows(results)
                 .build();
     }
-
-    // =====================================================================
     // Read
-    // =====================================================================
-
     @Override
     public UserResponse getUserById(String userId, User actor) {
         User target = userRepository.findById(userId).orElseThrow(() -> notFound("User not found"));
@@ -421,11 +407,7 @@ public class UserServiceImpl implements UserService {
                         .build())
                 .toList();
     }
-
-    // =====================================================================
     // Update / status / move / resets
-    // =====================================================================
-
     @Override
     public UserResponse updateUser(String userId, UpdateUserRequest r, User actor) {
         User target = loadManaged(userId, actor);
@@ -573,16 +555,10 @@ public class UserServiceImpl implements UserService {
             s.setRevokedAt(now);
         });
         refreshTokenRepository.saveAll(sessions);
-
-        // Access tokens are valid for a few minutes, so they are also rejected by their issue time.
-        // JWT issue times are whole seconds, so this moment is cut to whole seconds too.
         user.setTokensValidFrom(now.truncatedTo(ChronoUnit.SECONDS));
         userRepository.save(user);
     }
-
-    // =====================================================================
     // Rules and permissions
-    // =====================================================================
 
     /** The actor is above the target in the hierarchy (an admin is above everyone). A user never manages themselves. */
     private boolean isManagerOf(User actor, User target) {

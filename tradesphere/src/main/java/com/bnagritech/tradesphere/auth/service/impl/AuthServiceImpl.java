@@ -70,7 +70,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
 
     private final SecureRandom random = new SecureRandom();
-
     @Value("${app.jwt.refresh-token-days:30}")
     private long refreshTokenDays = 30;
 
@@ -201,11 +200,7 @@ public class AuthServiceImpl implements AuthService {
     public void logoutAll(User currentUser) {
         userService.revokeAllSessions(currentUser);
     }
-
-    // =====================================================================
     // Passwords
-    // =====================================================================
-
     @Override
     public AuthResponse changePassword(ChangePasswordRequest r, User currentUser, String ipAddress, String userAgent) {
         User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> unauthorized("Invalid user"));
@@ -231,39 +226,97 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public MessageResponse forgotPassword(ForgotPasswordRequest r, String ipAddress) {
-        if (!rateLimiter.tryAcquire("forgot:" + ipAddress, 10, Duration.ofHours(1))) {
-            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests. Try again later.");
+
+        if (!rateLimiter.tryAcquire(
+                "forgot:" + ipAddress,
+                10,
+                Duration.ofHours(1)
+        )) {
+            throw new ResponseStatusException(
+                    HttpStatus.TOO_MANY_REQUESTS,
+                    "Too many requests. Try again later."
+            );
         }
 
-        User user = findByIdentifier(r.getUsername().trim().toLowerCase(Locale.ROOT));
-        if (user != null && user.getStatus() == UserStatus.ACTIVE && !isBlank(user.getEmail())) {
+        User user = findByIdentifier(
+                r.getUsername()
+                        .trim()
+                        .toLowerCase(Locale.ROOT)
+        );
+
+        if (user != null
+                && user.getStatus() == UserStatus.ACTIVE
+                && !isBlank(user.getEmail())) {
+
             Instant now = Instant.now();
-            long recent = passwordResetCodeRepository.countByUserIdAndCreatedAtAfter(user.getId(), now.minus(1, ChronoUnit.HOURS));
+
+            long recent =
+                    passwordResetCodeRepository
+                            .countByUserIdAndCreatedAtAfter(
+                                    user.getId(),
+                                    now.minus(1, ChronoUnit.HOURS)
+                            );
+
             if (recent < MAX_RESET_REQUESTS_PER_HOUR) {
-                // Only the newest code may work
-                List<PasswordResetCode> older = passwordResetCodeRepository.findByUserIdAndUsedFalse(user.getId());
+
+                // Only the newest reset code may work
+                List<PasswordResetCode> older =
+                        passwordResetCodeRepository
+                                .findByUserIdAndUsedFalse(user.getId());
+
                 older.forEach(c -> c.setUsed(true));
                 passwordResetCodeRepository.saveAll(older);
 
-                String code = String.format("%06d", random.nextInt(1_000_000));
-                passwordResetCodeRepository.save(PasswordResetCode.builder()
-                        .userId(user.getId())
-                        .codeHash(passwordEncoder.encode(code))
-                        .createdAt(now)
-                        .expiresAt(now.plus(RESET_CODE_VALID_MINUTES, ChronoUnit.MINUTES))
-                        .build());
+                // Generate 6-digit reset code
+                String code = String.format(
+                        "%06d",
+                        random.nextInt(1_000_000)
+                );
 
+                // Save hashed reset code in MongoDB
+                passwordResetCodeRepository.save(
+                        PasswordResetCode.builder()
+                                .userId(user.getId())
+                                .codeHash(passwordEncoder.encode(code))
+                                .createdAt(now)
+                                .expiresAt(
+                                        now.plus(
+                                                RESET_CODE_VALID_MINUTES,
+                                                ChronoUnit.MINUTES
+                                        )
+                                )
+                                .build()
+                );
+
+                // Send actual reset code to user's email
                 boolean sent = emailService.sendPasswordResetCode(
-                        user.getEmail(), user.getFullName(), code, RESET_CODE_VALID_MINUTES);
+                        user.getEmail(),
+                        user.getFullName(),
+                        code,
+                        RESET_CODE_VALID_MINUTES
+                );
+
                 if (!sent) {
-                    log.warn("The reset code for {} could not be emailed", user.getUsername());
+                    log.warn(
+                            "The reset code for {} could not be emailed",
+                            user.getUsername()
+                    );
                 }
+
+                // Testing only
                 if (logResetCodes) {
-                    log.warn("TESTING ONLY: the reset code for {} is {}", user.getUsername(), code);
+                    log.warn(
+                            "the reset code for {} is {}",
+                            user.getUsername(),
+                            code
+                    );
                 }
             }
         }
-        return MessageResponse.builder().message(FORGOT_PASSWORD_ANSWER).build();
+
+        return MessageResponse.builder()
+                .message(FORGOT_PASSWORD_ANSWER)
+                .build();
     }
 
     @Override
