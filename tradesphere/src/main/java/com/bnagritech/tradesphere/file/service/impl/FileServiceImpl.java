@@ -165,7 +165,7 @@ public class FileServiceImpl implements FileService {
     public void delete(String fileId, User currentUser) {
         StoredFile file = fileRepository.findByIdAndDeletedFalse(fileId)
                 .filter(f -> canView(f, currentUser))
-                .orElseThrow(() -> notFound());
+                .orElseThrow(this::notFound);
         if (!file.getUploadedBy().equals(currentUser.getId()) && currentUser.getRole() != UserRole.ADMIN) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the person who uploaded the file can delete it");
         }
@@ -204,7 +204,7 @@ public class FileServiceImpl implements FileService {
     private StoredFile loadVisible(String fileId, User user) {
         return fileRepository.findByIdAndDeletedFalse(fileId)
                 .filter(f -> canView(f, user))
-                .orElseThrow(() -> notFound());
+                .orElseThrow(this::notFound);
     }
 
     /** Finds the real type from the first bytes. The type the app claims is ignored. */

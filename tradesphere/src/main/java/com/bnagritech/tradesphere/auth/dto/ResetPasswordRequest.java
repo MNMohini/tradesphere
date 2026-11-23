@@ -18,7 +18,7 @@ public class ResetPasswordRequest {
     @Size(max = 100)
     private String username;
 
-    // The 6 digit code that was emailed
+    // The 6-digit code that was emailed
     @NotBlank(message = "code is required")
     @Pattern(regexp = "^[0-9]{6}$", message = "code must be 6 digits")
     private String code;

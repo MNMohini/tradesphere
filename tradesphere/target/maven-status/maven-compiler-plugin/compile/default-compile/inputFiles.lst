@@ -52,6 +52,7 @@ C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradespher
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\BeatFrequency.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\BeatStatus.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\DeliveryStatus.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\FileCategory.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\LoginResult.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\OrderSource.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\OrderStatus.java
@@ -69,6 +70,7 @@ C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradespher
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\VisitStatus.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\enums\VisitType.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\exception\AccountLockedException.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\exception\ApiError.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\exception\BadRequestException.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\exception\EmployeeAlreadyExistsException.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\exception\EmployeeNotFoundException.java
@@ -89,10 +91,12 @@ C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradespher
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\common\util\SimpleRateLimiter.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\controller\FileController.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\dto\FileResponse.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\model\FileDocuments.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\repository\FileRepository.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\service\FileDocService.java
-C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\service\impl\FileDocServiceImpl.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\model\StoredFile.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\repository\StoredFileRepository.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\service\FileService.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\service\FileStorageService.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\service\impl\FileServiceImpl.java
+C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\file\service\impl\LocalFileStorageServiceImpl.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\order\controller\OrderController.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\order\dto\CreateOrderRequest.java
 C:\Users\mohini.BNAGRITECHLTD\OneDrive - B N AGRITECH LTD\tradesphere\tradesphere\src\main\java\com\bnagritech\tradesphere\order\dto\LocationDto.java
