@@ -44,8 +44,7 @@ public class UserController {
     // POST /api/users/
     @PostMapping("/create")
     public ResponseEntity<TempPasswordResponse> createUser(
-            @Valid @RequestBody CreateUserRequest request,
-            @AuthenticationPrincipal User currentUser) {
+            @Valid @RequestBody CreateUserRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 

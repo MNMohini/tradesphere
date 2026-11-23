@@ -23,10 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * An employee account. This class replaces your earlier User entity. It is also the Spring Security
- * principal, so controllers can receive it with @AuthenticationPrincipal.
- */
 @Data
 @Builder
 @NoArgsConstructor
