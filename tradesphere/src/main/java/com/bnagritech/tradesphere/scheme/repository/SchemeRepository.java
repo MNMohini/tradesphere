@@ -12,18 +12,11 @@ import java.util.Optional;
 @Repository
 public interface SchemeRepository extends MongoRepository<Scheme, String> {
 
-    Optional<Scheme> findBySchemeCode(String schemeCode);
-
     boolean existsBySchemeCode(String schemeCode);
 
     boolean existsBySchemeCodeAndIdNot(String schemeCode, String id);
 
     List<Scheme> findByStatus(SchemeStatus status);
-
-    List<Scheme> findByStartDateLessThanEqualAndEndDateGreaterThanEqual(
-            LocalDate startDate,
-            LocalDate endDate
-    );
 
     List<Scheme> findByStatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
             SchemeStatus status,
