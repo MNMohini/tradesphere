@@ -35,13 +35,6 @@ public class Scheme {
     private LocalDate endDate;
 
     private List<String> productIds;
-
-    private List<String> territoryIds;
-
-    private List<String> beatIds;
-
-    private List<String> outletIds;
-
     private SchemeStatus status;
 
     private Instant createdAt;

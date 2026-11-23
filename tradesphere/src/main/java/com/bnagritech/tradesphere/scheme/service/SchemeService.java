@@ -10,14 +10,13 @@ public interface SchemeService {
 
     SchemeResponse createScheme(
             SchemeRequest request,
-            String currentUserId
+            String currentUserName
     );
 
     SchemeResponse updateScheme(
             String schemeId,
             SchemeRequest request,
-            String currentUserId
-    );
+            String currentUserName    );
 
     SchemeResponse getSchemeById(String schemeId);
 

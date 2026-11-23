@@ -1,16 +1,20 @@
 package com.bnagritech.tradesphere.scheme.service.impl;
 
+import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
+import com.bnagritech.tradesphere.product.model.Product;
+import com.bnagritech.tradesphere.product.repository.ProductRepository;
 import com.bnagritech.tradesphere.scheme.dto.SchemeRequest;
 import com.bnagritech.tradesphere.scheme.dto.SchemeResponse;
-
+import com.bnagritech.tradesphere.common.enums.SchemeStatus;
 import com.bnagritech.tradesphere.scheme.model.Scheme;
 import com.bnagritech.tradesphere.scheme.repository.SchemeRepository;
 import com.bnagritech.tradesphere.scheme.service.SchemeService;
+import com.bnagritech.tradesphere.territory.model.Territory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import com.bnagritech.tradesphere.common.enums.SchemeStatus;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -21,11 +25,11 @@ import java.util.Locale;
 public class SchemeServiceImpl implements SchemeService {
 
     private final SchemeRepository schemeRepository;
-
+    private final ProductRepository productRepository;
     @Override
     public SchemeResponse createScheme(
             SchemeRequest request,
-            String currentUserId) {
+            String currentUserName) {
 
         validateDates(request);
 
@@ -50,14 +54,11 @@ public class SchemeServiceImpl implements SchemeService {
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .productIds(request.getProductIds())
-                .territoryIds(request.getTerritoryIds())
-                .beatIds(request.getBeatIds())
-                .outletIds(request.getOutletIds())
                 .status(request.getStatus())
                 .createdAt(now)
                 .updatedAt(now)
-                .createdBy(currentUserId)
-                .updatedBy(currentUserId)
+                .createdBy(currentUserName)
+                .updatedBy(currentUserName)
                 .build();
 
         return toResponse(
@@ -97,10 +98,6 @@ public class SchemeServiceImpl implements SchemeService {
         scheme.setEndDate(request.getEndDate());
 
         scheme.setProductIds(request.getProductIds());
-        scheme.setTerritoryIds(request.getTerritoryIds());
-        scheme.setBeatIds(request.getBeatIds());
-        scheme.setOutletIds(request.getOutletIds());
-
         scheme.setStatus(request.getStatus());
 
         scheme.setUpdatedAt(Instant.now());
@@ -214,9 +211,6 @@ public class SchemeServiceImpl implements SchemeService {
                 .startDate(scheme.getStartDate())
                 .endDate(scheme.getEndDate())
                 .productIds(scheme.getProductIds())
-                .territoryIds(scheme.getTerritoryIds())
-                .beatIds(scheme.getBeatIds())
-                .outletIds(scheme.getOutletIds())
                 .status(scheme.getStatus())
                 .createdAt(scheme.getCreatedAt())
                 .updatedAt(scheme.getUpdatedAt())

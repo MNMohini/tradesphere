@@ -33,12 +33,6 @@ public class SchemeRequest {
 
     private List<String> productIds;
 
-    private List<String> territoryIds;
-
-    private List<String> beatIds;
-
-    private List<String> outletIds;
-
     @NotNull(message = "Scheme status is required")
     private SchemeStatus status;
 }

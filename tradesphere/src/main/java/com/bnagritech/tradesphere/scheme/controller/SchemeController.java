@@ -28,7 +28,7 @@ public class SchemeController {
 
         SchemeResponse response = schemeService.createScheme(
                 request,
-                currentUser.getId()
+                currentUser.getUsername()
         );
 
         return ResponseEntity
@@ -46,7 +46,7 @@ public class SchemeController {
                 schemeService.updateScheme(
                         schemeId,
                         request,
-                        currentUser.getId()
+                        currentUser.getUsername()
                 )
         );
     }
@@ -60,7 +60,7 @@ public class SchemeController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<SchemeResponse>> getAllSchemes() {
 
         return ResponseEntity.ok(
