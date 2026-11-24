@@ -1,8 +1,10 @@
 package com.bnagritech.tradesphere.product.service.impl;
 
 import com.bnagritech.tradesphere.auth.model.User;
+import com.bnagritech.tradesphere.beat.model.Beat;
 import com.bnagritech.tradesphere.common.enums.ProductStatus;
 import com.bnagritech.tradesphere.common.enums.UserRole;
+import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.product.dto.CreateProductRequest;
 import com.bnagritech.tradesphere.product.dto.ProductResponse;
 import com.bnagritech.tradesphere.product.dto.ProductSummaryResponse;
@@ -203,6 +205,14 @@ public class ProductServiceImpl implements ProductService {
                 .stream()
                 .map(this::toSummary)
                 .toList();
+    }
+
+    @Override
+    public void deleteProduct(String skuCode, User currentUser) {
+        requireManager(currentUser);
+        Product product = productRepository.findBySkuCode(normalizeSku(skuCode))
+                .orElseThrow(() -> notFound("Product not found"));
+        productRepository.delete(product);
     }
 
     // =====================================================================

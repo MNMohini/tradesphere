@@ -10,14 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 /**
  * REST endpoints of the product module. The controller only receives the request,
@@ -37,7 +31,13 @@ public class ProductController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request, currentUser));
     }
-
+    @DeleteMapping("/delete/{skuCode}")
+    public ResponseEntity<Void> deleteProductBySku(
+            @PathVariable String skuCode,
+            @AuthenticationPrincipal User currentUser) {
+        productService.deleteProduct(skuCode, currentUser);
+        return ResponseEntity.noContent().build();
+    }
     // GET /api/products/categories
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getCategories(@AuthenticationPrincipal User currentUser) {
@@ -50,7 +50,7 @@ public class ProductController {
     }
 
     // GET /api/products/sku/{skuCode}
-    @GetMapping("/{skuCode}")
+    @GetMapping("/sku/{skuCode}")
     public ResponseEntity<ProductResponse> getProductBySku(
             @PathVariable String skuCode,
             @AuthenticationPrincipal User currentUser) {

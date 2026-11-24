@@ -34,4 +34,5 @@ public interface ProductService {
         /** Brands of ACTIVE products. */
         List<String> getBrands(User currentUser);
         List<ProductSummaryResponse> getAllProducts();
+        void deleteProduct(String skuCode, User currentUser);
 }
