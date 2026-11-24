@@ -51,10 +51,11 @@ public class ProductController {
 
     // GET /api/products/sku/{skuCode}
     @GetMapping("/sku/{skuCode}")
-    public ResponseEntity<ProductResponse> getProductBySku(
+    public ResponseEntity<String> getProductBySku(
             @PathVariable String skuCode,
             @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(productService.getProductBySku(skuCode, currentUser));
+        productService.getProductBySku(skuCode, currentUser);
+        return ResponseEntity.ok("Successfully deleted product");
     }
 
     // GET /api/products//details/{productId}
