@@ -32,11 +32,11 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request, currentUser));
     }
     @DeleteMapping("/delete/{skuCode}")
-    public ResponseEntity<Void> deleteProductBySku(
+    public ResponseEntity<String> deleteProductBySku(
             @PathVariable String skuCode,
             @AuthenticationPrincipal User currentUser) {
         productService.deleteProduct(skuCode, currentUser);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Deleted successfully");
     }
     // GET /api/products/categories
     @GetMapping("/categories")
@@ -51,11 +51,11 @@ public class ProductController {
 
     // GET /api/products/sku/{skuCode}
     @GetMapping("/sku/{skuCode}")
-    public ResponseEntity<String> getProductBySku(
+    public ResponseEntity<ProductResponse> getProductBySku(
             @PathVariable String skuCode,
             @AuthenticationPrincipal User currentUser) {
         productService.getProductBySku(skuCode, currentUser);
-        return ResponseEntity.ok("Successfully deleted product");
+        return ResponseEntity.ok(productService.getProductBySku(skuCode, currentUser));
     }
 
     // GET /api/products//details/{productId}

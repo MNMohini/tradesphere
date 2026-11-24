@@ -21,6 +21,7 @@ import com.bnagritech.tradesphere.outlet.repository.OutletDistance;
 import com.bnagritech.tradesphere.outlet.repository.OutletFilter;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.outlet.service.OutletService;
+import com.bnagritech.tradesphere.product.model.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -336,6 +337,21 @@ public class OutletServiceImpl implements OutletService {
     @Override
     public List<OutletSummaryResponse> getOutletsByBeat(String beatId, User currentUser) {
         return outletRepository.findByBeatIdAndStatusOrderByNameAsc(beatId, OutletStatus.ACTIVE).stream()
+                .map(this::toSummary)
+                .toList();
+    }
+
+    @Override
+    public void deleteOutlet(String outletCode, User currentUser) {
+        Outlet outlet = outletRepository.findByOutletCode(outletCode)
+                .orElseThrow(this::notFound);
+       outletRepository.delete(outlet);
+    }
+
+    @Override
+    public List<OutletSummaryResponse> getAllOutlets() {
+        return outletRepository.findAll()
+                .stream()
                 .map(this::toSummary)
                 .toList();
     }

@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.outlet.service;
 
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.outlet.dto.*;
+import com.bnagritech.tradesphere.product.dto.ProductSummaryResponse;
 
 import java.util.List;
 
@@ -36,4 +37,9 @@ public interface OutletService {
 
     /** ACTIVE outlets of a beat, sorted by name (used when planning visits). */
     List<OutletSummaryResponse> getOutletsByBeat(String beatId, User currentUser);
+
+    // Delete Outlet
+    void deleteOutlet(String outletCode, User currentUser);
+    //get all
+    List<OutletSummaryResponse> getAllOutlets();
 }

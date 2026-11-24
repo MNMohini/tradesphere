@@ -8,22 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * REST endpoints of the outlet module. The controller only receives the request,
- * validates it and hands it to OutletService; the rules live in the service.
- */
 @RestController
 @RequestMapping("/api/outlets")
 @RequiredArgsConstructor
@@ -32,7 +20,7 @@ public class OutletController {
     private final OutletService outletService;
 
     // POST /api/outlets
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<OutletResponse> createOutlet(
             @Valid @RequestBody CreateOutletRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -40,7 +28,7 @@ public class OutletController {
     }
 
     // GET /api/outlets?keyword=Sharma&city=Delhi&status=ACTIVE&limit=50
-    @GetMapping
+    @GetMapping("/serach")
     public ResponseEntity<List<OutletSummaryResponse>> searchOutlets(
             @Valid @ModelAttribute OutletSearchRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -72,7 +60,7 @@ public class OutletController {
     }
 
     // GET /api/outlets/{outletId}
-    @GetMapping("/{outletId}")
+    @GetMapping("/id/{outletId}")
     public ResponseEntity<OutletResponse> getOutletById(
             @PathVariable String outletId,
             @AuthenticationPrincipal User currentUser) {
@@ -80,7 +68,7 @@ public class OutletController {
     }
 
     // PUT /api/outlets/{outletId}
-    @PutMapping("/{outletId}")
+    @PutMapping("/update{outletId}")
     public ResponseEntity<OutletResponse> updateOutlet(
             @PathVariable String outletId,
             @Valid @RequestBody UpdateOutletRequest request,
@@ -96,4 +84,16 @@ public class OutletController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(outletService.updateOutletStatus(outletId, request, currentUser));
     }
+    @DeleteMapping("/delete/{outletCode}")
+    public ResponseEntity<String> deleteOutletByCode(
+            @PathVariable String outletCode,
+            @AuthenticationPrincipal User currentUser) {
+        outletService.deleteOutlet(outletCode, currentUser);
+        return ResponseEntity.ok("Deleted successfully");
+    }
+
+   @GetMapping("/getAll")
+    public ResponseEntity<List<OutletSummaryResponse>> getAllOutlets() {
+        return ResponseEntity.ok(outletService.getAllOutlets());
+   }
 }
