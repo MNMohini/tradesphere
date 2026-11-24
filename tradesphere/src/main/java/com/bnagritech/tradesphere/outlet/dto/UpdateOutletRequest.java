@@ -23,8 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateOutletRequest {
 
-    @Size(max = 50)
-    private String externalCode;
+
 
     @Size(max = 150)
     private String name;
@@ -59,5 +58,4 @@ public class UpdateOutletRequest {
 
     private String territoryId;
     private String beatId;
-    private String distributorId;
 }

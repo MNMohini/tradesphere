@@ -75,8 +75,6 @@ public class Outlet {
     // ---- Business mapping (ids only; those modules own the details) ----
     private String territoryId;
     private String beatId;
-    private String distributorId;
-
     // ---- Status ----
     private OutletStatus status;
     private String statusReason;       // why it was rejected or deactivated

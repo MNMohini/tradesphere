@@ -68,7 +68,7 @@ public class OutletController {
     }
 
     // PUT /api/outlets/{outletId}
-    @PutMapping("/update{outletId}")
+    @PutMapping("/update/{outletId}")
     public ResponseEntity<OutletResponse> updateOutlet(
             @PathVariable String outletId,
             @Valid @RequestBody UpdateOutletRequest request,

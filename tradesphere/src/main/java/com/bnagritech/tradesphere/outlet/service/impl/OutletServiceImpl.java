@@ -192,13 +192,7 @@ public class OutletServiceImpl implements OutletService {
             outlet.setName(request.getName().trim());
         }
 
-        String externalCode = blankToNull(request.getExternalCode());
-        if (externalCode != null && !externalCode.equals(outlet.getExternalCode())) {
-            if (outletRepository.existsByExternalCode(externalCode)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "externalCode is already used by another outlet");
-            }
-            outlet.setExternalCode(externalCode);
-        }
+
 
         if (request.getOwnerName() != null) {
             outlet.setOwnerName(request.getOwnerName());
@@ -235,9 +229,6 @@ public class OutletServiceImpl implements OutletService {
         }
         if (request.getBeatId() != null) {
             outlet.setBeatId(request.getBeatId());
-        }
-        if (request.getDistributorId() != null) {
-            outlet.setDistributorId(request.getDistributorId());
         }
 
         outlet.setUpdatedBy(currentUser.getId());
@@ -378,7 +369,7 @@ public class OutletServiceImpl implements OutletService {
 
     private boolean touchesPrivilegedFields(UpdateOutletRequest r) {
         return r.getGrade() != null || r.getLocation() != null || r.getTerritoryId() != null
-                || r.getBeatId() != null || r.getDistributorId() != null;
+                || r.getBeatId() != null;
     }
 
     private boolean isCreator(Outlet outlet, User user) {
@@ -442,7 +433,6 @@ public class OutletServiceImpl implements OutletService {
                 .location(toLocationDto(o.getLocation(), o.getLocationAccuracyMeters()))
                 .territoryId(o.getTerritoryId())
                 .beatId(o.getBeatId())
-                .distributorId(o.getDistributorId())
                 .status(o.getStatus())
                 .statusReason(o.getStatusReason())
                 .statusHistory(o.getStatusHistory())

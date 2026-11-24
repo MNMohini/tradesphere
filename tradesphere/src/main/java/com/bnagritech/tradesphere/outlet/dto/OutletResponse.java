@@ -38,7 +38,7 @@ public class OutletResponse {
 
     private String territoryId;
     private String beatId;
-    private String distributorId;
+
 
     private OutletStatus status;
     private String statusReason;
