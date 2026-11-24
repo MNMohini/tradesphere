@@ -86,11 +86,6 @@ public class User implements UserDetails {
     // Access tokens issued before this moment are rejected (set on logout-all, password change, deactivation)
     private Instant tokensValidFrom;
 
-    // ---- Device (optional single-device rule, push notifications) ----
-    private String deviceId;
-    private String deviceName;
-    private String fcmToken;
-
     // ---- Audit ----
     private Instant lastLoginAt;
     private Instant passwordChangedAt;

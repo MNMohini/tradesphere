@@ -40,11 +40,7 @@ public class ProductServiceImpl implements ProductService {
     private static final Set<UserRole> MANAGE_ROLES = EnumSet.of(UserRole.ADMIN, UserRole.NATIONAL_HEAD);
 
     private final ProductRepository productRepository;
-
-    // =====================================================================
     // Create / update
-    // =====================================================================
-
     @Override
     public ProductResponse createProduct(CreateProductRequest request, User currentUser) {
         requireManager(currentUser);
@@ -74,8 +70,8 @@ public class ProductServiceImpl implements ProductService {
                 .sellingPrice(sellingPrice)
                 .taxPercent(taxPercent)
                 .status(ProductStatus.ACTIVE)
-                .createdBy(currentUser.getId())
-                .updatedBy(currentUser.getId())
+                .createdBy(currentUser.getUsername())
+                .updatedBy(currentUser.getUsername())
                 .build();
 
         product.getPriceHistory().add(historyEntry(mrp, sellingPrice, taxPercent, currentUser, now, "Initial price"));
@@ -200,6 +196,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<String> getBrands(User currentUser) {
         return productRepository.findActiveBrands() ;  }
+
+    @Override
+    public List<ProductSummaryResponse> getAllProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(this::toSummary)
+                .toList();
+    }
 
     // =====================================================================
     // Rules and permissions

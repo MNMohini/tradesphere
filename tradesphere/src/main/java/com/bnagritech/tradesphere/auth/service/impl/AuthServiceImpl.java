@@ -97,13 +97,13 @@ public class AuthServiceImpl implements AuthService {
         String identifier = r.getUsername().trim().toLowerCase(Locale.ROOT);
         User user = findByIdentifier(identifier);
         if (user == null) {
-            record(null, identifier, LoginResult.USER_NOT_FOUND, ipAddress, r.getDeviceId(), userAgent);
+            record(null, identifier, LoginResult.USER_NOT_FOUND, ipAddress, userAgent);
             throw invalidCredentials();
         }
 
         Instant now = Instant.now();
         if (!user.isAccountNonLocked()) {
-            record(user, identifier, LoginResult.ACCOUNT_LOCKED, ipAddress, r.getDeviceId(), userAgent);
+            record(user, identifier, LoginResult.ACCOUNT_LOCKED, ipAddress, userAgent);
             long minutes = Math.max(1, Duration.between(now, user.getLockedUntil()).toMinutes() + 1);
             throw new ResponseStatusException(HttpStatus.LOCKED,
                     "The account is locked after too many wrong passwords. Try again in " + minutes + " minutes.");
@@ -117,44 +117,27 @@ public class AuthServiceImpl implements AuthService {
             }
             user.setFailedLoginAttempts(attempts);
             userRepository.save(user);
-            record(user, identifier, LoginResult.INVALID_CREDENTIALS, ipAddress, r.getDeviceId(), userAgent);
+            record(user, identifier, LoginResult.INVALID_CREDENTIALS, ipAddress, userAgent);
             throw invalidCredentials();
         }
 
         // The password is right, so it is now safe to say why the account cannot be used
         if (user.getStatus() != UserStatus.ACTIVE) {
-            record(user, identifier, LoginResult.ACCOUNT_LOCKED, ipAddress, r.getDeviceId(), userAgent);
+            record(user, identifier, LoginResult.ACCOUNT_LOCKED, ipAddress, userAgent);
             String message = user.getStatus() == UserStatus.PENDING_APPROVAL
                     ? "Your account is waiting for approval by your manager."
                     : "Your account is not active. Contact your manager.";
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, message);
         }
 
-        if (singleDevice) {
-            if (isBlank(r.getDeviceId())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deviceId is required");
-            }
-            if (user.getDeviceId() != null && !user.getDeviceId().equals(r.getDeviceId())) {
-                record(user, identifier, LoginResult.DEVICE_MISMATCH, ipAddress, r.getDeviceId(), userAgent);
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "This account is registered to another phone. Ask your manager to reset the device.");
-            }
-        }
 
         user.setFailedLoginAttempts(0);
         user.setLockedUntil(null);
         user.setLastLoginAt(now);
-        if (!isBlank(r.getDeviceId())) {
-            user.setDeviceId(r.getDeviceId());
-            user.setDeviceName(r.getDeviceName());
-        }
-        if (!isBlank(r.getFcmToken())) {
-            user.setFcmToken(r.getFcmToken());
-        }
         userRepository.save(user);
 
-        record(user, identifier, LoginResult.SUCCESS, ipAddress, r.getDeviceId(), userAgent);
-        return issueTokens(user, r.getDeviceId(), r.getDeviceName(), ipAddress, userAgent);
+        record(user, identifier, LoginResult.SUCCESS, ipAddress, userAgent);
+        return issueTokens(user, ipAddress, userAgent);
     }
 
     @Override
@@ -181,7 +164,7 @@ public class AuthServiceImpl implements AuthService {
         stored.setRevokedAt(now);
         refreshTokenRepository.save(stored);
 
-        return issueTokens(user, stored.getDeviceId(), stored.getDeviceName(), ipAddress, userAgent);
+        return issueTokens(user, ipAddress, userAgent);
     }
 
     @Override
@@ -221,7 +204,7 @@ public class AuthServiceImpl implements AuthService {
         user.setMustChangePassword(false);
         userService.revokeAllSessions(user);   // saves the user, ends every session including this one
 
-        return issueTokens(user, r.getDeviceId(), r.getDeviceName(), ipAddress, userAgent);
+        return issueTokens(user, ipAddress, userAgent);
     }
 
     @Override
@@ -389,9 +372,6 @@ public class AuthServiceImpl implements AuthService {
         if (r.getProfileImageUrl() != null) {
             user.setProfileImageUrl(r.getProfileImageUrl());
         }
-        if (r.getFcmToken() != null) {
-            user.setFcmToken(r.getFcmToken());
-        }
 
         user.setUpdatedBy(user.getId());
         try {
@@ -405,15 +385,13 @@ public class AuthServiceImpl implements AuthService {
     // Helpers
     // =====================================================================
 
-    private AuthResponse issueTokens(User user, String deviceId, String deviceName, String ipAddress, String userAgent) {
+    private AuthResponse issueTokens(User user, String ipAddress, String userAgent) {
         String rawRefreshToken = newRefreshToken();
         Instant now = Instant.now();
 
         refreshTokenRepository.save(RefreshToken.builder()
                 .userId(user.getId())
                 .tokenHash(hash(rawRefreshToken))
-                .deviceId(deviceId)
-                .deviceName(deviceName)
                 .ipAddress(ipAddress)
                 .userAgent(userAgent)
                 .createdAt(now)
@@ -434,13 +412,12 @@ public class AuthServiceImpl implements AuthService {
         return byName.orElseGet(() -> userRepository.findByPhoneNumber(identifier).orElse(null));
     }
 
-    private void record(User user, String typedName, LoginResult result, String ipAddress, String deviceId, String userAgent) {
+    private void record(User user, String typedName, LoginResult result, String ipAddress, String userAgent) {
         loginHistoryRepository.save(LoginHistory.builder()
                 .userId(user != null ? user.getId() : null)
                 .userName(typedName)
                 .result(result)
                 .ipAddress(ipAddress)
-                .deviceId(deviceId)
                 .userAgent(userAgent)
                 .attemptedAt(Instant.now())
                 .build());

@@ -53,20 +53,17 @@ public class Visit {
     private String outletName;           // snapshot
     private GeoJsonPoint outletLocation; // snapshot, used for the distance check
     private String beatId;
-
+    private String pictureWithOutlet;
     // ---- When ----
     // Calendar day in IST as "yyyy-MM-dd": the planned day, or the check-in day for unplanned visits.
     // Stored as text so it never shifts with time zones, and still sorts and range-queries correctly.
     private String visitDay;
-
     // ---- State ----
     private boolean planned;             // false = the rep walked in without a plan
     private VisitStatus status;
-
     private VisitPunch checkIn;
     private VisitPunch checkOut;
     private Long durationMinutes;
-
     private VisitOutcome outcome;
     private String outcomeRemarks;
     private String cancellationReason;

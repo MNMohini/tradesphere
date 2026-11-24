@@ -28,7 +28,6 @@ public class LoginHistory {
     private String userName;          // what was typed
     private LoginResult result;
     private String ipAddress;
-    private String deviceId;
     private String userAgent;
 
     @Indexed(expireAfter = "15_552_000")

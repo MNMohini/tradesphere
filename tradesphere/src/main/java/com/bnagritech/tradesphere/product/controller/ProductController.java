@@ -1,16 +1,14 @@
 package com.bnagritech.tradesphere.product.controller;
 
 import com.bnagritech.tradesphere.auth.model.User;
-import com.bnagritech.tradesphere.product.dto.CreateProductRequest;
-import com.bnagritech.tradesphere.product.dto.ProductResponse;
-import com.bnagritech.tradesphere.product.dto.UpdateProductPriceRequest;
-import com.bnagritech.tradesphere.product.dto.UpdateProductRequest;
-import com.bnagritech.tradesphere.product.dto.UpdateProductStatusRequest;
+import com.bnagritech.tradesphere.beat.dto.BeatsResponse;
+import com.bnagritech.tradesphere.product.dto.*;
 import com.bnagritech.tradesphere.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -32,6 +30,7 @@ public class ProductController {
 
     private final ProductService productService;
     // POST /api/products
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ProductResponse> createProduct(
             @Valid @RequestBody CreateProductRequest request,
@@ -65,7 +64,10 @@ public class ProductController {
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(productService.getProductById(productId, currentUser));
     }
-
+    @GetMapping("/all")
+    public ResponseEntity <List<ProductSummaryResponse>>getAllProducts(){
+        return ResponseEntity.ok(productService.getAllProducts());
+    }
     // PUT /api/products/update
     @PutMapping("/update/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(

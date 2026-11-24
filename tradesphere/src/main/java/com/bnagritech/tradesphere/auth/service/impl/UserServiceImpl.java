@@ -401,8 +401,6 @@ public class UserServiceImpl implements UserService {
                         .attemptedAt(h.getAttemptedAt())
                         .userName(h.getUserName())
                         .result(h.getResult())
-                        .ipAddress(h.getIpAddress())
-                        .deviceId(h.getDeviceId())
                         .userAgent(h.getUserAgent())
                         .build())
                 .toList();
@@ -539,8 +537,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public MessageResponse resetUserDevice(String userId, User actor) {
         User target = loadManaged(userId, actor);
-        target.setDeviceId(null);
-        target.setDeviceName(null);
         target.setUpdatedBy(actor.getUsername());
         userRepository.save(target);
         return MessageResponse.builder().message("The registered device was cleared. The next login registers a new one.").build();
@@ -655,7 +651,6 @@ public class UserServiceImpl implements UserService {
                 .status(u.getStatus())
                 .statusReason(u.getStatusReason())
                 .mustChangePassword(u.isMustChangePassword())
-                .deviceRegistered(u.getDeviceId() != null)
                 .lastLoginAt(u.getLastLoginAt())
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())

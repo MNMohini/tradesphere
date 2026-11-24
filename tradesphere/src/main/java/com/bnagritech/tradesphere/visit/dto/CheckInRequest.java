@@ -23,7 +23,7 @@ public class CheckInRequest {
     private String visitId;
     private String outletId;
     private String beatId;
-
+    private String pictureWithOutlet;
     // UUID created by the app so a retried check-in never creates a second visit
     @Size(max = 64)
     private String clientVisitId;

@@ -28,7 +28,5 @@ public class UpdateProfileRequest {
     @Size(max = 500)
     private String profileImageUrl;
 
-    // Firebase token of the phone, for push notifications
-    @Size(max = 500)
-    private String fcmToken;
+
 }
