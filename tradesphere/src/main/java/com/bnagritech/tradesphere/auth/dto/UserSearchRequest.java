@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Query parameters for GET /api/users, for example:
- * /api/users?keyword=ravi&role=SALES_REPRESENTATIVE&status=ACTIVE&limit=50
+ * /api/users?keyword=Ravi&role=SALES_REPRESENTATIVE&status=ACTIVE&limit=50
  * Results are always limited to the caller and the people below them.
  * There is no paging; "limit" (default 100, maximum 500) keeps one call from returning everything.
  */

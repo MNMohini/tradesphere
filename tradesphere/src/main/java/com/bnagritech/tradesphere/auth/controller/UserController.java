@@ -56,7 +56,7 @@ public class UserController {
         return ResponseEntity.ok(userService.importUsers(file, currentUser));
     }
 
-    // GET /api/users?keyword=ravi&role=SALES_REPRESENTATIVE&status=ACTIVE&limit=50
+    // GET /api/users?keyword=Ravi&role=SALES_REPRESENTATIVE&status=ACTIVE&limit=50
     @GetMapping
     public ResponseEntity<List<UserSummaryResponse>> searchUsers(
             @Valid @ModelAttribute UserSearchRequest request,
