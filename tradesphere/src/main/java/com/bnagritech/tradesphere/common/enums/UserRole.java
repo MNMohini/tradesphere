@@ -6,7 +6,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 @Getter
-public enum UserRole {
+public enum      UserRole {
     ADMIN(0),
     NATIONAL_HEAD(1),
     REGIONAL_MANAGER(2),

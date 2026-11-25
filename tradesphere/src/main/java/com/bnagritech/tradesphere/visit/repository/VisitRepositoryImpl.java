@@ -29,8 +29,8 @@ public class VisitRepositoryImpl implements VisitRepositoryCustom {
         if (f.userId() != null) {
             conditions.add(Criteria.where("userId").is(f.userId()));
         }
-        if (f.outletId() != null) {
-            conditions.add(Criteria.where("outletId").is(f.outletId()));
+        if (f.outletCode() != null) {
+            conditions.add(Criteria.where("outletId").is(f.outletCode()));
         }
         if (f.beatId() != null) {
             conditions.add(Criteria.where("beatId").is(f.beatId()));

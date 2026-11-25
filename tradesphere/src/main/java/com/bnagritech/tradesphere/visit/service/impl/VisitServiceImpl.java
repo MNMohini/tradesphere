@@ -70,6 +70,9 @@ public class VisitServiceImpl implements VisitService {
     private static final Set<VisitOutcome> REMARKS_REQUIRED = EnumSet.of(
             VisitOutcome.NO_ORDER, VisitOutcome.FOLLOW_UP_REQUIRED, VisitOutcome.OTHER);
 
+    // Order statuses that do not count as a live order for a visit
+    private static final Set<OrderStatus> DEAD_ORDER_STATUSES = EnumSet.of(OrderStatus.CANCELLED, OrderStatus.RETURNED);
+
     // Allowed status changes. Anything not listed is rejected.
     private static final Map<VisitStatus, Set<VisitStatus>> TRANSITIONS = Map.of(
             VisitStatus.PLANNED, EnumSet.of(VisitStatus.IN_PROGRESS, VisitStatus.CANCELLED, VisitStatus.MISSED),
@@ -78,9 +81,11 @@ public class VisitServiceImpl implements VisitService {
             VisitStatus.MISSED, EnumSet.noneOf(VisitStatus.class),
             VisitStatus.CANCELLED, EnumSet.noneOf(VisitStatus.class)
     );
+
     private final VisitRepository visitRepository;
     private final OrderRepository orderRepository;
     private final OutletRepository outletRepository;
+
     // application.yml:  app.visit.checkin-radius-meters / app.visit.enforce-geofence
     @Value("${app.visit.checkin-radius-meters:100}")
     private double checkInRadiusMeters = 100.0;
@@ -117,9 +122,13 @@ public class VisitServiceImpl implements VisitService {
         for (String outletId : outletIds) {
             boolean alreadyPlanned = visitRepository.existsByUserIdAndOutletIdAndVisitDayAndStatus(
                     currentUser.getId(), outletId, visitDay, VisitStatus.PLANNED);
-            OutletInfo outlet = alreadyPlanned ? null : loadOutlet(outletId);
-
-            if (alreadyPlanned || !outlet.active()) {
+            if (alreadyPlanned) {
+                skipped.add(outletId);
+                continue;
+            }
+            // FIX: a missing outlet is skipped, not a failure of the whole plan
+            OutletInfo outlet = findOutlet(outletId).orElse(null);
+            if (outlet == null || !outlet.active()) {
                 skipped.add(outletId);
                 continue;
             }
@@ -127,11 +136,12 @@ public class VisitServiceImpl implements VisitService {
                     VisitStatus.PLANNED, now, "Visit planned"));
         }
 
-        List<Visit> saved = List.of();
+        // FIX: the planned visits were built but never saved
+        List<Visit> saved = toSave.isEmpty() ? List.of() : visitRepository.saveAll(toSave);
 
         return PlanVisitsResponse.builder()
                 .requested(outletIds.size())
-                .created(0)
+                .created(saved.size())
                 .visits(saved.stream().map(this::toSummary).toList())
                 .skippedOutletIds(skipped)
                 .build();
@@ -164,7 +174,7 @@ public class VisitServiceImpl implements VisitService {
         if (visitId != null) {
             // Starting a planned visit
             visit = visitRepository.findById(visitId)
-                    .orElseThrow( ()-> new ResourceNotFoundException("Not found" ));
+                    .orElseThrow(() -> new ResourceNotFoundException("Visit not found: " + visitId));
             if (!isOwner(visit, currentUser)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This visit belongs to another user");
             }
@@ -186,19 +196,20 @@ public class VisitServiceImpl implements VisitService {
             if (outletId == null) {
                 throw badRequest("visitId or outletId is required");
             }
-            OutletInfo outlet = loadOutlet(outletId);
-            if (!outlet.active()) {
+            OutletInfo outlet = findOutlet(outletId).orElse(null);
+            if (outlet == null || !outlet.active()) {
                 throw badRequest("Outlet not found or inactive: " + outletId);
             }
             visit = newVisit(currentUser, outlet, request.getBeatId(), checkInDay.toString(), false,
                     VisitStatus.IN_PROGRESS, now, "Checked in without a plan");
         }
 
-        // A user can be checked in to only one outlet at a time
+        // A user can be checked in to only one outlet at a time.
+        // This read gives a friendly message; the unique partial index on Visit
+        // (userId where status = IN_PROGRESS) is what really stops two at once.
         Optional<Visit> active = visitRepository.findFirstByUserIdAndStatus(currentUser.getId(), VisitStatus.IN_PROGRESS);
         if (active.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "You are already checked in at " + active.get().getOutletName() + ". Check out first.");
+            throw alreadyCheckedIn(active.get());
         }
 
         VisitPunch punch = buildPunch(checkInTime, request.getLocation(), visit.getOutletLocation());
@@ -222,12 +233,19 @@ public class VisitServiceImpl implements VisitService {
         try {
             return toResponse(visitRepository.save(visit));
         } catch (DuplicateKeyException e) {
-            // Two requests with the same clientVisitId arrived at the same moment
-            if (clientVisitId == null) {
-                throw e;
+            // Case 1: two requests with the same clientVisitId arrived at the same moment
+            if (clientVisitId != null) {
+                Optional<Visit> winner = visitRepository.findByClientVisitId(clientVisitId);
+                if (winner.isPresent()) {
+                    return toResponse(ownedOrConflict(winner.get(), currentUser));
+                }
             }
-            Visit winner = visitRepository.findByClientVisitId(clientVisitId).orElseThrow(() -> e);
-            return toResponse(ownedOrConflict(winner, currentUser));
+            // Case 2 (FIX): another check-in for this user won the race (one-active-visit index)
+            Optional<Visit> other = visitRepository.findFirstByUserIdAndStatus(currentUser.getId(), VisitStatus.IN_PROGRESS);
+            if (other.isPresent()) {
+                throw alreadyCheckedIn(other.get());
+            }
+            throw e;
         }
     }
 
@@ -255,7 +273,9 @@ public class VisitServiceImpl implements VisitService {
                 .limit(room)
                 .toList();
 
+        // FIX: keep the whole stored list in time order, even when an offline batch arrives late
         visit.getTrackPoints().addAll(incoming);
+        visit.getTrackPoints().sort(Comparator.comparing(TrackPoint::getRecordedAt));
         visit.setUpdatedBy(currentUser.getId());
         return toResponse(visitRepository.save(visit));
     }
@@ -283,7 +303,7 @@ public class VisitServiceImpl implements VisitService {
         }
 
         // The outcome must agree with the orders actually taken in this visit
-        int orders = activeOrderCount(visit.getId());
+        long orders = activeOrderCount(visit.getId());
         if (outcome == VisitOutcome.ORDER_TAKEN && orders == 0) {
             throw badRequest("No order was taken in this visit. Choose another outcome.");
         }
@@ -388,17 +408,19 @@ public class VisitServiceImpl implements VisitService {
         return overdue.size();
     }
 
+    // =====================================================================
+    // Outlet lookup
+    // =====================================================================
 
     /** What the visit module needs to know about an outlet. */
     private record OutletInfo(String outletId, String name, GeoJsonPoint location, boolean active) {
     }
 
-    /** Return the outlet, or null if it does not exist. */
-    private OutletInfo loadOutlet(String outletId) {
+    /** FIX: returns empty for a missing outlet, so each caller decides whether that is an error or a skip. */
+    private Optional<OutletInfo> findOutlet(String outletId) {
         return outletRepository.findById(outletId)
                 .map(o -> new OutletInfo(o.getId(), o.getName(), o.getLocation(),
-                        o.getStatus() == OutletStatus.ACTIVE))
-                .orElseThrow( ()-> new ResourceNotFoundException("Null" ));
+                        o.getStatus() == OutletStatus.ACTIVE));
     }
 
     // =====================================================================
@@ -485,11 +507,12 @@ public class VisitServiceImpl implements VisitService {
         return deviceTime;
     }
 
-    /** Orders of this visit that are still alive (not canceled or rejected). */
-    private int activeOrderCount(String visitId) {
-        return (int) orderRepository.findByVisitIdOrderByOrderDateDesc(visitId).stream()
-                .filter(o -> o.getStatus() != OrderStatus.CANCELLED && o.getStatus() != OrderStatus.RETURNED)
-                .count();
+    /**
+     * Orders of this visit that are still alive (not CANCELLED or RETURNED).
+     * FIX: a count query instead of loading every order document.
+     */
+    private long activeOrderCount(String visitId) {
+        return orderRepository.countByVisitIdAndStatusNotIn(visitId, DEAD_ORDER_STATUSES);
     }
 
     // =====================================================================
@@ -525,14 +548,14 @@ public class VisitServiceImpl implements VisitService {
     private Visit loadVisibleVisit(String visitId, User user) {
         return visitRepository.findById(visitId)
                 .filter(visit -> canView(visit, user))
-                .orElseThrow( ()-> new ResourceNotFoundException("Not found" ));
+                .orElseThrow(() -> new ResourceNotFoundException("Visit not found: " + visitId));
     }
 
     /** Only the person who owns the visit may change it (track, check out). */
     private Visit loadOwnedVisit(String visitId, User user) {
         return visitRepository.findById(visitId)
                 .filter(visit -> isOwner(visit, user))
-                .orElseThrow( ()-> new ResourceNotFoundException("Not found" ));
+                .orElseThrow(() -> new ResourceNotFoundException("Visit not found: " + visitId));
     }
 
     private Visit ownedOrConflict(Visit visit, User user) {
@@ -540,6 +563,11 @@ public class VisitServiceImpl implements VisitService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "clientVisitId is already used by another user");
         }
         return visit;
+    }
+
+    private ResponseStatusException alreadyCheckedIn(Visit active) {
+        return new ResponseStatusException(HttpStatus.CONFLICT,
+                "You are already checked in at " + active.getOutletName() + ". Check out first.");
     }
 
     /** null = may see everything; otherwise the id used to match own and subordinate visits. */
@@ -570,7 +598,7 @@ public class VisitServiceImpl implements VisitService {
                 .outcome(visit.getOutcome())
                 .outcomeRemarks(visit.getOutcomeRemarks())
                 .cancellationReason(visit.getCancellationReason())
-                .orderCount(visit.getId() == null ? 0 : activeOrderCount(visit.getId()))
+                .orderCount(visit.getId() == null ? 0 : (int) activeOrderCount(visit.getId()))
                 .trackPoints(visit.getTrackPoints() == null ? List.of()
                         : visit.getTrackPoints().stream().map(this::toTrackPointDto).toList())
                 .statusHistory(visit.getStatusHistory())
@@ -646,5 +674,4 @@ public class VisitServiceImpl implements VisitService {
     private ResponseStatusException badRequest(String message) {
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
-
 }

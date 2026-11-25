@@ -12,7 +12,7 @@ import com.bnagritech.tradesphere.common.enums.VisitStatus;
 public record VisitFilter(
         String viewerUserId,
         String userId,
-        String outletId,
+        String outletCode,
         String beatId,
         VisitStatus status,
         String fromDay,

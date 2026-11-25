@@ -31,6 +31,10 @@ import java.util.List;
         @CompoundIndex(name = "outlet_day", def = "{'outletId': 1, 'visitDay': -1}"),
         @CompoundIndex(name = "status_day", def = "{'status': 1, 'visitDay': -1}")
 })
+@CompoundIndex(name = "one_active_visit_per_user",
+        def = "{'userId': 1}",
+        unique = true,
+        partialFilter = "{ 'status': 'IN_PROGRESS' }")
 public class Visit {
 
     @Id
