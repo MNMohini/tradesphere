@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.visit.model;
 
 import com.bnagritech.tradesphere.common.enums.VisitOutcome;
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
+import com.bnagritech.tradesphere.outlet.model.Outlet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,10 +21,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * One visit = one user at ONE outlet on one day.
- * A plan for many outlets creates many Visit documents.
- */
 @Data
 @Builder
 @AllArgsConstructor
@@ -32,24 +29,20 @@ import java.util.List;
 @CompoundIndexes({
         @CompoundIndex(name = "user_day",   def = "{'userId': 1, 'visitDay': -1}"),
         @CompoundIndex(name = "path_day",   def = "{'userPath': 1, 'visitDay': -1}"),
-        @CompoundIndex(name = "outlet_day", def = "{'outletCode': 1, 'visitDay': -1}"),
+        @CompoundIndex(name = "outlet_day", def = "{'outletId': 1, 'visitDay': -1}"),
         @CompoundIndex(name = "status_day", def = "{'status': 1, 'visitDay': -1}"),
         @CompoundIndex(name = "one_active_visit_per_user",
                 def = "{'userId': 1}", unique = true,
                 partialFilter = "{ 'status': 'IN_PROGRESS' }"),
         @CompoundIndex(name = "one_plan_per_outlet_per_day",
-                def = "{'userId': 1, 'outletCode': 1, 'visitDay': 1}", unique = true,
+                def = "{'userId': 1, 'outletId': 1, 'visitDay': 1}", unique = true,
                 partialFilter = "{ 'status': 'PLANNED' }")
 })
 public class Visit {
 
     @Id
     private String id;
-
-    // Readable code, e.g. VI-000123 (one per visit)
-    @Indexed(unique = true, sparse = true)
     private String visitId;
-
     @Version
     private Long version;
 
@@ -62,21 +55,17 @@ public class Visit {
     private String userName;             // snapshot
     private List<String> userPath;       // the user's ancestors, for manager-level queries
 
-    // ---- Where (ONE outlet) ----
-    private String outletCode;
-    private String outletName;           // snapshot
-    private GeoJsonPoint outletLocation; // snapshot; the check-in distance is measured from here
-    private String beatId;
-
+    // ---- Where ----
+    private List<String> outletCodes;// snapshot
+    private String pictureWithOutlet;
     // ---- When ----
     // Calendar day in IST as "yyyy-MM-dd": the planned day, or the check-in day for unplanned visits.
     // Stored as text so it never shifts with time zones, and still sorts and range-queries correctly.
     private String visitDay;
-
     // ---- State ----
     private boolean planned;             // false = the rep walked in without a plan
     private VisitStatus status;
-    private VisitPunch checkIn;          // the photo with the outlet is checkIn.photo
+    private VisitPunch checkIn;
     private VisitPunch checkOut;
     private Long durationMinutes;
     private VisitOutcome outcome;

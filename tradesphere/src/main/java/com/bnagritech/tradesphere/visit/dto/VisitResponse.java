@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.visit.dto;
 
 import com.bnagritech.tradesphere.common.enums.VisitOutcome;
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
+import com.bnagritech.tradesphere.outlet.model.Outlet;
 import com.bnagritech.tradesphere.visit.model.VisitStatusHistory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,21 +21,16 @@ import java.util.List;
 public class VisitResponse {
 
     private String id;
-    private String visitId;
     private String clientVisitId;
-    private String userId;
+    private String visitId;
     private String userName;
 
-    private String outletCode;
-    private String outletName;
-    private GeoPointDto outletLocation;
-    private String beatId;
-
+    private List<String> outletCodes;
     private LocalDate visitDay;
     private boolean planned;
     private VisitStatus status;
 
-    private PunchResponse checkIn;     // checkIn.photo = photo with the outlet
+    private PunchResponse checkIn;
     private PunchResponse checkOut;
     private Long durationMinutes;
 

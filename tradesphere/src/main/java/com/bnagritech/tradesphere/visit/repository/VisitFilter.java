@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.visit.repository;
 
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
+import com.bnagritech.tradesphere.outlet.model.Outlet;
 
 /**
  * Parameters for searching visits. Every field except viewerUserId is optional.

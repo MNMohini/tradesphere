@@ -5,10 +5,11 @@ import com.bnagritech.tradesphere.common.enums.*;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.util.GeoUtils;
 import com.bnagritech.tradesphere.common.util.SequenceGenerator;
-import com.bnagritech.tradesphere.media.dto.MediaFolder;
-import com.bnagritech.tradesphere.media.dto.MediaRef;
-import com.bnagritech.tradesphere.media.service.ImageKitService;
+import com.bnagritech.tradesphere.imagekit.dto.MediaFolder;
+import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
+import com.bnagritech.tradesphere.imagekit.service.ImageKitService;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
+import com.bnagritech.tradesphere.outlet.model.Outlet;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.visit.dto.AddTrackPointsRequest;
 import com.bnagritech.tradesphere.visit.dto.CancelVisitRequest;
@@ -42,16 +43,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -64,7 +56,7 @@ public class VisitServiceImpl implements VisitService {
     private static final int MAX_TRACK_POINTS = 500;
     private static final int MAX_PLAN_DAYS_AHEAD = 30;
     private static final int DEFAULT_SEARCH_DAYS = 7;
-    private static final int MAX_OUTLETS_PER_PLAN = 20;   // same limit as PlanVisitsRequest
+    private static final int MAX_OUTLETS_PER_PLAN = 100;
 
     // A visit in one of these statuses already covers the outlet for that day,
     // so the same outlet cannot be planned again on the same date.
@@ -155,14 +147,12 @@ public class VisitServiceImpl implements VisitService {
         // (PLANNED, IN_PROGRESS or COMPLETED) - these must not be planned again
         Set<String> alreadyCovered = new HashSet<>();
         visitRepository.findByUserIdAndVisitDayAndOutletCodeInAndStatusIn(
-                        currentUser.getId(), visitDay, outletCodes, BLOCKS_REPLAN)
-                .forEach(v -> alreadyCovered.add(v.getOutletCode()));
+                        currentUser.getId(), visitDay, (List<String>) outletCodes, BLOCKS_REPLAN)
+                .forEach(v -> alreadyCovered.add(v.getOutletCodes().toString()));
 
-        // Load the requested outlets (at most 20; missing ones are simply absent from the map)
+        // One query: all requested outlets (missing ones are simply absent from the map)
         Map<String, OutletInfo> outlets = new HashMap<>();
-        for (String code : outletCodes) {
-            findOutlet(code).ifPresent(o -> outlets.put(code, o));
-        }
+
 
         List<Visit> saved = new ArrayList<>();
         List<String> skipped = new ArrayList<>();
@@ -173,7 +163,7 @@ public class VisitServiceImpl implements VisitService {
                 skipped.add(outletCode);
                 continue;
             }
-            Visit visit = newVisit(currentUser, outlet, request.getBeatId(), visitDay, true,
+            Visit visit = newVisit(currentUser, outlet, visitDay, true,
                     VisitStatus.PLANNED, now, "Visit planned");
             try {
                 saved.add(visitRepository.save(visit));
@@ -228,7 +218,7 @@ public class VisitServiceImpl implements VisitService {
             if (visit.getStatus() != VisitStatus.PLANNED) {
                 throw badRequest("Only a PLANNED visit can be started. Current status: " + visit.getStatus());
             }
-            if (request.getOutletCode() != null && !request.getOutletCode().equals(visit.getOutletCode())) {
+            if (request.getOutletCode() != null && !request.getOutletCode().equals(visit.getOutletCodes())) {
                 throw badRequest("outletCode does not match the planned visit");
             }
             if (LocalDate.parse(visit.getVisitDay()).isAfter(checkInDay)) {
@@ -252,7 +242,7 @@ public class VisitServiceImpl implements VisitService {
                 if (outlet == null || !outlet.active()) {
                     throw badRequest("Outlet not found or inactive: " + outletCode);
                 }
-                visit = newVisit(currentUser, outlet, request.getBeatId(), checkInDay.toString(), false,
+                visit = newVisit(currentUser, outlet, checkInDay.toString(), false,
                         VisitStatus.IN_PROGRESS, now, "Checked in without a plan");
             }
         }
@@ -265,7 +255,7 @@ public class VisitServiceImpl implements VisitService {
             throw alreadyCheckedIn(active.get());
         }
 
-        VisitPunch punch = buildPunch(checkInTime, request.getLocation(), visit.getOutletLocation());
+        VisitPunch punch = buildPunch(checkInTime, request.getLocation(), visit.getCheckIn().getLocation());
         if (enforceGeofence && Boolean.FALSE.equals(punch.getWithinRange())) {
             throw badRequest(String.format("You are %.0f m from the outlet. Check in within %.0f m.",
                     punch.getDistanceFromOutletMeters(), checkInRadiusMeters));
@@ -283,9 +273,6 @@ public class VisitServiceImpl implements VisitService {
         visit.setCheckIn(punch);
         if (clientVisitId != null) {
             visit.setClientVisitId(clientVisitId);
-        }
-        if (visit.getBeatId() == null && request.getBeatId() != null) {
-            visit.setBeatId(request.getBeatId());
         }
         if (visit.getStatus() == VisitStatus.PLANNED) {
             changeStatus(visit, VisitStatus.IN_PROGRESS, currentUser.getId(), "Checked in", now);
@@ -373,7 +360,7 @@ public class VisitServiceImpl implements VisitService {
             throw badRequest("An order exists for this visit, so the outcome cannot be NO_ORDER");
         }
 
-        visit.setCheckOut(buildPunch(checkOutTime, request.getLocation(), visit.getOutletLocation()));
+        visit.setCheckOut(buildPunch(checkOutTime, request.getLocation(), visit.getCheckOut().getLocation()));
         visit.setDurationMinutes(Duration.between(visit.getCheckIn().getTime(), checkOutTime).toMinutes());
         visit.setOutcome(outcome);
         visit.setOutcomeRemarks(remarks);
@@ -489,7 +476,7 @@ public class VisitServiceImpl implements VisitService {
     // Building and changing visits
     // =====================================================================
 
-    private Visit newVisit(User user, OutletInfo outlet, String beatId, String visitDay, boolean planned,
+    private Visit newVisit(User user, OutletInfo outlet, String visitDay, boolean planned,
                            VisitStatus status, Instant now, String remarks) {
         // Copy of the user's ancestors; managers' visit lists depend on it
         List<String> userPath = new ArrayList<>();
@@ -502,10 +489,7 @@ public class VisitServiceImpl implements VisitService {
                 .userId(user.getId())
                 .userName(user.getUsername())
                 .userPath(userPath)
-                .outletCode(outlet.outletCode())
-                .outletName(outlet.name())
-                .outletLocation(outlet.location())
-                .beatId(beatId)
+                .outletCodes(Collections.singletonList(outlet.outletCode()))
                 .visitDay(visitDay)
                 .planned(planned)
                 .status(status)
@@ -645,7 +629,7 @@ public class VisitServiceImpl implements VisitService {
 
     private ResponseStatusException alreadyCheckedIn(Visit active) {
         return new ResponseStatusException(HttpStatus.CONFLICT,
-                "You are already checked in at " + active.getOutletName() + ". Check out first.");
+                "You are already checked in at " + active.getOutletCodes() + ". Check out first.");
     }
 
     /** null = may see everything; otherwise the id used to match own and subordinate visits. */
@@ -662,12 +646,8 @@ public class VisitServiceImpl implements VisitService {
                 .id(visit.getId())
                 .visitId(visit.getVisitId())
                 .clientVisitId(visit.getClientVisitId())
-                .userId(visit.getUserId())
                 .userName(visit.getUserName())
-                .outletCode(visit.getOutletCode())
-                .outletName(visit.getOutletName())
-                .outletLocation(toGeo(visit.getOutletLocation(), null))
-                .beatId(visit.getBeatId())
+                .outletCodes(visit.getOutletCodes())
                 .visitDay(parseDay(visit.getVisitDay()))
                 .planned(visit.isPlanned())
                 .status(visit.getStatus())
@@ -692,9 +672,7 @@ public class VisitServiceImpl implements VisitService {
                 .visitId(visit.getVisitId())
                 .userId(visit.getUserId())
                 .userName(visit.getUserName())
-                .outletCode(visit.getOutletCode())
-                .outletName(visit.getOutletName())
-                .beatId(visit.getBeatId())
+                .outletCode(visit.getOutletCodes().toString())
                 .visitDay(parseDay(visit.getVisitDay()))
                 .planned(visit.isPlanned())
                 .status(visit.getStatus())
