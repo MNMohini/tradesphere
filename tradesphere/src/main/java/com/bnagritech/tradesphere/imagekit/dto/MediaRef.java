@@ -1,4 +1,4 @@
-package com.bnagritech.tradesphere.media.dto;
+package com.bnagritech.tradesphere.imagekit.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

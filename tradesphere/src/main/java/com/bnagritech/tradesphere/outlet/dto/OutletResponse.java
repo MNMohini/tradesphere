@@ -30,6 +30,7 @@ public class OutletResponse {
     private String alternatePhoneNumber;
     private String email;
     private String gstNumber;
+    private String outletImage;
     private OutletType type;
     private OutletGrade grade;
     private OutletFeedbackAndStock feedbackAndStock;

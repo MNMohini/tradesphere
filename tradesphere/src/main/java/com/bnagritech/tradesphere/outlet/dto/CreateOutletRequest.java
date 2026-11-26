@@ -34,7 +34,7 @@ public class CreateOutletRequest {
     @NotBlank(message = "name is required")
     @Size(max = 150)
     private String name;
-
+    private String outletImage;
     @Size(max = 100)
     private String ownerName;
 

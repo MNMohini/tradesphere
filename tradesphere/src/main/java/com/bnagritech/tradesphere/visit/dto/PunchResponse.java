@@ -1,5 +1,6 @@
 package com.bnagritech.tradesphere.visit.dto;
 
+import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class PunchResponse {
     private GeoPointDto location;
     private Double distanceFromOutletMeters;
     private Boolean withinRange;
+    private MediaRef photo;
 }

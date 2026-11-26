@@ -132,6 +132,7 @@ public class OutletServiceImpl implements OutletService {
                 .alternatePhoneNumber(request.getAlternatePhoneNumber())
                 .email(request.getEmail())
                 .gstNumber(request.getGstNumber())
+                .outletImage(request.getOutletImage())
                 .type(request.getType())
                 .grade(request.getGrade())
                 .address(toAddress(request.getAddress()))
@@ -205,6 +206,9 @@ public class OutletServiceImpl implements OutletService {
         }
         if (request.getEmail() != null) {
             outlet.setEmail(request.getEmail());
+        }
+        if (request.getOutletImage() != null) {
+            outlet.setOutletImage(request.getOutletImage());
         }
         if (request.getGstNumber() != null) {
             outlet.setGstNumber(request.getGstNumber());
@@ -426,6 +430,7 @@ public class OutletServiceImpl implements OutletService {
                 .phoneNumber(o.getPhoneNumber())
                 .alternatePhoneNumber(o.getAlternatePhoneNumber())
                 .email(o.getEmail())
+                .outletImage(o.getOutletImage())
                 .gstNumber(o.getGstNumber())
                 .type(o.getType())
                 .grade(o.getGrade())

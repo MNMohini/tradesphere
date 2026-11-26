@@ -3,7 +3,7 @@ package com.bnagritech.tradesphere.imagekit.service;
 import com.bnagritech.tradesphere.imagekit.dto.ImageKitAuthResponse;
 import com.bnagritech.tradesphere.imagekit.dto.ImageKitFile;
 import com.bnagritech.tradesphere.imagekit.dto.MediaFolder;
-import com.bnagritech.tradesphere.media.dto.MediaRef;
+import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

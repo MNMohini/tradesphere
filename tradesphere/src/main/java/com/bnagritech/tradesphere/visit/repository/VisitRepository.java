@@ -28,4 +28,6 @@ public interface VisitRepository extends MongoRepository<Visit, String>, VisitRe
 
     /** Used by the nightly job: planned visits whose day has passed. */
     List<Visit> findByStatusAndVisitDayLessThan(VisitStatus status, String visitDay);
+
+    boolean existsByCheckInPhotoFileId(String fileId);
 }

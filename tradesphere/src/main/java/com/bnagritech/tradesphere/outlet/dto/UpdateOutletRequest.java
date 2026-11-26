@@ -36,7 +36,7 @@ public class UpdateOutletRequest {
 
     @Pattern(regexp = "^[6-9][0-9]{9}$", message = "alternatePhoneNumber must be a 10 digit mobile number")
     private String alternatePhoneNumber;
-
+    private String outletImage;
     @Email(message = "email is not valid")
     @Size(max = 150)
     private String email;

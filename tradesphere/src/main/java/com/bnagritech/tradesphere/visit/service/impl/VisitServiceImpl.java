@@ -4,6 +4,9 @@ import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.*;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.util.GeoUtils;
+import com.bnagritech.tradesphere.imagekit.dto.MediaFolder;
+import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
+import com.bnagritech.tradesphere.imagekit.service.ImageKitService;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.visit.dto.AddTrackPointsRequest;
@@ -94,6 +97,11 @@ public class VisitServiceImpl implements VisitService {
     private final VisitRepository visitRepository;
     private final OrderRepository orderRepository;
     private final OutletRepository outletRepository;
+    private final ImageKitService imageKitService;
+
+    // true = a check-in without a photo is rejected
+    @Value("${app.visit.require-checkin-photo:false}")
+    private boolean requireCheckInPhoto = false;
 
     // application.yml:  app.visit.checkin-radius-meters / app.visit.enforce-geofence
     @Value("${app.visit.checkin-radius-meters:100}")
@@ -145,7 +153,7 @@ public class VisitServiceImpl implements VisitService {
         // (PLANNED, IN_PROGRESS or COMPLETED) - these must not be planned again
         Set<String> alreadyCovered = new HashSet<>();
         visitRepository.findByUserIdAndVisitDayAndOutletIdInAndStatusIn(
-                        currentUser.getUsername(), visitDay, outletIds, BLOCKS_REPLAN)
+                        currentUser.getId(), visitDay, outletIds, BLOCKS_REPLAN)
                 .forEach(v -> alreadyCovered.add(v.getOutletId()));
 
         // One query: all requested outlets (missing ones are simply absent from the map)
@@ -258,6 +266,15 @@ public class VisitServiceImpl implements VisitService {
         if (enforceGeofence && Boolean.FALSE.equals(punch.getWithinRange())) {
             throw badRequest(String.format("You are %.0f m from the outlet. Check in within %.0f m.",
                     punch.getDistanceFromOutletMeters(), checkInRadiusMeters));
+        }
+
+        // Check-in photo: the app uploaded it to ImageKit (VisitImages) and sends only the fileId
+        String photoFileId = blankToNull(request.getPhotoFileId());
+        if (photoFileId == null && requireCheckInPhoto) {
+            throw badRequest("A photo is required to check in");
+        }
+        if (photoFileId != null) {
+            punch.setPhoto(loadCheckInPhoto(photoFileId, currentUser, now));
         }
 
         visit.setCheckIn(punch);
@@ -550,6 +567,21 @@ public class VisitServiceImpl implements VisitService {
     }
 
     /**
+     * Checks the photo with ImageKit: it must exist, be in the VisitImages folder,
+     * be recent (no old photo re-used) and not be attached to another visit already.
+     */
+    private MediaRef loadCheckInPhoto(String fileId, User user, Instant now) {
+        MediaRef photo = imageKitService.verifyUploadedFile(fileId, MediaFolder.VISIT_IMAGES, user.getId());
+        if (photo.getUploadedAt() != null && photo.getUploadedAt().isBefore(now.minus(MAX_OFFLINE_AGE))) {
+            throw badRequest("This photo is older than " + MAX_OFFLINE_AGE.toDays() + " days. Take a new photo.");
+        }
+        if (visitRepository.existsByCheckInPhotoFileId(fileId)) {
+            throw badRequest("This photo is already used for another visit. Take a new photo.");
+        }
+        return photo;
+    }
+
+    /**
      * Orders of this visit that are still alive (not CANCELLED or RETURNED).
      * FIX: a count query instead of loading every order document.
      */
@@ -677,6 +709,7 @@ public class VisitServiceImpl implements VisitService {
                 .location(toGeo(punch.getLocation(), punch.getAccuracyMeters()))
                 .distanceFromOutletMeters(punch.getDistanceFromOutletMeters())
                 .withinRange(punch.getWithinRange())
+                .photo(punch.getPhoto())
                 .build();
     }
 

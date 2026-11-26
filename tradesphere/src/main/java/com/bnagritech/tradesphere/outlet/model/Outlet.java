@@ -59,6 +59,7 @@ public class Outlet {
     private String name;
     private String ownerName;
     private String phoneNumber;
+    private String outletImage;
     private String alternatePhoneNumber;
     private String email;
     private String gstNumber;

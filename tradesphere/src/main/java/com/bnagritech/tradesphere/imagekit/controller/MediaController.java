@@ -3,7 +3,7 @@ package com.bnagritech.tradesphere.imagekit.controller;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.imagekit.dto.ImageKitAuthResponse;
 import com.bnagritech.tradesphere.imagekit.dto.MediaFolder;
-import com.bnagritech.tradesphere.media.dto.MediaRef;
+import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
 import com.bnagritech.tradesphere.imagekit.service.ImageKitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
