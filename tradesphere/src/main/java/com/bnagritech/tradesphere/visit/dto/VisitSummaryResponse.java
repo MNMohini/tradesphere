@@ -2,7 +2,6 @@ package com.bnagritech.tradesphere.visit.dto;
 
 import com.bnagritech.tradesphere.common.enums.VisitOutcome;
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
-import com.bnagritech.tradesphere.outlet.model.Outlet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 /** One row in a visit list. */
 @Data
@@ -19,10 +19,10 @@ import java.time.LocalDate;
 public class VisitSummaryResponse {
 
     private String id;
+    private String visitId;              // VI000000001
     private String userId;
-    private String visitId;
     private String userName;
-    private String outletCode;
+    private List<String> outletCodes;
     private String beatId;
     private LocalDate visitDay;
     private boolean planned;

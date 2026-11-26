@@ -1,7 +1,6 @@
 package com.bnagritech.tradesphere.visit.repository;
 
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
-import com.bnagritech.tradesphere.outlet.model.Outlet;
 import com.bnagritech.tradesphere.visit.model.Visit;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -11,24 +10,24 @@ import java.util.Optional;
 
 public interface VisitRepository extends MongoRepository<Visit, String>, VisitRepositoryCustom {
 
-    /** Retry safety for check-in from the mobile app. */
+    /** Find by the tracking number, e.g. VI000000001. */
+    Optional<Visit> findByVisitId(String visitId);
+
+    /** Retry safety for a walk-in check-in from the mobile app. */
     Optional<Visit> findByClientVisitId(String clientVisitId);
 
-    /** The visit a user is currently checked in to (a user may have only one). */
+    /** The visit a user is on right now (a user may have only one). */
     Optional<Visit> findFirstByUserIdAndStatus(String userId, VisitStatus status);
 
-    /** Stops the same outlet being planned twice for the same user and day. */
-    boolean existsByUserIdAndOutletIdAndVisitDayAndStatus(
-            String userId, String outletId, String visitDay, VisitStatus status);
-
-    List<Visit> findByUserIdAndVisitDayAndOutletCodeInAndStatusIn(
-            String userId, String visitDay, List<String> outletCodes, Collection<VisitStatus> statuses);
+    /** A user's visits on one day in the given statuses. */
+    List<Visit> findByUserIdAndVisitDayAndStatusIn(String userId, String visitDay, Collection<VisitStatus> statuses);
 
     /** A user's visits for one day, in the order they were created. */
     List<Visit> findByUserIdAndVisitDayOrderByCreatedAtAsc(String userId, String visitDay);
 
-    /** Used by the nightly job: planned visits whose day has passed. */
+    /** Used by the nightly job: visits in a status whose day has passed. */
     List<Visit> findByStatusAndVisitDayLessThan(VisitStatus status, String visitDay);
 
-    boolean existsByCheckInPhotoFileId(String fileId);
+    /** A photo may be used for one outlet check-in only. */
+    boolean existsByOutletVisitsPictureWithOutletFileId(String fileId);
 }

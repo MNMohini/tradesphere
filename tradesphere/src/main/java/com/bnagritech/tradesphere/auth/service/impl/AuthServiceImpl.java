@@ -52,7 +52,7 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
-    private static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+    private static final Duration LOCK_DURATION = Duration.ofMinutes(2);
     private static final int RESET_CODE_VALID_MINUTES = 10;
     private static final int MAX_RESET_CODE_ATTEMPTS = 5;
     private static final int MAX_RESET_REQUESTS_PER_HOUR = 3;

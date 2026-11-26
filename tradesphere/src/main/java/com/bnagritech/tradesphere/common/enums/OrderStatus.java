@@ -9,5 +9,6 @@ public enum OrderStatus {
     CANCELLED,
     RETURNED,
     DELIVERED,
-    SUBMITTED
+    SUBMITTED,
+    REJECTED,
 }

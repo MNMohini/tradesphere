@@ -1,7 +1,6 @@
 package com.bnagritech.tradesphere.visit.dto;
 
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
-import com.bnagritech.tradesphere.outlet.model.Outlet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.time.LocalDate;
 
 /**
  * Query parameters for GET /api/visits, for example:
- * /api/visits?status=COMPLETED&fromDate=2026-11-01&toDate=2026-11-07
+ * /api/visits?status=COMPLETED&fromDate=2026-11-01&toDate=2026-11-07&outletCode=OUT-001
  * With no dates, the last 7 days are returned. Results are always limited to
  * the visits the caller is allowed to see.
  */
@@ -23,7 +22,7 @@ import java.time.LocalDate;
 public class VisitSearchRequest {
 
     private String userId;
-    private String outletCode;
+    private String outletCode;     // visits that include this outlet
     private String beatId;
     private VisitStatus status;
 

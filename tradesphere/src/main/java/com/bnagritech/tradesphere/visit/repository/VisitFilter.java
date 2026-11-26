@@ -1,13 +1,13 @@
 package com.bnagritech.tradesphere.visit.repository;
 
 import com.bnagritech.tradesphere.common.enums.VisitStatus;
-import com.bnagritech.tradesphere.outlet.model.Outlet;
 
 /**
  * Parameters for searching visits. Every field except viewerUserId is optional.
  *
  * viewerUserId: the user who is asking; results are limited to their own visits and the
  *               visits of everyone below them. Pass null ONLY for ADMIN and NATIONAL_HEAD.
+ * outletCode:   visits that include this outlet.
  * fromDay / toDay: inclusive, ISO text such as "2026-11-02".
  */
 public record VisitFilter(

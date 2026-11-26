@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.visit.dto;
 
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,12 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 public class PlanVisitsResponse {
 
-    private String visitId;
-    @Size(max = 50)
-    private int requested;
-    private int created;
+    private String visitId;      // VI000000001 - the visit these outlets were added to
+    private int requested;       // outlets sent
+    private int created;         // outlets added to the visit
     private List<VisitSummaryResponse> visits;
 
-    // Outlets that were not planned: already planned for that day, unknown or inactive
+    // Outlets that were not added: already in a visit that day, unknown or inactive
     private List<String> skippedOutletIds;
 }

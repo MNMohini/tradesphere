@@ -30,7 +30,8 @@ public class VisitRepositoryImpl implements VisitRepositoryCustom {
             conditions.add(Criteria.where("userId").is(f.userId()));
         }
         if (f.outletCode() != null) {
-            conditions.add(Criteria.where("outletCode").is(f.outletCode()));
+            // outletCodes is a list: this matches visits that contain the outlet
+            conditions.add(Criteria.where("outletCodes").is(f.outletCode()));
         }
         if (f.beatId() != null) {
             conditions.add(Criteria.where("beatId").is(f.beatId()));
