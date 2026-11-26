@@ -37,7 +37,6 @@ public class BeatServiceImpl implements BeatService {
         Beat beat = Beat.builder()
                 .beatId(request.getBeatId())
                 .territoryId(territory.getTerritoryId())
-                .userName(request.getUserName())
                 .beatStatus(request.getBeatStatus())
                 .state(request.getState())
                 .city(request.getCity())
@@ -134,7 +133,6 @@ public class BeatServiceImpl implements BeatService {
                         ()-> new ResourceNotFoundException("Beat Id not found"));
         beat.setBeatId(request.getBeatId());
         beat.setTerritoryId(request.getTerritoryId());
-        beat.setUserName(request.getUserName());
         beat.setBeatStatus(request.getBeatStatus());
         beat.setState(request.getState());
         beat.setCity(request.getCity());
@@ -170,7 +168,6 @@ public class BeatServiceImpl implements BeatService {
         return BeatsResponse.builder()
                 .beatId(beat.getBeatId())
                 .territoryId(beat.getTerritoryId())
-                .userName(beat.getUserName())
                 .beatStatus(beat.getBeatStatus())
                 .state(beat.getState())
                 .city(beat.getCity())

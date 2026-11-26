@@ -42,14 +42,10 @@ public class ImageKitService {
 
     @Value("${app.imagekit.public-key}")
     private String publicKey;
-
-    // Never send this to the app or browser. Keep it in an environment variable / secret store.
     @Value("${app.imagekit.private-key}")
     private String privateKey;
-
     @Value("${app.imagekit.url-endpoint}")          // e.g. https://ik.imagekit.io/bnagritech
     private String urlEndpoint;
-
     // Every file of this project goes under this folder. Use / to put the folders at the top level.
     @Value("${app.imagekit.root-folder:/tradesphere}")
     private String rootFolder;

@@ -18,9 +18,10 @@ import java.time.LocalDate;
 public class VisitSummaryResponse {
 
     private String id;
+    private String visitId;
     private String userId;
     private String userName;
-    private String outletId;
+    private String outletCode;
     private String outletName;
     private String beatId;
     private LocalDate visitDay;

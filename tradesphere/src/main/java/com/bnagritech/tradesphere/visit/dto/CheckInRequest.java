@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 /**
- * Starts a visit. Send visitId to start a planned visit, or outletId to start an
+ * Starts a visit. Send visitId to start a planned visit, or outletCode to start an
  * unplanned one (one of the two is required).
  */
 @Data
@@ -20,10 +20,17 @@ import java.time.Instant;
 @NoArgsConstructor
 public class CheckInRequest {
 
+    // Mongo id of a PLANNED visit (the "id" field in the plan response)
     private String visitId;
-    private String outletId;
+
+    // For an unplanned visit
+    private String outletCode;
+
+    // fileId of the photo with the outlet, uploaded to ImageKit (VisitImages) first
     private String photoFileId;
+
     private String beatId;
+
     // UUID created by the app so a retried check-in never creates a second visit
     @Size(max = 64)
     private String clientVisitId;
@@ -35,4 +42,3 @@ public class CheckInRequest {
     // Time on the device (important when the check-in was done offline)
     private Instant checkInTime;
 }
-

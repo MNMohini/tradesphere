@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/** Result of planning: each created visit (with its own visitId) is in "visits". */
 @Data
 @Builder
 @AllArgsConstructor
@@ -17,6 +18,6 @@ public class PlanVisitsResponse {
     private int created;
     private List<VisitSummaryResponse> visits;
 
-    // Outlets that were not planned: already planned for that day, unknown or inactive
+    // Outlet codes that were not planned: already planned for that day, unknown or inactive
     private List<String> skippedOutletIds;
 }

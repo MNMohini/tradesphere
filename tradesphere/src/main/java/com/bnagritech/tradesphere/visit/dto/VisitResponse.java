@@ -20,12 +20,12 @@ import java.util.List;
 public class VisitResponse {
 
     private String id;
+    private String visitId;
     private String clientVisitId;
-
     private String userId;
     private String userName;
 
-    private String outletId;
+    private String outletCode;
     private String outletName;
     private GeoPointDto outletLocation;
     private String beatId;
@@ -34,7 +34,7 @@ public class VisitResponse {
     private boolean planned;
     private VisitStatus status;
 
-    private PunchResponse checkIn;
+    private PunchResponse checkIn;     // checkIn.photo = photo with the outlet
     private PunchResponse checkOut;
     private Long durationMinutes;
 

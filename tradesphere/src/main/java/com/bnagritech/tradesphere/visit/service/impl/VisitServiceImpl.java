@@ -4,9 +4,10 @@ import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.*;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.util.GeoUtils;
-import com.bnagritech.tradesphere.imagekit.dto.MediaFolder;
-import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
-import com.bnagritech.tradesphere.imagekit.service.ImageKitService;
+import com.bnagritech.tradesphere.common.util.SequenceGenerator;
+import com.bnagritech.tradesphere.media.dto.MediaFolder;
+import com.bnagritech.tradesphere.media.dto.MediaRef;
+import com.bnagritech.tradesphere.media.service.ImageKitService;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.visit.dto.AddTrackPointsRequest;
@@ -63,7 +64,7 @@ public class VisitServiceImpl implements VisitService {
     private static final int MAX_TRACK_POINTS = 500;
     private static final int MAX_PLAN_DAYS_AHEAD = 30;
     private static final int DEFAULT_SEARCH_DAYS = 7;
-    private static final int MAX_OUTLETS_PER_PLAN = 100;
+    private static final int MAX_OUTLETS_PER_PLAN = 20;   // same limit as PlanVisitsRequest
 
     // A visit in one of these statuses already covers the outlet for that day,
     // so the same outlet cannot be planned again on the same date.
@@ -98,6 +99,7 @@ public class VisitServiceImpl implements VisitService {
     private final OrderRepository orderRepository;
     private final OutletRepository outletRepository;
     private final ImageKitService imageKitService;
+    private final SequenceGenerator sequenceGenerator;
 
     // true = a check-in without a photo is rejected
     @Value("${app.visit.require-checkin-photo:false}")
@@ -130,19 +132,19 @@ public class VisitServiceImpl implements VisitService {
         }
 
         // Clean the array: drop blank ids and repeats, keep the order the user sent
-        Set<String> outletIds = new LinkedHashSet<>();
-        if (request.getOutletIds() != null) {
-            for (String id : request.getOutletIds()) {
+        Set<String> outletCodes = new LinkedHashSet<>();
+        if (request.getOutletCodes() != null) {
+            for (String id : request.getOutletCodes()) {
                 String clean = blankToNull(id);
                 if (clean != null) {
-                    outletIds.add(clean);
+                    outletCodes.add(clean);
                 }
             }
         }
-        if (outletIds.isEmpty()) {
-            throw badRequest("outletIds must contain at least one outlet");
+        if (outletCodes.isEmpty()) {
+            throw badRequest("outletCodes must contain at least one outlet");
         }
-        if (outletIds.size() > MAX_OUTLETS_PER_PLAN) {
+        if (outletCodes.size() > MAX_OUTLETS_PER_PLAN) {
             throw badRequest("You can plan at most " + MAX_OUTLETS_PER_PLAN + " outlets at a time");
         }
 
@@ -152,22 +154,23 @@ public class VisitServiceImpl implements VisitService {
         // One query: outlets this user already has a live visit for on this day
         // (PLANNED, IN_PROGRESS or COMPLETED) - these must not be planned again
         Set<String> alreadyCovered = new HashSet<>();
-        visitRepository.findByUserIdAndVisitDayAndOutletIdInAndStatusIn(
-                        currentUser.getId(), visitDay, outletIds, BLOCKS_REPLAN)
-                .forEach(v -> alreadyCovered.add(v.getOutletId()));
+        visitRepository.findByUserIdAndVisitDayAndOutletCodeInAndStatusIn(
+                        currentUser.getId(), visitDay, outletCodes, BLOCKS_REPLAN)
+                .forEach(v -> alreadyCovered.add(v.getOutletCode()));
 
-        // One query: all requested outlets (missing ones are simply absent from the map)
+        // Load the requested outlets (at most 20; missing ones are simply absent from the map)
         Map<String, OutletInfo> outlets = new HashMap<>();
-        outletRepository.findAllById(outletIds).forEach(o -> outlets.put(o.getId(),
-                new OutletInfo(o.getId(), o.getName(), o.getLocation(), o.getStatus() == OutletStatus.ACTIVE)));
+        for (String code : outletCodes) {
+            findOutlet(code).ifPresent(o -> outlets.put(code, o));
+        }
 
         List<Visit> saved = new ArrayList<>();
         List<String> skipped = new ArrayList<>();
 
-        for (String outletId : outletIds) {
-            OutletInfo outlet = outlets.get(outletId);
-            if (alreadyCovered.contains(outletId) || outlet == null || !outlet.active()) {
-                skipped.add(outletId);
+        for (String outletCode : outletCodes) {
+            OutletInfo outlet = outlets.get(outletCode);
+            if (alreadyCovered.contains(outletCode) || outlet == null || !outlet.active()) {
+                skipped.add(outletCode);
                 continue;
             }
             Visit visit = newVisit(currentUser, outlet, request.getBeatId(), visitDay, true,
@@ -176,12 +179,12 @@ public class VisitServiceImpl implements VisitService {
                 saved.add(visitRepository.save(visit));
             } catch (DuplicateKeyException e) {
                 // A parallel request planned the same outlet for the same day a moment earlier
-                skipped.add(outletId);
+                skipped.add(outletCode);
             }
         }
 
         return PlanVisitsResponse.builder()
-                .requested(outletIds.size())
+                .requested(outletCodes.size())
                 .created(saved.size())
                 .visits(saved.stream().map(this::toSummary).toList())
                 .skippedOutletIds(skipped)
@@ -225,29 +228,29 @@ public class VisitServiceImpl implements VisitService {
             if (visit.getStatus() != VisitStatus.PLANNED) {
                 throw badRequest("Only a PLANNED visit can be started. Current status: " + visit.getStatus());
             }
-            if (request.getOutletId() != null && !request.getOutletId().equals(visit.getOutletId())) {
-                throw badRequest("outletId does not match the planned visit");
+            if (request.getOutletCode() != null && !request.getOutletCode().equals(visit.getOutletCode())) {
+                throw badRequest("outletCode does not match the planned visit");
             }
             if (LocalDate.parse(visit.getVisitDay()).isAfter(checkInDay)) {
                 throw badRequest("This visit is planned for " + visit.getVisitDay());
             }
         } else {
             // Unplanned visit: the rep walked into an outlet that was not on the plan
-            String outletId = blankToNull(request.getOutletId());
-            if (outletId == null) {
-                throw badRequest("visitId or outletId is required");
+            String outletCode = blankToNull(request.getOutletCode());
+            if (outletCode == null) {
+                throw badRequest("visitId or outletCode is required");
             }
             // If this outlet is already planned for the day, start that plan instead of
             // creating a second visit (otherwise the plan would later turn MISSED)
-            Optional<Visit> plannedToday = visitRepository.findByUserIdAndVisitDayAndOutletIdInAndStatusIn(
-                            currentUser.getId(), checkInDay.toString(), List.of(outletId), Set.of(VisitStatus.PLANNED))
+            Optional<Visit> plannedToday = visitRepository.findByUserIdAndVisitDayAndOutletCodeInAndStatusIn(
+                            currentUser.getId(), checkInDay.toString(), List.of(outletCode), Set.of(VisitStatus.PLANNED))
                     .stream().findFirst();
             if (plannedToday.isPresent()) {
                 visit = plannedToday.get();
             } else {
-                OutletInfo outlet = findOutlet(outletId).orElse(null);
+                OutletInfo outlet = findOutlet(outletCode).orElse(null);
                 if (outlet == null || !outlet.active()) {
-                    throw badRequest("Outlet not found or inactive: " + outletId);
+                    throw badRequest("Outlet not found or inactive: " + outletCode);
                 }
                 visit = newVisit(currentUser, outlet, request.getBeatId(), checkInDay.toString(), false,
                         VisitStatus.IN_PROGRESS, now, "Checked in without a plan");
@@ -424,7 +427,7 @@ public class VisitServiceImpl implements VisitService {
         VisitFilter filter = new VisitFilter(
                 viewerFilterId(currentUser),
                 request.getUserId(),
-                request.getOutletId(),
+                request.getOutletCode(),
                 request.getBeatId(),
                 request.getStatus(),
                 from != null ? from.toString() : null,
@@ -472,13 +475,13 @@ public class VisitServiceImpl implements VisitService {
     // =====================================================================
 
     /** What the visit module needs to know about an outlet. */
-    private record OutletInfo(String outletId, String name, GeoJsonPoint location, boolean active) {
+    private record OutletInfo(String outletCode, String name, GeoJsonPoint location, boolean active) {
     }
 
-    /** FIX: returns empty for a missing outlet, so each caller decides whether that is an error or a skip. */
-    private Optional<OutletInfo> findOutlet(String outletId) {
-        return outletRepository.findById(outletId)
-                .map(o -> new OutletInfo(o.getId(), o.getName(), o.getLocation(),
+    /** Finds the outlet by its outletCode. Returns empty for a missing outlet, so each caller decides whether that is an error or a skip. */
+    private Optional<OutletInfo> findOutlet(String outletCode) {
+        return outletRepository.findByOutletCode(outletCode)
+                .map(o -> new OutletInfo(o.getOutletCode(), o.getName(), o.getLocation(),
                         o.getStatus() == OutletStatus.ACTIVE));
     }
 
@@ -495,10 +498,11 @@ public class VisitServiceImpl implements VisitService {
         }
 
         Visit visit = Visit.builder()
+                .visitId(String.format("VI-%06d", sequenceGenerator.next("Visit")))   // readable id, one per visit
                 .userId(user.getId())
                 .userName(user.getUsername())
                 .userPath(userPath)
-                .outletId(outlet.outletId())
+                .outletCode(outlet.outletCode())
                 .outletName(outlet.name())
                 .outletLocation(outlet.location())
                 .beatId(beatId)
@@ -656,10 +660,11 @@ public class VisitServiceImpl implements VisitService {
     private VisitResponse toResponse(Visit visit) {
         return VisitResponse.builder()
                 .id(visit.getId())
+                .visitId(visit.getVisitId())
                 .clientVisitId(visit.getClientVisitId())
                 .userId(visit.getUserId())
                 .userName(visit.getUserName())
-                .outletId(visit.getOutletId())
+                .outletCode(visit.getOutletCode())
                 .outletName(visit.getOutletName())
                 .outletLocation(toGeo(visit.getOutletLocation(), null))
                 .beatId(visit.getBeatId())
@@ -684,9 +689,10 @@ public class VisitServiceImpl implements VisitService {
     private VisitSummaryResponse toSummary(Visit visit) {
         return VisitSummaryResponse.builder()
                 .id(visit.getId())
+                .visitId(visit.getVisitId())
                 .userId(visit.getUserId())
                 .userName(visit.getUserName())
-                .outletId(visit.getOutletId())
+                .outletCode(visit.getOutletCode())
                 .outletName(visit.getOutletName())
                 .beatId(visit.getBeatId())
                 .visitDay(parseDay(visit.getVisitDay()))

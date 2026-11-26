@@ -22,7 +22,6 @@ public class Beat {
     private String id;
     private String beatId;
     private String territoryId;
-    private String userName;
     private BeatStatus beatStatus;
     private String state;
     private String city;

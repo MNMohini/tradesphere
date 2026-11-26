@@ -51,7 +51,7 @@ public class OutletServiceImpl implements OutletService {
 
     // Roles that may create outlets
     private static final Set<UserRole> CREATE_ROLES = EnumSet.of(
-            UserRole.AREA_MANAGER, UserRole.REGIONAL_MANAGER, UserRole.NATIONAL_HEAD, UserRole.ADMIN);
+            UserRole.SUPERVISOR, UserRole.PROMOTER, UserRole.SALES_REPRESENTATIVE, UserRole.ADMIN, UserRole.SALES_OFFICER);
 
     // Outlets created by these roles are ACTIVE immediately, with no approval step
     private static final Set<UserRole> AUTO_ACTIVE_ROLES = EnumSet.of(
