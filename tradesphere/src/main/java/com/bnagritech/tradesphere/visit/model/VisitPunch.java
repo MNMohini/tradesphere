@@ -1,6 +1,5 @@
 package com.bnagritech.tradesphere.visit.model;
 
-import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +18,7 @@ public class VisitPunch {
     private Instant time;
     private GeoJsonPoint location;
     private Double accuracyMeters;
-    private MediaRef photo;
+
     // Straight-line distance to the outlet's saved location (null if the outlet has none)
     private Double distanceFromOutletMeters;
 
