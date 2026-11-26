@@ -4,6 +4,7 @@ import com.bnagritech.tradesphere.common.enums.VisitStatus;
 import com.bnagritech.tradesphere.visit.model.Visit;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,9 @@ public interface VisitRepository extends MongoRepository<Visit, String>, VisitRe
     /** Stops the same outlet being planned twice for the same user and day. */
     boolean existsByUserIdAndOutletIdAndVisitDayAndStatus(
             String userId, String outletId, String visitDay, VisitStatus status);
+
+    List<Visit> findByUserIdAndVisitDayAndOutletIdInAndStatusIn(
+            String userId, String visitDay, Collection<String> outletCode, Collection<VisitStatus> statuses);
 
     /** A user's visits for one day, in the order they were created. */
     List<Visit> findByUserIdAndVisitDayOrderByCreatedAtAsc(String userId, String visitDay);

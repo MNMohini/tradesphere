@@ -41,6 +41,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,13 @@ public class VisitServiceImpl implements VisitService {
     private static final int MAX_TRACK_POINTS = 500;
     private static final int MAX_PLAN_DAYS_AHEAD = 30;
     private static final int DEFAULT_SEARCH_DAYS = 7;
+    private static final int MAX_OUTLETS_PER_PLAN = 100;
+
+    // A visit in one of these statuses already covers the outlet for that day,
+    // so the same outlet cannot be planned again on the same date.
+    // CANCELLED and MISSED do not block: the rep may plan that outlet again.
+    private static final Set<VisitStatus> BLOCKS_REPLAN = EnumSet.of(
+            VisitStatus.PLANNED, VisitStatus.IN_PROGRESS, VisitStatus.COMPLETED);
 
     // Field roles that make visits
     private static final Set<UserRole> VISIT_ROLES = EnumSet.of(
@@ -112,32 +121,56 @@ public class VisitServiceImpl implements VisitService {
             throw badRequest("You can plan at most " + MAX_PLAN_DAYS_AHEAD + " days ahead");
         }
 
+        // Clean the array: drop blank ids and repeats, keep the order the user sent
+        Set<String> outletIds = new LinkedHashSet<>();
+        if (request.getOutletIds() != null) {
+            for (String id : request.getOutletIds()) {
+                String clean = blankToNull(id);
+                if (clean != null) {
+                    outletIds.add(clean);
+                }
+            }
+        }
+        if (outletIds.isEmpty()) {
+            throw badRequest("outletIds must contain at least one outlet");
+        }
+        if (outletIds.size() > MAX_OUTLETS_PER_PLAN) {
+            throw badRequest("You can plan at most " + MAX_OUTLETS_PER_PLAN + " outlets at a time");
+        }
+
         String visitDay = day.toString();
         Instant now = Instant.now();
-        Set<String> outletIds = new LinkedHashSet<>(request.getOutletIds());
 
-        List<Visit> toSave = new ArrayList<>();
+        // One query: outlets this user already has a live visit for on this day
+        // (PLANNED, IN_PROGRESS or COMPLETED) - these must not be planned again
+        Set<String> alreadyCovered = new HashSet<>();
+        visitRepository.findByUserIdAndVisitDayAndOutletIdInAndStatusIn(
+                        currentUser.getUsername(), visitDay, outletIds, BLOCKS_REPLAN)
+                .forEach(v -> alreadyCovered.add(v.getOutletId()));
+
+        // One query: all requested outlets (missing ones are simply absent from the map)
+        Map<String, OutletInfo> outlets = new HashMap<>();
+        outletRepository.findAllById(outletIds).forEach(o -> outlets.put(o.getId(),
+                new OutletInfo(o.getId(), o.getName(), o.getLocation(), o.getStatus() == OutletStatus.ACTIVE)));
+
+        List<Visit> saved = new ArrayList<>();
         List<String> skipped = new ArrayList<>();
 
         for (String outletId : outletIds) {
-            boolean alreadyPlanned = visitRepository.existsByUserIdAndOutletIdAndVisitDayAndStatus(
-                    currentUser.getId(), outletId, visitDay, VisitStatus.PLANNED);
-            if (alreadyPlanned) {
+            OutletInfo outlet = outlets.get(outletId);
+            if (alreadyCovered.contains(outletId) || outlet == null || !outlet.active()) {
                 skipped.add(outletId);
                 continue;
             }
-            // FIX: a missing outlet is skipped, not a failure of the whole plan
-            OutletInfo outlet = findOutlet(outletId).orElse(null);
-            if (outlet == null || !outlet.active()) {
+            Visit visit = newVisit(currentUser, outlet, request.getBeatId(), visitDay, true,
+                    VisitStatus.PLANNED, now, "Visit planned");
+            try {
+                saved.add(visitRepository.save(visit));
+            } catch (DuplicateKeyException e) {
+                // A parallel request planned the same outlet for the same day a moment earlier
                 skipped.add(outletId);
-                continue;
             }
-            toSave.add(newVisit(currentUser, outlet, request.getBeatId(), visitDay, true,
-                    VisitStatus.PLANNED, now, "Visit planned"));
         }
-
-        // FIX: the planned visits were built but never saved
-        List<Visit> saved = toSave.isEmpty() ? List.of() : visitRepository.saveAll(toSave);
 
         return PlanVisitsResponse.builder()
                 .requested(outletIds.size())
@@ -196,12 +229,21 @@ public class VisitServiceImpl implements VisitService {
             if (outletId == null) {
                 throw badRequest("visitId or outletId is required");
             }
-            OutletInfo outlet = findOutlet(outletId).orElse(null);
-            if (outlet == null || !outlet.active()) {
-                throw badRequest("Outlet not found or inactive: " + outletId);
+            // If this outlet is already planned for the day, start that plan instead of
+            // creating a second visit (otherwise the plan would later turn MISSED)
+            Optional<Visit> plannedToday = visitRepository.findByUserIdAndVisitDayAndOutletIdInAndStatusIn(
+                            currentUser.getId(), checkInDay.toString(), List.of(outletId), Set.of(VisitStatus.PLANNED))
+                    .stream().findFirst();
+            if (plannedToday.isPresent()) {
+                visit = plannedToday.get();
+            } else {
+                OutletInfo outlet = findOutlet(outletId).orElse(null);
+                if (outlet == null || !outlet.active()) {
+                    throw badRequest("Outlet not found or inactive: " + outletId);
+                }
+                visit = newVisit(currentUser, outlet, request.getBeatId(), checkInDay.toString(), false,
+                        VisitStatus.IN_PROGRESS, now, "Checked in without a plan");
             }
-            visit = newVisit(currentUser, outlet, request.getBeatId(), checkInDay.toString(), false,
-                    VisitStatus.IN_PROGRESS, now, "Checked in without a plan");
         }
 
         // A user can be checked in to only one outlet at a time.
