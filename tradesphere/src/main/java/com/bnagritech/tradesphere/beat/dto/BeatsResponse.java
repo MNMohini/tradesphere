@@ -10,6 +10,8 @@ import java.util.List;
 public class BeatsResponse {
 
     private String beatId;
+    private String assignedUserId;
+    private String userName;
     private String territoryId;
     private String state;
     private String city;

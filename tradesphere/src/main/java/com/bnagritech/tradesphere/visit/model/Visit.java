@@ -20,9 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * One visit = one user's round of several outlets on one day, tracked by visitId (VI000000001).
- * Each outlet of the round is one entry in outletVisits, with its own check-in, check-out,
- * outcome and photo.
+ * One visit = one user's planned or actual trip to one outlet on one day, tracked by visitId.
+ * Each visit has one outlet entry with its own check-in, check-out, outcome and photo.
  *
  *  Visit status:   PLANNED -> IN_PROGRESS (first outlet check-in) -> COMPLETED (all outlets done, or ended)
  *                  PLANNED -> MISSED (nightly job) or CANCELLED
@@ -34,6 +33,7 @@ import java.util.List;
 @NoArgsConstructor
 @Document(collection = "visits")
 @CompoundIndexes({
+        @CompoundIndex(name = "visit_day_created", def = "{'visitDay': -1, 'createdAt': -1}"),
         @CompoundIndex(name = "user_day",   def = "{'userId': 1, 'visitDay': -1}"),
         @CompoundIndex(name = "path_day",   def = "{'userPath': 1, 'visitDay': -1}"),
         @CompoundIndex(name = "outlets_day", def = "{'outletCodes': 1, 'visitDay': -1}"),
@@ -42,10 +42,10 @@ import java.util.List;
         @CompoundIndex(name = "one_active_visit_per_user",
                 def = "{'userId': 1}", unique = true,
                 partialFilter = "{ 'status': 'IN_PROGRESS' }"),
-        // a user has only one PLANNED visit per day (planning again adds outlets to it)
-        @CompoundIndex(name = "one_planned_visit_per_day",
-                def = "{'userId': 1, 'visitDay': 1}", unique = true,
-                partialFilter = "{ 'status': 'PLANNED' }"),
+        // A user may plan many outlets per day, but each outlet is planned only once that day.
+        @CompoundIndex(name = "one_user_day_outlet",
+                def = "{'userId': 1, 'visitDay': 1, 'outletCodes': 1}", unique = true,
+                partialFilter = "{ 'status': { '$in': ['PLANNED', 'IN_PROGRESS', 'COMPLETED'] } }"),
         // a photo can be used only once
         @CompoundIndex(name = "outlet_photo", def = "{'outletVisits.pictureWithOutlet.fileId': 1}")
 })
@@ -72,9 +72,9 @@ public class Visit {
 
     // ---- Where ----
     @Builder.Default
-    private List<String> outletCodes = new ArrayList<>();          // all outlets of this visit
+    private List<String> outletCodes = new ArrayList<>();          // one outlet for this visit
     @Builder.Default
-    private List<VisitOutlet> outletVisits = new ArrayList<>();    // one entry per outlet (same order)
+    private List<VisitOutlet> outletVisits = new ArrayList<>();    // one entry for the outlet
     private String beatId;
 
     // ---- When ----

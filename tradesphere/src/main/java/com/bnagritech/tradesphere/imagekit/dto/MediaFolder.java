@@ -4,7 +4,7 @@ package com.bnagritech.tradesphere.imagekit.dto;
  * The only folders a file may go to. The app sends one of these names, never a raw path,
  * so nobody can write files anywhere else in the media library.
  *
- * Folder in ImageKit = app.imagekit.root-folder + "/" + path, e.g. /tradesphere/VisitImages
+ * Folder in ImageKit = app.imagekit.root-folder + "/" + path, e.g. /VisitImages
  */
 public enum MediaFolder {
 

@@ -23,6 +23,7 @@ public class VisitSummaryResponse {
     private String userId;
     private String userName;
     private List<String> outletCodes;
+    private List<VisitOutletSummaryResponse> outletVisits;
     private String beatId;
     private LocalDate visitDay;
     private boolean planned;

@@ -1,6 +1,9 @@
 package com.bnagritech.tradesphere.visit.service.impl;
 
 import com.bnagritech.tradesphere.auth.model.User;
+import com.bnagritech.tradesphere.auth.repository.UserRepository;
+import com.bnagritech.tradesphere.beat.model.Beat;
+import com.bnagritech.tradesphere.beat.repository.BeatRepository;
 import com.bnagritech.tradesphere.common.enums.*;
 import com.bnagritech.tradesphere.common.exception.ResourceNotFoundException;
 import com.bnagritech.tradesphere.common.util.GeoUtils;
@@ -9,6 +12,7 @@ import com.bnagritech.tradesphere.imagekit.dto.MediaFolder;
 import com.bnagritech.tradesphere.imagekit.dto.MediaRef;
 import com.bnagritech.tradesphere.imagekit.service.ImageKitService;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
+import com.bnagritech.tradesphere.outlet.model.OutletAddress;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.visit.dto.AddTrackPointsRequest;
 import com.bnagritech.tradesphere.visit.dto.CancelVisitRequest;
@@ -21,9 +25,13 @@ import com.bnagritech.tradesphere.visit.dto.PlanVisitsResponse;
 import com.bnagritech.tradesphere.visit.dto.PunchResponse;
 import com.bnagritech.tradesphere.visit.dto.TrackPointDto;
 import com.bnagritech.tradesphere.visit.dto.VisitOutletResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitOutletSummaryResponse;
 import com.bnagritech.tradesphere.visit.dto.VisitResponse;
 import com.bnagritech.tradesphere.visit.dto.VisitSearchRequest;
 import com.bnagritech.tradesphere.visit.dto.VisitSummaryResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitorAttendanceItemResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitorAttendancePageResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitorAttendanceSearchRequest;
 import com.bnagritech.tradesphere.visit.model.TrackPoint;
 import com.bnagritech.tradesphere.visit.model.Visit;
 import com.bnagritech.tradesphere.visit.model.VisitOutlet;
@@ -49,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -103,22 +112,23 @@ public class VisitServiceImpl implements VisitService {
     );
 
     private final VisitRepository visitRepository;
+    private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final OutletRepository outletRepository;
+    private final BeatRepository beatRepository;
     private final ImageKitService imageKitService;
     private final SequenceGenerator sequenceGenerator;
 
-    // true = a check-in without a photo is rejected
-    @Value("${app.visit.require-checkin-photo:false}")
-    private boolean requireCheckInPhoto = false;
+    // A check-in without a photo is rejected.
+    @Value("${app.visit.require-checkin-photo:true}")
+    private boolean requireCheckInPhoto = true;
 
     @Value("${app.visit.checkin-radius-meters:100}")
     private double checkInRadiusMeters = 100.0;
 
-    // false = a check-in far from the outlet is allowed but flagged (withinRange = false)
-    // true  = a check-in far from the outlet is rejected
-    @Value("${app.visit.enforce-geofence:false}")
-    private boolean enforceGeofence = false;
+    // Punches outside the outlet radius are rejected.
+    @Value("${app.visit.enforce-geofence:true}")
+    private boolean enforceGeofence = true;
 
     // =====================================================================
     // Plan
@@ -135,6 +145,18 @@ public class VisitServiceImpl implements VisitService {
         }
         if (day.isAfter(today.plusDays(MAX_PLAN_DAYS_AHEAD))) {
             throw badRequest("You can plan at most " + MAX_PLAN_DAYS_AHEAD + " days ahead");
+        }
+        String beatId = blankToNull(request.getBeatId());
+        if (beatId == null) {
+            throw badRequest("beatId is required");
+        }
+        Beat beat = beatRepository.findByBeatId(beatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Beat not found: " + beatId));
+        boolean assignedBeat = currentUser.getId().equals(beat.getAssignedUserId())
+                || (beat.getAssignedUserId() == null
+                && currentUser.getUsername().equalsIgnoreCase(beat.getUserName()));
+        if (!assignedBeat) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This beat is not assigned to you");
         }
 
         // Clean the list: drop blanks and repeats, keep the order sent
@@ -157,69 +179,68 @@ public class VisitServiceImpl implements VisitService {
         String visitDay = day.toString();
         Instant now = Instant.now();
 
-        // The user's visits that day. An outlet already planned / visited that day is skipped,
-        // and new outlets go into the open visit of that day (no second plan for the same day).
+        // An outlet already planned or visited that day cannot be planned again.
         List<Visit> sameDay = visitRepository.findByUserIdAndVisitDayAndStatusIn(
                 currentUser.getId(), visitDay, EnumSet.of(VisitStatus.PLANNED, VisitStatus.IN_PROGRESS, VisitStatus.COMPLETED));
         Set<String> alreadyTaken = new HashSet<>();
-        Visit openVisit = null;
         for (Visit v : sameDay) {
-            for (VisitOutlet o : v.getOutletVisits()) {
-                if (OUTLET_TAKEN.contains(o.getStatus())) {
-                    alreadyTaken.add(o.getOutletCode());
+            if (v.getOutletVisits() != null && !v.getOutletVisits().isEmpty()) {
+                for (VisitOutlet outlet : v.getOutletVisits()) {
+                    if (OUTLET_TAKEN.contains(outlet.getStatus())) {
+                        alreadyTaken.add(outlet.getOutletCode());
+                    }
                 }
-            }
-            if (openVisit == null && OPEN.contains(v.getStatus())) {
-                openVisit = v;
+            } else if (OUTLET_TAKEN.contains(v.getStatus()) && v.getOutletCodes() != null) {
+                alreadyTaken.addAll(v.getOutletCodes());
             }
         }
 
-        List<String> toAdd = new ArrayList<>();
+        Map<String, OutletInfo> toAdd = new LinkedHashMap<>();
         List<String> skipped = new ArrayList<>();
-        for (String code : outletCodes) {
-            Optional<OutletInfo> outlet = findOutlet(code);
-            if (alreadyTaken.contains(code) || outlet.isEmpty() || !outlet.get().active()) {
-                skipped.add(code);
+        for (String outletReference : outletCodes) {
+            Optional<OutletInfo> outlet = findOutlet(outletReference);
+            if (outlet.isEmpty() || !outlet.get().active()) {
+                skipped.add(outletReference);
+                continue;
+            }
+            if (!isOutletInBeat(outlet.get(), outletReference, beat)) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "Outlet " + outletReference + " is not part of beat " + beatId);
+            }
+            if (alreadyTaken.contains(outlet.get().outletCode())) {
+                skipped.add(outletReference);
             } else {
-                toAdd.add(code);
+                toAdd.put(outlet.get().outletCode(), outlet.get());
             }
         }
 
         if (toAdd.isEmpty()) {
             return PlanVisitsResponse.builder()
-                    .visitId(openVisit != null ? openVisit.getVisitId() : null)
                     .requested(outletCodes.size())
                     .created(0)
-                    .visits(openVisit != null ? List.of(toSummary(openVisit)) : List.of())
+                    .visits(List.of())
                     .skippedOutletIds(skipped)
                     .build();
         }
 
-        Visit visit = openVisit != null
-                ? openVisit
-                : newVisit(currentUser, visitDay, true, request.getBeatId(), now, "Visit planned");
-        for (String code : toAdd) {
-            addOutlet(visit, code, true);
-        }
-        if (visit.getBeatId() == null && request.getBeatId() != null) {
-            visit.setBeatId(request.getBeatId());
-        }
-        visit.setUpdatedBy(currentUser.getId());
-
-        Visit saved;
-        try {
-            saved = visitRepository.save(visit);
-        } catch (DuplicateKeyException e) {
-            // Another plan request for the same day was saved a moment earlier
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "A visit for " + visitDay + " was just created. Please send the request again.");
+        List<Visit> createdVisits = new ArrayList<>();
+        for (Map.Entry<String, OutletInfo> outletEntry : toAdd.entrySet()) {
+            Visit visit = newVisit(currentUser, visitDay, true, request.getBeatId(), now, "Visit planned");
+            addOutlet(visit, outletEntry.getKey(), true, request.getBeatId(), outletEntry.getValue());
+            visit.setUpdatedBy(currentUser.getId());
+            try {
+                createdVisits.add(visitRepository.save(visit));
+            } catch (DuplicateKeyException e) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "A selected outlet was just planned. Refresh your visits and try again.");
+            }
         }
 
         return PlanVisitsResponse.builder()
-                .visitId(saved.getVisitId())
+                .visitId(createdVisits.get(0).getVisitId())
                 .requested(outletCodes.size())
                 .created(toAdd.size())
-                .visits(List.of(toSummary(saved)))
+                .visits(createdVisits.stream().map(this::toSummary).toList())
                 .skippedOutletIds(skipped)
                 .build();
     }
@@ -232,10 +253,16 @@ public class VisitServiceImpl implements VisitService {
     public VisitResponse checkIn(CheckInRequest request, User currentUser) {
         requireVisitRole(currentUser);
 
-        String outletCode = blankToNull(request.getOutletCode());
-        if (outletCode == null) {
+        String outletReference = blankToNull(request.getOutletCode());
+        if (outletReference == null) {
             throw badRequest("outletCode is required");
         }
+        OutletInfo outlet = findOutlet(outletReference)
+                .orElseThrow(() -> badRequest("Outlet not found: " + outletReference));
+        if (!outlet.active()) {
+            throw badRequest("Outlet is not active: " + outletReference);
+        }
+        String outletCode = outlet.outletCode();
         String clientVisitId = blankToNull(request.getClientVisitId());
 
         Instant now = Instant.now();
@@ -243,7 +270,7 @@ public class VisitServiceImpl implements VisitService {
         LocalDate checkInDay = checkInTime.atZone(IST).toLocalDate();
 
         // 1. Which visit?
-        Visit visit = findTargetVisit(request, clientVisitId, checkInDay, currentUser);
+        Visit visit = findTargetVisit(request, clientVisitId, checkInDay, currentUser, outletCode);
         if (visit == null) {
             // No open visit today: a walk-in starts a new unplanned visit
             visit = newVisit(currentUser, checkInDay.toString(), false, request.getBeatId(), now,
@@ -271,22 +298,18 @@ public class VisitServiceImpl implements VisitService {
         if (target != null && target.getStatus() != VisitStatus.PLANNED) {
             throw badRequest("Outlet " + outletCode + " is already " + target.getStatus() + " in this visit");
         }
-
-        OutletInfo outlet = findOutlet(outletCode)
-                .orElseThrow(() -> badRequest("Outlet not found: " + outletCode));
-        if (!outlet.active()) {
-            throw badRequest("Outlet is not active: " + outletCode);
+        if (target == null && visit.getOutletCodes() != null && !visit.getOutletCodes().isEmpty()) {
+            throw badRequest("Visit " + visit.getVisitId() + " belongs to a different outlet");
         }
+
         if (target == null) {
-            target = addOutlet(visit, outletCode, false);   // walk-in outlet added to this visit
+            target = addOutlet(visit, outletCode, false, request.getBeatId(), outlet);
         }
 
-        // 4. Where is the user compared to the outlet?
+        // 4. The outlet must have a saved location so the server can enforce its radius.
+        requireOutletLocation(outlet.location());
         VisitPunch punch = buildPunch(checkInTime, request.getLocation(), outlet.location());
-        if (enforceGeofence && Boolean.FALSE.equals(punch.getWithinRange())) {
-            throw badRequest(String.format("You are %.0f m from the outlet. Check in within %.0f m.",
-                    punch.getDistanceFromOutletMeters(), checkInRadiusMeters));
-        }
+        requireWithinOutletRadius(punch, "check in");
 
         // 5. Photo with the outlet (uploaded to ImageKit first; the app sends only the fileId)
         String photoFileId = blankToNull(request.getPhotoFileId());
@@ -324,8 +347,13 @@ public class VisitServiceImpl implements VisitService {
         }
     }
 
-    /** visitId given -> that visit; retried walk-in -> its visit; otherwise today's open visit (or null). */
-    private Visit findTargetVisit(CheckInRequest request, String clientVisitId, LocalDate checkInDay, User user) {
+    /** visitId given -> that visit; retry -> its visit; otherwise today's open visit containing the outlet. */
+    private Visit findTargetVisit(
+            CheckInRequest request,
+            String clientVisitId,
+            LocalDate checkInDay,
+            User user,
+            String outletCode) {
         String visitKey = blankToNull(request.getVisitId());
         if (visitKey != null) {
             Visit visit = findVisit(visitKey)
@@ -355,6 +383,7 @@ public class VisitServiceImpl implements VisitService {
         // Today's open visit: the one in progress first, then the planned one
         List<Visit> open = visitRepository.findByUserIdAndVisitDayAndStatusIn(user.getId(), checkInDay.toString(), OPEN);
         return open.stream()
+                .filter(v -> outletOf(v, outletCode) != null)
                 .min(Comparator.comparing(v -> v.getStatus() == VisitStatus.IN_PROGRESS ? 0 : 1))
                 .orElse(null);
     }
@@ -386,8 +415,12 @@ public class VisitServiceImpl implements VisitService {
             throw badRequest("remarks are required for outcome " + outcome);
         }
 
-        GeoJsonPoint outletLocation = findOutlet(current.getOutletCode()).map(OutletInfo::location).orElse(null);
+        GeoJsonPoint outletLocation = findOutlet(current.getOutletCode())
+                .map(OutletInfo::location)
+                .orElse(null);
+        requireOutletLocation(outletLocation);
         VisitPunch punch = buildPunch(checkOutTime, request.getLocation(), outletLocation);
+        requireWithinOutletRadius(punch, "check out");
 
         current.setCheckOut(punch);
         current.setDurationMinutes(Duration.between(current.getCheckIn().getTime(), checkOutTime).toMinutes());
@@ -562,6 +595,147 @@ public class VisitServiceImpl implements VisitService {
     }
 
     @Override
+    public VisitorAttendancePageResponse getVisitorAttendance(
+            VisitorAttendanceSearchRequest request,
+            User currentUser) {
+        if (currentUser == null || currentUser.getRole() != UserRole.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrators can view visitor attendance");
+        }
+        if (request.getPage() < 0 || request.getSize() < 1 || request.getSize() > 100) {
+            throw badRequest("page must be non-negative and size must be between 1 and 100");
+        }
+
+        LocalDate today = LocalDate.now(IST);
+        LocalDate from = request.getFromDate();
+        LocalDate to = request.getToDate();
+        if (from == null && to == null) {
+            to = today;
+            from = to.minusDays(DEFAULT_SEARCH_DAYS - 1L);
+        } else if (from == null) {
+            from = to.minusDays(DEFAULT_SEARCH_DAYS - 1L);
+        } else if (to == null) {
+            to = today;
+        }
+        if (to.isBefore(from)) {
+            throw badRequest("toDate cannot be before fromDate");
+        }
+
+        VisitFilter filter = new VisitFilter(
+                null,
+                null,
+                null,
+                null,
+                request.getStatus(),
+                from.toString(),
+                to.toString());
+        long offset = (long) request.getPage() * request.getSize();
+        List<Visit> visits = visitRepository.searchAttendance(filter, offset, request.getSize());
+        long total = visitRepository.countAttendance(filter);
+
+        return VisitorAttendancePageResponse.builder()
+                .items(toVisitorAttendanceItems(visits))
+                .page(request.getPage())
+                .size(request.getSize())
+                .totalElements(total)
+                .totalPages((int) ((total + request.getSize() - 1) / request.getSize()))
+                .build();
+    }
+
+    private List<VisitorAttendanceItemResponse> toVisitorAttendanceItems(List<Visit> visits) {
+        Set<String> visitorIds = visits.stream()
+                .map(Visit::getUserId)
+                .map(this::blankToNull)
+                .filter(id -> id != null)
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+        Map<String, User> usersById = new LinkedHashMap<>();
+        userRepository.findAllById(visitorIds).forEach(user -> usersById.put(user.getId(), user));
+
+        Set<String> managerIds = new LinkedHashSet<>();
+        for (Visit visit : visits) {
+            String managerId = managerIdFor(visit, usersById.get(visit.getUserId()));
+            if (managerId != null) {
+                managerIds.add(managerId);
+            }
+        }
+        userRepository.findAllById(managerIds).forEach(user -> usersById.put(user.getId(), user));
+
+        List<VisitorAttendanceItemResponse> items = new ArrayList<>();
+        for (Visit visit : visits) {
+            User visitor = usersById.get(visit.getUserId());
+            String managerId = managerIdFor(visit, visitor);
+            User manager = managerId == null ? null : usersById.get(managerId);
+
+            List<VisitOutlet> outletVisits = visit.getOutletVisits();
+            if (outletVisits == null || outletVisits.isEmpty()) {
+                outletVisits = visit.getOutletCodes() == null
+                        ? List.of()
+                        : visit.getOutletCodes().stream()
+                                .map(code -> VisitOutlet.builder()
+                                        .outletCode(code)
+                                        .status(visit.getStatus())
+                                        .build())
+                                .toList();
+            }
+            for (VisitOutlet outlet : outletVisits) {
+                items.add(toVisitorAttendanceItem(visit, outlet, visitor, manager));
+            }
+        }
+        return items;
+    }
+
+    private String managerIdFor(Visit visit, User visitor) {
+        String managerId = visitor == null ? null : blankToNull(visitor.getManagerId());
+        if (managerId == null && visit.getUserPath() != null && !visit.getUserPath().isEmpty()) {
+            managerId = blankToNull(visit.getUserPath().get(visit.getUserPath().size() - 1));
+        }
+        return managerId;
+    }
+
+    private VisitorAttendanceItemResponse toVisitorAttendanceItem(
+            Visit visit,
+            VisitOutlet outlet,
+            User visitor,
+            User manager) {
+        return VisitorAttendanceItemResponse.builder()
+                .visitId(visit.getVisitId())
+                .visitDay(parseDay(visit.getVisitDay()))
+                .visitorName(displayName(visitor, visit.getUserName()))
+                .managerName(displayName(manager, null))
+                .outletCode(outlet.getOutletCode())
+                .outletName(outlet.getOutletName())
+                .photo(outlet.getPictureWithOutlet())
+                .checkInTime(outlet.getCheckIn() != null
+                        ? outlet.getCheckIn().getTime()
+                        : visit.getCheckIn() != null ? visit.getCheckIn().getTime() : null)
+                .checkOutTime(outlet.getCheckOut() != null
+                        ? outlet.getCheckOut().getTime()
+                        : visit.getCheckOut() != null ? visit.getCheckOut().getTime() : null)
+                .durationMinutes(outlet.getDurationMinutes() != null
+                        ? outlet.getDurationMinutes()
+                        : visit.getDurationMinutes())
+                .outcome(outlet.getOutcome() != null ? outlet.getOutcome() : visit.getOutcome())
+                .remarks(outlet.getOutcomeRemarks() != null
+                        ? outlet.getOutcomeRemarks()
+                        : visit.getOutcomeRemarks())
+                .status(outlet.getStatus() != null ? outlet.getStatus() : visit.getStatus())
+                .build();
+    }
+
+    private String displayName(User user, String fallback) {
+        if (user != null) {
+            String fullName = blankToNull(user.getFullName());
+            if (fullName != null) {
+                return fullName;
+            }
+            String userName = blankToNull(user.getUsername());
+            if (userName != null) {
+                return userName;
+            }
+        }
+        return blankToNull(fallback);
+    }
+
+    @Override
     public List<VisitSummaryResponse> getMyTodayVisits(User currentUser) {
         String today = LocalDate.now(IST).toString();
         return visitRepository.findByUserIdAndVisitDayOrderByCreatedAtAsc(currentUser.getId(), today).stream()
@@ -622,19 +796,52 @@ public class VisitServiceImpl implements VisitService {
     // =====================================================================
 
     /** What the visit module needs to know about an outlet. */
-    private record OutletInfo(String outletCode, GeoJsonPoint location, boolean active) {
+    private record OutletInfo(
+            String id,
+            String outletCode,
+            String beatId,
+            GeoJsonPoint location,
+            boolean active,
+            String name,
+            String phoneNumber,
+            OutletAddress address) {
     }
 
     /** The app may send the outlet's Mongo id or its outlet code; both work. */
     private Optional<OutletInfo> findOutlet(String outletCode) {
         return outletRepository.findById(outletCode)
                 .or(() -> outletRepository.findByOutletCode(outletCode))
-                .map(o -> new OutletInfo(outletCode, o.getLocation(), o.getStatus() == OutletStatus.ACTIVE));
+                .map(o -> new OutletInfo(
+                        o.getId(),
+                        o.getOutletCode(),
+                        o.getBeatId(),
+                        o.getLocation(),
+                        o.getStatus() == OutletStatus.ACTIVE,
+                        o.getName(),
+                        o.getPhoneNumber(),
+                        o.getAddress()));
     }
 
-    private VisitOutlet addOutlet(Visit visit, String outletCode, boolean planned) {
+    private boolean isOutletInBeat(OutletInfo outlet, String outletReference, Beat beat) {
+        return (outlet.beatId() != null && beat.getBeatId().equals(outlet.beatId()))
+                || (beat.getOutletCodes() != null
+                && (beat.getOutletCodes().contains(outletReference)
+                || beat.getOutletCodes().contains(outlet.id())
+                || beat.getOutletCodes().contains(outlet.outletCode())));
+    }
+
+    private VisitOutlet addOutlet(
+            Visit visit,
+            String outletCode,
+            boolean planned,
+            String beatId,
+            OutletInfo outlet) {
         VisitOutlet entry = VisitOutlet.builder()
                 .outletCode(outletCode)
+                .beatId(beatId)
+                .outletName(outlet.name())
+                .phoneNumber(outlet.phoneNumber())
+                .address(outlet.address())
                 .planned(planned)
                 .status(VisitStatus.PLANNED)
                 .build();
@@ -721,6 +928,19 @@ public class VisitServiceImpl implements VisitService {
                 .distanceFromOutletMeters(distance)
                 .withinRange(withinRange)
                 .build();
+    }
+
+    private void requireOutletLocation(GeoJsonPoint outletLocation) {
+        if (outletLocation == null) {
+            throw badRequest("This outlet has no saved latitude and longitude. Ask an administrator to update its location before checking in or out.");
+        }
+    }
+
+    private void requireWithinOutletRadius(VisitPunch punch, String action) {
+        if (enforceGeofence && Boolean.FALSE.equals(punch.getWithinRange())) {
+            throw badRequest(String.format("You are %.0f m from the outlet. Move within %.0f m to %s.",
+                    punch.getDistanceFromOutletMeters(), checkInRadiusMeters, action));
+        }
     }
 
     /** Accepts the phone's time (offline work) but rejects times in the future or too far in the past. */
@@ -821,7 +1041,8 @@ public class VisitServiceImpl implements VisitService {
                 .userId(visit.getUserId())
                 .userName(visit.getUserName())
                 .outletCodes(visit.getOutletCodes())
-                .outletVisits(visit.getOutletVisits().stream().map(this::toOutletResponse).toList())
+                .outletVisits(visit.getOutletVisits().stream()
+                        .map(outlet -> toOutletResponse(outlet, visit.getBeatId())).toList())
                 .beatId(visit.getBeatId())
                 .visitDay(parseDay(visit.getVisitDay()))
                 .planned(visit.isPlanned())
@@ -841,9 +1062,14 @@ public class VisitServiceImpl implements VisitService {
                 .build();
     }
 
-    private VisitOutletResponse toOutletResponse(VisitOutlet o) {
+    private VisitOutletResponse toOutletResponse(VisitOutlet o, String visitBeatId) {
+        OutletInfo details = outletDetailsFor(o);
         return VisitOutletResponse.builder()
                 .outletCode(o.getOutletCode())
+                .beatId(o.getBeatId() != null ? o.getBeatId() : visitBeatId)
+                .outletName(o.getOutletName() != null ? o.getOutletName() : details != null ? details.name() : null)
+                .phoneNumber(o.getPhoneNumber() != null ? o.getPhoneNumber() : details != null ? details.phoneNumber() : null)
+                .address(o.getAddress() != null ? o.getAddress() : details != null ? details.address() : null)
                 .planned(o.isPlanned())
                 .status(o.getStatus())
                 .checkIn(toPunch(o.getCheckIn()))
@@ -862,6 +1088,9 @@ public class VisitServiceImpl implements VisitService {
                 .userId(visit.getUserId())
                 .userName(visit.getUserName())
                 .outletCodes(visit.getOutletCodes())
+                .outletVisits(visit.getOutletVisits().stream()
+                        .map(outlet -> toOutletSummary(outlet, visit.getBeatId()))
+                        .toList())
                 .beatId(visit.getBeatId())
                 .visitDay(parseDay(visit.getVisitDay()))
                 .planned(visit.isPlanned())
@@ -872,6 +1101,28 @@ public class VisitServiceImpl implements VisitService {
                 .outcome(visit.getOutcome())
                 .checkInWithinRange(visit.getCheckIn() != null ? visit.getCheckIn().getWithinRange() : null)
                 .build();
+    }
+
+    private VisitOutletSummaryResponse toOutletSummary(VisitOutlet outlet, String visitBeatId) {
+        OutletInfo details = outletDetailsFor(outlet);
+        return VisitOutletSummaryResponse.builder()
+                .outletCode(outlet.getOutletCode())
+                .beatId(outlet.getBeatId() != null ? outlet.getBeatId() : visitBeatId)
+                .outletName(outlet.getOutletName() != null ? outlet.getOutletName() : details != null ? details.name() : null)
+                .phoneNumber(outlet.getPhoneNumber() != null
+                        ? outlet.getPhoneNumber()
+                        : details != null ? details.phoneNumber() : null)
+                .address(outlet.getAddress() != null ? outlet.getAddress() : details != null ? details.address() : null)
+                .planned(outlet.isPlanned())
+                .status(outlet.getStatus())
+                .build();
+    }
+
+    private OutletInfo outletDetailsFor(VisitOutlet outlet) {
+        if (outlet.getOutletName() != null && outlet.getPhoneNumber() != null && outlet.getAddress() != null) {
+            return null;
+        }
+        return findOutlet(outlet.getOutletCode()).orElse(null);
     }
 
     private PunchResponse toPunch(VisitPunch punch) {

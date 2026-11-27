@@ -13,9 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 public class PlanVisitsResponse {
 
-    private String visitId;      // VI000000001 - the visit these outlets were added to
+    private String visitId;      // first created visit, retained for API compatibility
     private int requested;       // outlets sent
-    private int created;         // outlets added to the visit
+    private int created;         // visits created (one per outlet)
     private List<VisitSummaryResponse> visits;
 
     // Outlets that were not added: already in a visit that day, unknown or inactive

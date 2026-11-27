@@ -27,7 +27,7 @@ public class CheckInRequest {
     @NotBlank(message = "outletCode is required")
     private String outletCode;           // outlet code or outlet id
 
-    private String photoFileId;          // fileId of the photo uploaded to ImageKit (VisitImages)
+    private String photoFileId;          // required ImageKit fileId from /api/media/upload (VISIT_IMAGES)
     private String beatId;
 
     // UUID created by the app so a retried walk-in never creates a second visit

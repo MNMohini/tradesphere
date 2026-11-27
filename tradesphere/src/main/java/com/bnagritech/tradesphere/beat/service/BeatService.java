@@ -2,6 +2,7 @@ package com.bnagritech.tradesphere.beat.service;
 
 import com.bnagritech.tradesphere.beat.dto.BeatsRequest;
 import com.bnagritech.tradesphere.beat.dto.BeatsResponse;
+import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.common.enums.BeatStatus;
 
 import java.util.List;
@@ -13,6 +14,9 @@ public interface BeatService {
     BeatsResponse updateBeatStatus(String beatId, BeatsRequest request);
     BeatsResponse getBeatById(String beatId);
     List<BeatsResponse> getAllBeats();
+    List<BeatsResponse> getMyBeats(User currentUser);
+    List<BeatsResponse> getAssignableBeats(User currentUser);
+    BeatsResponse assignBeat(String beatId, String userId, User currentUser);
     // TERRITORY
     List<BeatsResponse> getBeatsByTerritory(String territoryId);
     List<BeatsResponse> searchByCity(String city);

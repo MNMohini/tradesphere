@@ -11,11 +11,13 @@ import com.bnagritech.tradesphere.visit.dto.PlanVisitsResponse;
 import com.bnagritech.tradesphere.visit.dto.VisitResponse;
 import com.bnagritech.tradesphere.visit.dto.VisitSearchRequest;
 import com.bnagritech.tradesphere.visit.dto.VisitSummaryResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitorAttendancePageResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitorAttendanceSearchRequest;
 
 import java.util.List;
 
 /**
- * One visit (VI000000001) = one user's round of several outlets on one day.
+ * One visit (VI000000001) = one user's visit to one outlet on one day.
  *
  *  plan       -> visit PLANNED, outlets PLANNED
  *  check-in   -> outlet IN_PROGRESS (first one also moves the visit to IN_PROGRESS)
@@ -43,6 +45,8 @@ public interface VisitService {
     VisitResponse getVisitById(String visitId, User currentUser);
 
     List<VisitSummaryResponse> searchVisits(VisitSearchRequest request, User currentUser);
+
+    VisitorAttendancePageResponse getVisitorAttendance(VisitorAttendanceSearchRequest request, User currentUser);
 
     List<VisitSummaryResponse> getMyTodayVisits(User currentUser);
 

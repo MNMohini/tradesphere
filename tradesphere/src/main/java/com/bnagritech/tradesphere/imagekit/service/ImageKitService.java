@@ -34,7 +34,7 @@ import java.util.UUID;
 public class ImageKitService {
 
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("image/jpeg", "image/png", "image/webp", "image/heic");
-    private static final long MAX_FILE_BYTES = 10L * 1024 * 2048;   // 10 MB
+    private static final long MAX_FILE_BYTES = 10L * 1024 * 1024;
 
     private final RestClient imageKitRestClient;
 
@@ -46,8 +46,8 @@ public class ImageKitService {
     private String privateKey;
     @Value("${app.imagekit.url-endpoint}")          // e.g. https://ik.imagekit.io/bnagritech
     private String urlEndpoint;
-    // Every file of this project goes under this folder. Use / to put the folders at the top level.
-    @Value("${app.imagekit.root-folder:/tradesphere}")
+    // Leave empty to store media folders directly at the ImageKit root.
+    @Value("${app.imagekit.root-folder:}")
     private String rootFolder;
 
     // How long a client upload signature stays valid. ImageKit allows less than 1 hour.

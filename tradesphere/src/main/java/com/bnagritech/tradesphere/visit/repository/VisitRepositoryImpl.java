@@ -18,7 +18,43 @@ public class VisitRepositoryImpl implements VisitRepositoryCustom {
 
     @Override
     public List<Visit> search(VisitFilter f) {
+        return mongoTemplate.find(sorted(buildQuery(f)), Visit.class);
+    }
+
+    @Override
+    public List<Visit> search(VisitFilter f, long offset, int limit) {
+        Query query = sorted(buildQuery(f)).skip(offset).limit(limit);
+        return mongoTemplate.find(query, Visit.class);
+    }
+
+    @Override
+    public long count(VisitFilter f) {
+        return mongoTemplate.count(buildQuery(f), Visit.class);
+    }
+
+    @Override
+    public List<Visit> searchAttendance(VisitFilter f, long offset, int limit) {
+        Query query = sorted(buildQuery(f, true)).skip(offset).limit(limit);
+        return mongoTemplate.find(query, Visit.class);
+    }
+
+    @Override
+    public long countAttendance(VisitFilter f) {
+        return mongoTemplate.count(buildQuery(f, true), Visit.class);
+    }
+
+    private Query buildQuery(VisitFilter f) {
+        return buildQuery(f, false);
+    }
+
+    private Query buildQuery(VisitFilter f, boolean attendanceOnly) {
         List<Criteria> conditions = new ArrayList<>();
+
+        if (attendanceOnly) {
+            conditions.add(new Criteria().orOperator(
+                    Criteria.where("checkIn.time").exists(true),
+                    Criteria.where("outletVisits.checkIn.time").exists(true)));
+        }
 
         // Hierarchy visibility: own visits, or visits of anyone below the viewer
         if (f.viewerUserId() != null) {
@@ -54,8 +90,10 @@ public class VisitRepositoryImpl implements VisitRepositoryCustom {
         if (!conditions.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(conditions));
         }
-        query.with(Sort.by(Sort.Direction.DESC, "visitDay").and(Sort.by(Sort.Direction.DESC, "createdAt")));
+        return query;
+    }
 
-        return mongoTemplate.find(query, Visit.class);
+    private Query sorted(Query query) {
+        return query.with(Sort.by(Sort.Direction.DESC, "visitDay").and(Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 }

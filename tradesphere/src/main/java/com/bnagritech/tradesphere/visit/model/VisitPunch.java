@@ -22,6 +22,6 @@ public class VisitPunch {
     // Straight-line distance to the outlet's saved location (null if the outlet has none)
     private Double distanceFromOutletMeters;
 
-    // true = inside the allowed radius, false = outside (flag for manager review), null = unknown
+    // Whether this punch was within the configured outlet radius.
     private Boolean withinRange;
 }

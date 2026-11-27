@@ -21,6 +21,8 @@ public class Beat {
     @Id
     private String id;
     private String beatId;
+    private String assignedUserId;
+    private String userName;
     private String territoryId;
     private BeatStatus beatStatus;
     private String state;

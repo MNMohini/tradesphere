@@ -12,8 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Plans one visit (VI000000001) covering several outlets on one day.
- * Planning again for the same day adds the new outlets to that visit.
+ * Plans one separate visit per outlet for one day.
  */
 @Data
 @Builder
@@ -26,7 +25,7 @@ public class PlanVisitsRequest {
 
     @NotEmpty(message = "At least one outlet is required")
     @Size(max = 20, message = "Plan at most 20 outlets at a time")
-    private List<String> outletCodes;   // outlet code or outlet id
+    private List<String> outletCodes;   // outlet code or outlet id; each creates a separate visit
 
     private String beatId;              // optional
 }

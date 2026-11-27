@@ -11,6 +11,8 @@ import com.bnagritech.tradesphere.visit.dto.PlanVisitsResponse;
 import com.bnagritech.tradesphere.visit.dto.VisitResponse;
 import com.bnagritech.tradesphere.visit.dto.VisitSearchRequest;
 import com.bnagritech.tradesphere.visit.dto.VisitSummaryResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitorAttendancePageResponse;
+import com.bnagritech.tradesphere.visit.dto.VisitorAttendanceSearchRequest;
 import com.bnagritech.tradesphere.visit.service.VisitService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ import java.util.List;
  * Visit endpoints. All need:  Authorization: Bearer <token>
  * {visitId} in a path accepts the tracking number (VI000000001) or the Mongo id.
  *
- *  POST /api/visits/plan                  plan one visit with several outlets for a day
+ *  POST /api/visits/plan                  plan one separate visit per outlet for a day
  *  POST /api/visits/check-in              check in at one outlet
  *  POST /api/visits/{visitId}/check-out   check out from the current outlet
  *  POST /api/visits/{visitId}/end         end the whole visit (outlets not visited -> MISSED)
@@ -57,7 +59,7 @@ public class VisitController {
         return ResponseEntity.status(HttpStatus.CREATED).body(visitService.planVisits(request, currentUser));
     }
 
-    /** { "visitId": "VI000000001", "outletCode": "OUT-001", "location": {"latitude": 26.85, "longitude": 80.95}, "photoFileId": "..." } */
+    /** Requires a recent VISIT_IMAGES photo fileId and the user's current GPS location. */
     @PostMapping("/check-in")
     public ResponseEntity<VisitResponse> checkIn(
             @Valid @RequestBody CheckInRequest request,
@@ -116,6 +118,14 @@ public class VisitController {
             @Valid @ModelAttribute VisitSearchRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(visitService.searchVisits(request, currentUser));
+    }
+
+    /** Admin-only paged attendance report; dates are inclusive. */
+    @GetMapping("/admin/attendance")
+    public ResponseEntity<VisitorAttendancePageResponse> getVisitorAttendance(
+            @Valid @ModelAttribute VisitorAttendanceSearchRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(visitService.getVisitorAttendance(request, currentUser));
     }
 
     @GetMapping("/{visitId}")
