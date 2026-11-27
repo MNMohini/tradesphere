@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
 
     // Roles allowed to create orders.
     private static final Set<UserRole> ORDER_TAKER_ROLES =
-            EnumSet.of(UserRole.SALES_REPRESENTATIVE, UserRole.SALES_OFFICER, UserRole.PROMOTER, UserRole.SUPERVISOR);
+            EnumSet.of(UserRole.SALES_REPRESENTATIVE, UserRole.SALES_OFFICER, UserRole.SUPERVISOR);
 
     // Roles that retain their existing approve/action permission.
     private static final Set<UserRole> SEE_ALL_ROLES =
@@ -133,6 +133,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse updateOrder(String orderId, UpdateOrderRequest request, User currentUser) {
+        requireOrderViewer(currentUser);
         Order order = orderRepository.findByIdAndCreatedByIn(orderId, userIdentityValues(currentUser))
                 .orElseThrow(() -> notFound("Order not found"));
 
@@ -303,6 +304,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse getOrderByOrderNumber(String orderNumber, User currentUser) {
+        requireOrderViewer(currentUser);
         return orderRepository.findByOrderNumber(orderNumber)
                 .filter(order -> canView(order, currentUser))
                 .map(this::toResponse)
@@ -311,6 +313,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderSummaryResponse> getOrdersByVisit(String visitId, User currentUser) {
+        requireOrderViewer(currentUser);
         TeamTree tree = orderTeamResolver.resolve(currentUser);
         Collection<String> creatorReferences = visibleCreatorReferences(currentUser, tree, true);
         OrderFilter filter = new OrderFilter(
@@ -320,6 +323,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderSummaryResponse> getMyDrafts(User currentUser) {
+        requireOrderViewer(currentUser);
         return orderRepository
                 .findByCreatedByInAndStatusOrderByOrderDateDesc(
                         userIdentityValues(currentUser), OrderStatus.DRAFT).stream()
@@ -329,6 +333,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderSummaryResponse> searchOrders(OrderSearchRequest request, User currentUser) {
+        requireOrderViewer(currentUser);
         DateBounds bounds = dateBounds(request.getFromDate(), request.getToDate());
         TeamTree tree = orderTeamResolver.resolve(currentUser);
         OrderFilter filter = new OrderFilter(
@@ -347,6 +352,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public TeamMembersPageResponse getTeamMembers(OrderTeamSearchRequest request, User currentUser) {
+        requireOrderViewer(currentUser);
         TeamTree tree = orderTeamResolver.resolve(currentUser);
         User parent = resolveTeamMember(tree, request.getMemberId(), true);
         List<User> directReports = tree.directReports(parent).stream()
@@ -444,6 +450,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public SyncOrdersResponse syncOrders(SyncOrdersRequest request, User currentUser) {
+        requireOrderTaker(currentUser);
         List<SyncOrderResult> results = new ArrayList<>();
         int created = 0;
         int duplicates = 0;
@@ -795,6 +802,12 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    private void requireOrderViewer(User user) {
+        if (user == null || user.getRole() == UserRole.PROMOTER) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your role cannot access orders");
+        }
+    }
+
     private boolean isCreator(Order order, User user) {
         return Objects.equals(order.getCreatedBy(), user.getId())
                 || Objects.equals(order.getCreatedBy(), user.getUsername());
@@ -818,11 +831,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private boolean canView(Order order, User user) {
-        return orderTeamResolver.canViewOrder(user, order);
+        return user != null && user.getRole() != UserRole.PROMOTER
+                && orderTeamResolver.canViewOrder(user, order);
     }
 
     /** Hidden orders look like missing orders (404), so their existence is not revealed. */
     private Order loadVisibleOrder(String orderId, User user) {
+        requireOrderViewer(user);
         return orderRepository.findById(orderId)
                 .filter(order -> canView(order, user))
                 .orElseThrow(() -> notFound("Order not found"));
@@ -848,6 +863,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Collection<String> visibleCreatorReferences(User user, TeamTree tree, boolean includeRoot) {
+        requireOrderViewer(user);
         if (user.getRole() == UserRole.ADMIN) {
             return null;
         }
@@ -867,6 +883,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private TeamOrderQuery buildTeamOrderQuery(OrderTeamSearchRequest request, User currentUser) {
+        requireOrderViewer(currentUser);
         TeamTree tree = null;
         Collection<String> creatorReferences;
         if (request.isMyOrdersOnly()) {

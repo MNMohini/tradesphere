@@ -74,18 +74,18 @@ class OrderTeamResolverTest {
     }
 
     @Test
-    void resolvesOnlyCurrentDescendantsAndKeepsSupervisorPromoterBranchSeparateFromSr() {
+    void resolvesCurrentOrderDescendantsAndExcludesPromoters() {
         OrderTeamResolver.TeamTree rsmTree = resolver.resolve(firstRsm);
         OrderTeamResolver.TeamTree srTree = resolver.resolve(sr);
         OrderTeamResolver.TeamTree supervisorTree = resolver.resolve(supervisor);
 
         assertTrue(rsmTree.contains(so.getId()));
         assertTrue(rsmTree.contains(sr.getId()));
-        assertTrue(rsmTree.contains(promoter.getId()));
         assertFalse(rsmTree.contains(secondRsm.getId()));
         assertFalse(rsmTree.contains(otherSo.getId()));
+        assertFalse(rsmTree.contains(promoter.getId()));
+        assertFalse(supervisorTree.contains(promoter.getId()));
         assertFalse(srTree.contains(promoter.getId()));
-        assertTrue(supervisorTree.contains(promoter.getId()));
         assertFalse(srTree.contains(so.getId()));
     }
 
@@ -136,6 +136,7 @@ class OrderTeamResolverTest {
         promoter.setManagerId(sr.getUsername());
 
         assertFalse(resolver.resolve(sr).contains(promoter.getId()));
+        assertFalse(resolver.canViewOrder(promoter, Order.builder().createdBy(promoter.getId()).build()));
     }
 
     private User user(String id, String username, String managerId, UserRole role) {

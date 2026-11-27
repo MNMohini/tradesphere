@@ -69,6 +69,7 @@ public class OrderTeamResolver {
     private boolean isAllowedChild(User manager, User report) {
         return manager.getRole() != null
                 && report.getRole() != null
+                && report.getRole() != UserRole.PROMOTER
                 && manager.getRole().allowedChildren().contains(report.getRole());
     }
 
@@ -110,6 +111,9 @@ public class OrderTeamResolver {
     }
 
     public boolean canViewOrder(User viewer, Order order) {
+        if (viewer == null || viewer.getRole() == UserRole.PROMOTER) {
+            return false;
+        }
         if (viewer.getRole() == UserRole.ADMIN) {
             return true;
         }
