@@ -41,8 +41,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         if (f.paymentStatus() != null) {
             conditions.add(Criteria.where("payment.paymentStatus").is(f.paymentStatus()));
         }
-        if (f.outletId() != null) {
-            conditions.add(Criteria.where("outletId").is(f.outletId()));
+        if (f.outletCode() != null) {
+            conditions.add(Criteria.where("outletCode").is(f.outletCode()));
         }
         if (f.createdBy() != null) {
             conditions.add(Criteria.where("createdBy").is(f.createdBy()));

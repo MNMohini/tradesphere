@@ -28,17 +28,14 @@ public class OrderResponse {
     private String orderNumber;
     private String clientOrderId;
 
-    private String outletId;
+    private String outletCode;
     private String outletName;
     private String visitId;
     private String beatId;
-    private String territoryId;
 
     private String createdBy;
-    private String createdByName;
 
     private Instant orderDate;
-    private LocationDto location;
 
     private List<OrderItemResponse> items;
 

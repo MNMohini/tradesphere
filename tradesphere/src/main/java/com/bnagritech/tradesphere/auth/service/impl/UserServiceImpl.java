@@ -174,14 +174,14 @@ public class UserServiceImpl implements UserService {
             }
             // The creator must be the manager, or above the manager (an admin may create anywhere)
             boolean allowed = actor.getRole() == UserRole.ADMIN
-                    || actor.getId().equals(manager.getId())
-                    || (manager.getPath() != null && manager.getPath().contains(actor.getId()));
+                    || actor.getUsername().equals(manager.getUsername())
+                    || (manager.getPath() != null && manager.getPath().contains(actor.getUsername()));
             if (!allowed) {
                 throw forbidden("You can create users only under yourself or under someone below you");
             }
-            managerId = manager.getId();
+            managerId = manager.getUsername();
             path.addAll(manager.getPath());
-            path.add(manager.getId());
+            path.add(manager.getUsername());
         }
 
         String userName = normalize(r.getUserName());

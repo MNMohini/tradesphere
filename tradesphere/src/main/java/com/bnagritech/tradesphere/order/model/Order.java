@@ -45,7 +45,7 @@ public class Order {
     @Indexed(unique = true, sparse = true)
     private String clientOrderId;
     // ---- Who, where, when ----
-    private String outletId;
+    private String outletCode;
     private String outletName;          // snapshot at order time
     private String visitId;
     private String beatId;

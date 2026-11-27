@@ -18,7 +18,7 @@ public record OrderFilter(
         String viewerUserId,
         OrderStatus status,
         PaymentStatus paymentStatus,
-        String outletId,
+        String outletCode,
         String createdBy,
         Instant fromInclusive,
         Instant toExclusive

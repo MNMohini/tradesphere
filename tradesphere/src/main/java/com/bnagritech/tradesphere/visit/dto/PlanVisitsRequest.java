@@ -24,7 +24,7 @@ public class PlanVisitsRequest {
     private LocalDate plannedDate;
 
     @NotEmpty(message = "At least one outlet is required")
-    @Size(max = 20, message = "Plan at most 20 outlets at a time")
+    @Size(max = 4, message = "Plan at most 20 outlets at a time")
     private List<String> outletCodes;   // outlet code or outlet id; each creates a separate visit
 
     private String beatId;              // optional

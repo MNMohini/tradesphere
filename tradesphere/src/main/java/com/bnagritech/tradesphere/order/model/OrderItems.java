@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class OrderItems {
 
-    private String productId;
     private String skuCode;
     private String productName;
     private String unit;                 // PCS, CASE, KG ...

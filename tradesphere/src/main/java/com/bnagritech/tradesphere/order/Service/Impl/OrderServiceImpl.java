@@ -29,6 +29,7 @@ import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.outlet.model.Outlet;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
 import com.bnagritech.tradesphere.product.repository.ProductRepository;
+import com.bnagritech.tradesphere.visit.repository.VisitRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
 
     // Roles that may take orders. Promoters and supervisors do not.
     private static final Set<UserRole> ORDER_TAKER_ROLES =
-            EnumSet.of(UserRole.SALES_REPRESENTATIVE, UserRole.SALES_OFFICER);
+            EnumSet.of(UserRole.SALES_REPRESENTATIVE, UserRole.SALES_OFFICER, UserRole.PROMOTER, UserRole.SUPERVISOR);
 
     // Roles that may see (and approve) every order.
     private static final Set<UserRole> SEE_ALL_ROLES =
@@ -74,6 +75,7 @@ public class OrderServiceImpl implements OrderService {
     // Allowed status changes. Anything not listed is rejected.
     private static final Map<OrderStatus, Set<OrderStatus>> TRANSITIONS = Map.of(
             OrderStatus.DRAFT, EnumSet.of(OrderStatus.SUBMITTED, OrderStatus.CANCELLED),
+            OrderStatus.SUBMITTED, EnumSet.of(OrderStatus.APPROVED, OrderStatus.CANCELLED),
             OrderStatus.PENDING_APPROVAL, EnumSet.of(OrderStatus.APPROVED, OrderStatus.CANCELLED),
             OrderStatus.APPROVED, EnumSet.of(OrderStatus.DELIVERED, OrderStatus.CANCELLED),
             OrderStatus.CANCELLED, EnumSet.noneOf(OrderStatus.class),
@@ -84,6 +86,7 @@ public class OrderServiceImpl implements OrderService {
     private final Validator validator;
     private final OutletRepository outletRepository;
     private final ProductRepository productRepository;
+    private final VisitRepository visitRepository;
     // =====================================================================
     // Create / preview / update
     // =====================================================================
@@ -97,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderPreviewResponse previewOrder(OrderPreviewRequest request, User currentUser) {
         requireOrderTaker(currentUser);
-        loadOutletName(request.getOutletId());   // fails if the outlet does not exist
+        loadOutletName(request.getOutletCode());   // fails if the outlet does not exist
 
         List<String> warnings = new ArrayList<>();
         PricedBasket basket = priceItems(request.getItems(), false, warnings);
@@ -190,11 +193,11 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(to);
-        order.setUpdatedBy(currentUser.getId());
+        order.setUpdatedBy(currentUser.getUsername());
         order.getStatusHistory().add(OrderStatusHistory.builder()
                 .fromStatus(from)
                 .toStatus(to)
-                .updatedBy(currentUser.getId())
+                .updatedBy(currentUser.getUsername())
                 .remarks(reason != null ? reason : request.getRemarks())
                 .updatedAt(now)
                 .build());
@@ -233,7 +236,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setPayment(payment);
-        order.setUpdatedBy(currentUser.getId());
+        order.setUpdatedBy(currentUser.getUsername());
         return toResponse(orderRepository.save(order));
     }
 
@@ -244,7 +247,7 @@ public class OrderServiceImpl implements OrderService {
                 "You are not allowed to update delivery on this order");
 
         if (order.getStatus() != OrderStatus.APPROVED && order.getStatus() != OrderStatus.DELIVERED) {
-            throw badRequest("Delivery can be updated only for APPROVED or COMPLETED orders");
+            throw badRequest("Delivery can be updated only for APPROVED or DELIVERED orders");
         }
 
         DeliveryInfo delivery = order.getDelivery() != null ? order.getDelivery() : new DeliveryInfo();
@@ -270,7 +273,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setDelivery(delivery);
-        order.setUpdatedBy(currentUser.getId());
+        order.setUpdatedBy(currentUser.getUsername());
         return toResponse(orderRepository.save(order));
     }
 
@@ -303,7 +306,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderSummaryResponse> getMyDrafts(User currentUser) {
         return orderRepository
-                .findByCreatedByAndStatusOrderByOrderDateDesc(currentUser.getId(), OrderStatus.DRAFT).stream()
+                .findByCreatedByAndStatusOrderByOrderDateDesc(currentUser.getUsername(), OrderStatus.DRAFT).stream()
                 .map(this::toSummary)
                 .toList();
     }
@@ -331,7 +334,7 @@ public class OrderServiceImpl implements OrderService {
                 viewer,
                 request.getStatus(),
                 request.getPaymentStatus(),
-                request.getOutletId(),
+                request.getOutletCode(),
                 request.getCreatedBy(),
                 fromInclusive,
                 toExclusive);
@@ -447,7 +450,7 @@ public class OrderServiceImpl implements OrderService {
             throw badRequest("orderDate is in the future. Check the device clock.");
         }
 
-        String outletName = loadOutletName(request.getOutletId());
+        String outletName = loadOutletName(request.getOutletCode());
         VisitInfo visit = resolveVisit(request, user);
         String beatId = (visit != null && visit.beatId() != null) ? visit.beatId() : request.getBeatId();
         PricedBasket basket = priceItems(request.getItems(), true, null);
@@ -470,27 +473,25 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .orderNumber(nextOrderNumber(now))
                 .clientOrderId(request.getClientOrderId())
-                .outletId(request.getOutletId())
+                .outletCode(request.getOutletCode())
                 .outletName(outletName)
-                .visitId(request.getVisitId())
+                .visitId(visit != null ? visit.visitId() : null)   // always the VI number
                 .beatId(beatId)
-                .createdBy(user.getId())
-                .createdByName(displayName(user))
+                .createdBy(user.getUsername())
                 .userPath(userPath)
                 .orderDate(orderDate)
-                .location(toPoint(request.getLocation()))
                 .status(initialStatus)
                 .remarks(request.getRemarks())
                 .payment(payment)
                 .delivery(delivery)
-                .updatedBy(user.getId())
+                .updatedBy(user.getUsername())
                 .build();
         applyBasket(order, basket);
 
         order.setStatusHistory(new ArrayList<>(List.of(OrderStatusHistory.builder()
                 .fromStatus(null)
                 .toStatus(initialStatus)
-                .updatedBy(user.getId())
+                .updatedBy(user.getUsername())
                 .remarks("Order created")
                 .updatedAt(now)
                 .build())));
@@ -505,7 +506,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private CreateOutcome duplicateOutcome(Order existing, User user) {
-        if (!user.getId().equals(existing.getCreatedBy())) {
+        if (!user.getUsername().equals(existing.getCreatedBy())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "clientOrderId is already used by another user");
         }
         return new CreateOutcome(existing, true);
@@ -542,7 +543,6 @@ public class OrderServiceImpl implements OrderService {
     // =====================================================================
 
     private record ProductPricing(
-            String productId,
             String skuCode,
             String productName,
             String unit,
@@ -598,7 +598,6 @@ public class OrderServiceImpl implements OrderService {
             BigDecimal lineTotal = money(taxable.add(tax));
 
             items.add(OrderItems.builder()
-                    .productId(product.productId())
                     .skuCode(product.skuCode())
                     .productName(product.productName())
                     .unit(product.unit())
@@ -619,8 +618,11 @@ public class OrderServiceImpl implements OrderService {
             grandTotal = grandTotal.add(lineTotal);
         }
 
-        throw badRequest("The order has no valid items");
-
+        if (items.isEmpty()) {
+            throw badRequest("The order has no valid items");
+        }
+        return new PricedBasket(items, money(subtotal), money(totalDiscount), money(totalScheme),
+                money(totalTax), money(grandTotal));
     }
 
     private void applyBasket(Order order, PricedBasket basket) {
@@ -632,15 +634,10 @@ public class OrderServiceImpl implements OrderService {
         order.setGrandTotal(basket.grandTotal());
     }
 
-    // ---------------------------------------------------------------------
-    // TODO: connect to the Product, Scheme, Outlet and Visit modules once they exist.
-    // Only these four methods need to change. Nothing else here depends on them.
-    // ---------------------------------------------------------------------
-
     /** Return the current price and tax of the product, or null if it does not exist. */
     private ProductPricing loadProductPricing(String productId) {
         return productRepository.findById(productId)
-                .map(p -> new ProductPricing(p.getId(), p.getSkuCode(), p.getName(), p.getUnit().name(),
+                .map(p -> new ProductPricing( p.getSkuCode(), p.getName(), p.getUnit().name(),
                         p.getMrp(), p.getSellingPrice(), p.getTaxPercent(),
                         p.getStatus() == ProductStatus.ACTIVE))
                 .orElse(null);
@@ -653,7 +650,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     /** What the order module needs to know about a visit. */
-    private record VisitInfo(String visitId, String outletId, String userId, String beatId) {
+    private record VisitInfo(String visitId, List<String> outletIds, String userId, String beatId) {
     }
     private String loadOutletName(String outletId) {
         return outletRepository.findById(outletId)
@@ -663,7 +660,11 @@ public class OrderServiceImpl implements OrderService {
     }
     /** Return the visit, or null if it does not exist. */
     private VisitInfo loadVisit(String visitId) {
-        throw new UnsupportedOperationException("Visit module is not connected yet");
+        // The app may send the tracking number (VI000000001) or the visit's Mongo id
+        return visitRepository.findByVisitId(visitId)
+                .or(() -> visitRepository.findById(visitId))
+                .map(v -> new VisitInfo(v.getVisitId(), v.getOutletCodes(), v.getUserId(), v.getBeatId()))
+                .orElse(null);
     }
 
     /**
@@ -684,8 +685,14 @@ public class OrderServiceImpl implements OrderService {
         if (!user.getId().equals(visit.userId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This visit belongs to another user");
         }
-        if (!request.getOutletId().equals(visit.outletId())) {
-            throw badRequest("The visit is for a different outlet");
+        // The visit may hold the outlet's Mongo id or its outlet code; accept either
+        boolean inVisit = visit.outletIds() != null && (
+                visit.outletIds().contains(request.getOutletCode())
+                        || outletRepository.findById(request.getOutletCode())
+                        .map(o -> visit.outletIds().contains(o.getOutletCode()))
+                        .orElse(false));
+        if (!inVisit) {
+            throw badRequest("Outlet " + request.getOutletCode() + " is not part of visit " + visit.visitId());
         }
         return visit;
     }
@@ -741,15 +748,12 @@ public class OrderServiceImpl implements OrderService {
                 .id(order.getId())
                 .orderNumber(order.getOrderNumber())
                 .clientOrderId(order.getClientOrderId())
-                .outletId(order.getOutletId())
+                .outletCode(order.getOutletCode())
                 .outletName(order.getOutletName())
                 .visitId(order.getVisitId())
                 .beatId(order.getBeatId())
-                .territoryId(order.getTerritoryId())
                 .createdBy(order.getCreatedBy())
-                .createdByName(order.getCreatedByName())
                 .orderDate(order.getOrderDate())
-                .location(toLocationDto(order.getLocation()))
                 .items(order.getItems() == null ? List.of()
                         : order.getItems().stream().map(this::toItemResponse).toList())
                 .subtotal(order.getSubtotal())
@@ -774,7 +778,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderSummaryResponse.builder()
                 .id(order.getId())
                 .orderNumber(order.getOrderNumber())
-                .outletId(order.getOutletId())
+                .outletCode(order.getOutletCode())
                 .outletName(order.getOutletName())
                 .createdBy(order.getCreatedBy())
                 .createdByName(order.getCreatedByName())
@@ -790,7 +794,6 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderItemResponse toItemResponse(OrderItems item) {
         return OrderItemResponse.builder()
-                .productId(item.getProductId())
                 .skuCode(item.getSkuCode())
                 .productName(item.getProductName())
                 .unit(item.getUnit())

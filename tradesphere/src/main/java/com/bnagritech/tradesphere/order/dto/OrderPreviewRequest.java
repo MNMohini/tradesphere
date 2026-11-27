@@ -21,7 +21,7 @@ import java.util.List;
 public class OrderPreviewRequest {
 
     @NotBlank(message = "outletId is required")
-    private String outletId;
+    private String outletCode;
 
     @NotEmpty(message = "At least one item is required")
     @Valid

@@ -20,7 +20,7 @@ public class OrderSummaryResponse {
 
     private String id;
     private String orderNumber;
-    private String outletId;
+    private String outletCode;
     private String outletName;
     private String createdBy;
     private String createdByName;

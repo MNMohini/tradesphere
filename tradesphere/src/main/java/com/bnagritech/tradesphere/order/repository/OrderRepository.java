@@ -29,7 +29,6 @@ public interface OrderRepository extends MongoRepository<Order, String>, OrderRe
 
     List<Order> findByVisitIdOrderByOrderDateDesc(String visitId);
 
-    List<Order> findByOutletIdOrderByOrderDateDesc(String outletId);
     long countByVisitIdAndStatusNotIn(String visitId, Collection<OrderStatus> statuses);
     /** For example a rep's own DRAFT orders. */
     List<Order> findByCreatedByAndStatusOrderByOrderDateDesc(String createdBy, OrderStatus status);

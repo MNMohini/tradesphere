@@ -24,7 +24,7 @@ public class OrderSearchRequest {
 
     private OrderStatus status;
     private PaymentStatus paymentStatus;
-    private String outletId;
+    private String outletCode;
     private String createdBy;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

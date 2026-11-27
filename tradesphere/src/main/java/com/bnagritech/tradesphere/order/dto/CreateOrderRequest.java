@@ -28,8 +28,8 @@ public class CreateOrderRequest {
     @Size(max = 64)
     private String clientOrderId;
 
-    @NotBlank(message = "outletId is required")
-    private String outletId;
+    @NotBlank(message = "outletCode is required")
+    private String outletCode;
 
     private String visitId;
     private String beatId;
@@ -38,8 +38,6 @@ public class CreateOrderRequest {
     // If null, the server uses the current time.
     private Instant orderDate;
 
-    @Valid
-    private LocationDto location;
 
     @NotEmpty(message = "At least one item is required")
     @Valid
