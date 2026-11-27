@@ -563,10 +563,7 @@ public class OrderServiceImpl implements OrderService {
     ) {
     }
 
-    /**
-     * strict = true  (create/update): an unknown or inactive product rejects the request.
-     * strict = false (preview): such items are skipped and a warning is added.
-     */
+
     private PricedBasket priceItems(List<OrderItemRequest> requested, boolean strict, List<String> warnings) {
         List<OrderItems> items = new ArrayList<>();
         BigDecimal subtotal = BigDecimal.ZERO;
@@ -576,11 +573,11 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal grandTotal = BigDecimal.ZERO;
 
         for (OrderItemRequest req : requested) {
-            ProductPricing product = loadProductPricing(req.getProductId());
+            ProductPricing product = loadProductPricing(req.getSkuCode());
 
             if (product == null || !product.active()) {
                 String message = (product == null ? "Product not found: " : "Product is inactive: ")
-                        + req.getProductId();
+                        + req.getSkuCode();
                 if (strict) {
                     throw badRequest(message);
                 }
@@ -635,8 +632,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /** Return the current price and tax of the product, or null if it does not exist. */
-    private ProductPricing loadProductPricing(String productId) {
-        return productRepository.findById(productId)
+    private ProductPricing loadProductPricing(String skuCode) {
+        return productRepository.findBySkuCode(skuCode)
                 .map(p -> new ProductPricing( p.getSkuCode(), p.getName(), p.getUnit().name(),
                         p.getMrp(), p.getSellingPrice(), p.getTaxPercent(),
                         p.getStatus() == ProductStatus.ACTIVE))
@@ -667,12 +664,6 @@ public class OrderServiceImpl implements OrderService {
                 .orElse(null);
     }
 
-    /**
-     * visitId is optional. When it is given, the visit must exist, belong to the
-     * caller and be for the same outlet. The visit's beat then replaces any beatId
-     * sent by the app. The visit is NOT required to be open: an offline order may
-     * be uploaded after the rep has already checked out.
-     */
     private VisitInfo resolveVisit(CreateOrderRequest request, User user) {
         String visitId = request.getVisitId();
         if (visitId == null || visitId.isBlank()) {
@@ -806,16 +797,6 @@ public class OrderServiceImpl implements OrderService {
                 .totalAmount(item.getTotalAmount())
                 .schemeId(item.getSchemeId())
                 .build();
-    }
-
-    // GeoJSON stores longitude first, then latitude
-    private GeoJsonPoint toPoint(LocationDto location) {
-        return location == null ? null : new GeoJsonPoint(location.getLongitude(), location.getLatitude());
-    }
-
-    private LocationDto toLocationDto(GeoJsonPoint point) {
-        return point == null ? null
-                : LocationDto.builder().latitude(point.getY()).longitude(point.getX()).build();
     }
 
     // =====================================================================

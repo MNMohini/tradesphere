@@ -21,13 +21,11 @@ public class OrderItems {
     private String productName;
     private String unit;                 // PCS, CASE, KG ...
     private Integer quantity;
-
     private BigDecimal mrp;
     private BigDecimal sellingPrice;
     private BigDecimal discount;
     private BigDecimal taxableAmount;
     private BigDecimal taxAmount;
     private BigDecimal totalAmount;      // final line total
-
     private String schemeId;
 }

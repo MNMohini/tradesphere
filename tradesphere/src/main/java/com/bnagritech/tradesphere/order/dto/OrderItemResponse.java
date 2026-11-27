@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class OrderItemResponse {
 
-    private String productId;
     private String skuCode;
     private String productName;
     private String unit;
