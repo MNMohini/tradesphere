@@ -51,9 +51,9 @@ public class Order {
     private String beatId;
     private String territoryId;
 
-    private String createdBy;           // user id
+    private String createdBy;           // user id; older orders may contain the username
     private String createdByName;       // snapshot at order time
-    private List<String> userPath;      // creator's ancestors, for manager-level reports
+    private List<String> userPath;      // creator's ancestors; hierarchy data may use usernames
 
     private Instant orderDate;
     private GeoJsonPoint location;      // where the order was captured

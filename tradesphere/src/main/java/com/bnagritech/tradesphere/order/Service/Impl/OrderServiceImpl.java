@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -64,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
     private static final Duration MAX_CLOCK_SKEW = Duration.ofMinutes(10);
     private static final int DEFAULT_SEARCH_DAYS = 30;
 
-    // Roles that may take orders. Promoters and supervisors do not.
+    // Roles allowed to create orders.
     private static final Set<UserRole> ORDER_TAKER_ROLES =
             EnumSet.of(UserRole.SALES_REPRESENTATIVE, UserRole.SALES_OFFICER, UserRole.PROMOTER, UserRole.SUPERVISOR);
 
@@ -118,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse updateOrder(String orderId, UpdateOrderRequest request, User currentUser) {
-        Order order = orderRepository.findByIdAndCreatedBy(orderId, currentUser.getId())
+        Order order = orderRepository.findByIdAndCreatedByIn(orderId, userIdentityValues(currentUser))
                 .orElseThrow(() -> notFound("Order not found"));
 
         if (order.getStatus() != OrderStatus.DRAFT) {
@@ -306,7 +307,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderSummaryResponse> getMyDrafts(User currentUser) {
         return orderRepository
-                .findByCreatedByAndStatusOrderByOrderDateDesc(currentUser.getUsername(), OrderStatus.DRAFT).stream()
+                .findByCreatedByInAndStatusOrderByOrderDateDesc(
+                        userIdentityValues(currentUser), OrderStatus.DRAFT).stream()
                 .map(this::toSummary)
                 .toList();
     }
@@ -328,10 +330,13 @@ public class OrderServiceImpl implements OrderService {
         Instant fromInclusive = from != null ? from.atStartOfDay(IST).toInstant() : null;
         Instant toExclusive = to != null ? to.plusDays(1).atStartOfDay(IST).toInstant() : null;
 
-        String viewer = SEE_ALL_ROLES.contains(currentUser.getRole()) ? null : currentUser.getId();
+        boolean canSeeAll = SEE_ALL_ROLES.contains(currentUser.getRole());
+        String viewerId = canSeeAll ? null : currentUser.getId();
+        String viewerUsername = canSeeAll ? null : currentUser.getUsername();
 
         OrderFilter filter = new OrderFilter(
-                viewer,
+                viewerId,
+                viewerUsername,
                 request.getStatus(),
                 request.getPaymentStatus(),
                 request.getOutletCode(),
@@ -477,7 +482,8 @@ public class OrderServiceImpl implements OrderService {
                 .outletName(outletName)
                 .visitId(visit != null ? visit.visitId() : null)   // always the VI number
                 .beatId(beatId)
-                .createdBy(user.getUsername())
+                .createdBy(user.getId())
+                .createdByName(user.getFullName())
                 .userPath(userPath)
                 .orderDate(orderDate)
                 .status(initialStatus)
@@ -506,7 +512,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private CreateOutcome duplicateOutcome(Order existing, User user) {
-        if (!user.getUsername().equals(existing.getCreatedBy())) {
+        if (!isCreator(existing, user)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "clientOrderId is already used by another user");
         }
         return new CreateOutcome(existing, true);
@@ -699,7 +705,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private boolean isCreator(Order order, User user) {
-        return user.getId().equals(order.getCreatedBy());
+        return Objects.equals(order.getCreatedBy(), user.getId())
+                || Objects.equals(order.getCreatedBy(), user.getUsername());
     }
 
     /** A manager above the creator: someone in the creator's hierarchy path, or admin / national head. */
@@ -710,7 +717,16 @@ public class OrderServiceImpl implements OrderService {
         if (SEE_ALL_ROLES.contains(user.getRole())) {
             return true;
         }
-        return order.getUserPath() != null && order.getUserPath().contains(user.getId());
+        return order.getUserPath() != null
+                && (order.getUserPath().contains(user.getId())
+                || order.getUserPath().contains(user.getUsername()));
+    }
+
+    private List<String> userIdentityValues(User user) {
+        return Stream.of(user.getId(), user.getUsername())
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 
     private boolean canView(Order order, User user) {

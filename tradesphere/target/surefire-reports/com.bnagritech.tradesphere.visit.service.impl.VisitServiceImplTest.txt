@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.bnagritech.tradesphere.visit.service.impl.VisitServiceImplTest
 -------------------------------------------------------------------------------
-Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.784 s -- in com.bnagritech.tradesphere.visit.service.impl.VisitServiceImplTest
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.980 s -- in com.bnagritech.tradesphere.visit.service.impl.VisitServiceImplTest

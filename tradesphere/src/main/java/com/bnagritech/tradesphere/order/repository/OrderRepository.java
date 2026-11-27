@@ -25,6 +25,8 @@ public interface OrderRepository extends MongoRepository<Order, String>, OrderRe
     /** Load an order only if it belongs to this user (rep editing a draft). */
     Optional<Order> findByIdAndCreatedBy(String id, String createdBy);
 
+    Optional<Order> findByIdAndCreatedByIn(String id, Collection<String> createdBy);
+
     // ---- Lists ----
 
     List<Order> findByVisitIdOrderByOrderDateDesc(String visitId);
@@ -32,5 +34,8 @@ public interface OrderRepository extends MongoRepository<Order, String>, OrderRe
     long countByVisitIdAndStatusNotIn(String visitId, Collection<OrderStatus> statuses);
     /** For example a rep's own DRAFT orders. */
     List<Order> findByCreatedByAndStatusOrderByOrderDateDesc(String createdBy, OrderStatus status);
+
+    List<Order> findByCreatedByInAndStatusOrderByOrderDateDesc(
+            Collection<String> createdBy, OrderStatus status);
 
 }

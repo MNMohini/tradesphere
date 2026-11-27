@@ -28,12 +28,18 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     public List<Order> search(OrderFilter f) {
         List<Criteria> conditions = new ArrayList<>();
 
-        // Hierarchy visibility: own orders, or orders of anyone below the viewer.
-        // "userPath" is an array of ancestor ids, so .is(id) means "array contains id".
-        if (f.viewerUserId() != null) {
-            conditions.add(new Criteria().orOperator(
-                    Criteria.where("createdBy").is(f.viewerUserId()),
-                    Criteria.where("userPath").is(f.viewerUserId())));
+        // Existing records contain usernames while newer records use user IDs.
+        if (f.viewerUserId() != null || f.viewerUsername() != null) {
+            List<Criteria> visibility = new ArrayList<>();
+            if (f.viewerUserId() != null) {
+                visibility.add(Criteria.where("createdBy").is(f.viewerUserId()));
+                visibility.add(Criteria.where("userPath").is(f.viewerUserId()));
+            }
+            if (f.viewerUsername() != null) {
+                visibility.add(Criteria.where("createdBy").is(f.viewerUsername()));
+                visibility.add(Criteria.where("userPath").is(f.viewerUsername()));
+            }
+            conditions.add(new Criteria().orOperator(visibility.toArray(Criteria[]::new)));
         }
         if (f.status() != null) {
             conditions.add(Criteria.where("status").is(f.status()));
