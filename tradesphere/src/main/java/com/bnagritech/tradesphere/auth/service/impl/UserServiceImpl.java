@@ -638,6 +638,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse toResponse(User u) {
+        User manager = findManager(u.getManagerId());
+        String managerName = manager == null ? null : blankToNull(manager.getFullName());
+        if (manager != null && managerName == null) {
+            managerName = manager.getUsername();
+        }
+
         return UserResponse.builder()
                 .id(u.getId())
                 .userName(u.getUsername())
@@ -647,6 +653,8 @@ public class UserServiceImpl implements UserService {
                 .profileImageUrl(u.getProfileImageUrl())
                 .role(u.getRole())
                 .managerId(u.getManagerId())
+                .managerName(managerName)
+                .managerRole(manager == null ? null : manager.getRole())
                 .territoryIds(u.getTerritoryIds())
                 .status(u.getStatus())
                 .statusReason(u.getStatusReason())
@@ -655,6 +663,15 @@ public class UserServiceImpl implements UserService {
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())
                 .build();
+    }
+
+    private User findManager(String managerReference) {
+        if (isBlank(managerReference)) {
+            return null;
+        }
+        return userRepository.findById(managerReference.trim())
+                .or(() -> userRepository.findByUserName(normalize(managerReference)))
+                .orElse(null);
     }
 
     private UserSummaryResponse toSummary(User u) {

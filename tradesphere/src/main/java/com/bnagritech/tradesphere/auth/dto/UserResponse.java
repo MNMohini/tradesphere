@@ -26,6 +26,8 @@ public class UserResponse {
 
     private UserRole role;
     private String managerId;
+    private String managerName;
+    private UserRole managerRole;
     private List<String> territoryIds;
 
     private UserStatus status;

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.bnagritech.tradesphere.order.repository.OrderRepositoryImplTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.039 s -- in com.bnagritech.tradesphere.order.repository.OrderRepositoryImplTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.142 s -- in com.bnagritech.tradesphere.order.repository.OrderRepositoryImplTest

@@ -1,3 +1,4 @@
+com\bnagritech\tradesphere\auth\service\impl\UserServiceImplTest.class
 com\bnagritech\tradesphere\beat\service\impl\BeatServiceImplTest.class
 com\bnagritech\tradesphere\order\repository\OrderRepositoryImplTest.class
 com\bnagritech\tradesphere\visit\service\impl\VisitServiceImplTest.class
