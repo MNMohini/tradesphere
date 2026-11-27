@@ -53,6 +53,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -158,6 +159,7 @@ public class VisitServiceImpl implements VisitService {
         if (!assignedBeat) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This beat is not assigned to you");
         }
+        requireBeatScheduledOn(beat, day);
 
         // Clean the list: drop blanks and repeats, keep the order sent
         Set<String> outletCodes = new LinkedHashSet<>();
@@ -304,6 +306,19 @@ public class VisitServiceImpl implements VisitService {
 
         if (target == null) {
             target = addOutlet(visit, outletCode, false, request.getBeatId(), outlet);
+        }
+
+        String checkInBeatId = firstNonBlank(visit.getBeatId(), target.getBeatId(), request.getBeatId());
+        if (checkInBeatId != null) {
+            Beat checkInBeat = beatRepository.findByBeatId(checkInBeatId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Beat not found: " + checkInBeatId));
+            boolean assignedToUser = currentUser.getId().equals(checkInBeat.getAssignedUserId())
+                    || (checkInBeat.getAssignedUserId() == null
+                    && currentUser.getUsername().equalsIgnoreCase(checkInBeat.getUserName()));
+            if (!assignedToUser) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This beat is not assigned to you");
+            }
+            requireBeatScheduledOn(checkInBeat, checkInDay);
         }
 
         // 4. The outlet must have a saved location so the server can enforce its radius.
@@ -828,6 +843,29 @@ public class VisitServiceImpl implements VisitService {
                 && (beat.getOutletCodes().contains(outletReference)
                 || beat.getOutletCodes().contains(outlet.id())
                 || beat.getOutletCodes().contains(outlet.outletCode())));
+    }
+
+    private void requireBeatScheduledOn(Beat beat, LocalDate date) {
+        DayOfWeek requestedDay = date.getDayOfWeek();
+        boolean scheduled = beat.getBeatDays() != null
+                && beat.getBeatDays().stream().anyMatch(beatDay -> beatDay.name().equals(requestedDay.name()));
+        if (!scheduled) {
+            String scheduledDays = beat.getBeatDays() == null || beat.getBeatDays().isEmpty()
+                    ? "no visit days are configured"
+                    : "scheduled for " + beat.getBeatDays();
+            throw badRequest("Beat " + beat.getBeatId() + " cannot be visited on " + requestedDay
+                    + "; it is " + scheduledDays);
+        }
+    }
+
+    private String firstNonBlank(String... values) {
+        for (String value : values) {
+            String clean = blankToNull(value);
+            if (clean != null) {
+                return clean;
+            }
+        }
+        return null;
     }
 
     private VisitOutlet addOutlet(

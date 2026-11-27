@@ -5,6 +5,7 @@ import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.beat.model.Beat;
 import com.bnagritech.tradesphere.beat.repository.BeatRepository;
 import com.bnagritech.tradesphere.common.enums.OutletStatus;
+import com.bnagritech.tradesphere.common.enums.BeatDay;
 import com.bnagritech.tradesphere.common.enums.UserRole;
 import com.bnagritech.tradesphere.common.enums.UserStatus;
 import com.bnagritech.tradesphere.common.enums.VisitOutcome;
@@ -37,6 +38,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.DayOfWeek;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +82,9 @@ class VisitServiceImplTest {
 
     @Test
     void planningTwoOutletsCreatesTwoVisitsWithOutletAndBeatDetails() {
-        String visitDay = LocalDate.now(ZoneId.of("Asia/Kolkata")).toString();
+        LocalDate scheduledMonday = LocalDate.now(ZoneId.of("Asia/Kolkata"))
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+        String visitDay = scheduledMonday.toString();
         User user = User.builder()
                 .id("promoter-id")
                 .userName("promoter")
@@ -107,6 +112,7 @@ class VisitServiceImplTest {
         when(beatRepository.findByBeatId("BEAT-1")).thenReturn(Optional.of(Beat.builder()
                 .beatId("BEAT-1")
                 .assignedUserId(user.getId())
+                .beatDays(List.of(BeatDay.MONDAY))
                 .outletCodes(List.of("outlet-id-1", "outlet-id-2"))
                 .build()));
         when(outletRepository.findById("outlet-id-1")).thenReturn(Optional.of(firstOutlet));
@@ -131,6 +137,30 @@ class VisitServiceImplTest {
         assertEquals("First Shop", response.getVisits().get(0).getOutletVisits().get(0).getOutletName());
         assertEquals("9876543210", response.getVisits().get(0).getOutletVisits().get(0).getPhoneNumber());
         assertEquals("12 Market Road", response.getVisits().get(0).getOutletVisits().get(0).getAddress().getLine1());
+    }
+
+    @Test
+    void planningRejectsBeatOnAnUnscheduledWeekday() {
+        User user = fieldUser();
+        LocalDate monday = LocalDate.now(ZoneId.of("Asia/Kolkata"))
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+        LocalDate tuesday = monday.plusDays(1);
+        when(beatRepository.findByBeatId("BEAT-1")).thenReturn(Optional.of(Beat.builder()
+                .beatId("BEAT-1")
+                .assignedUserId(user.getId())
+                .beatDays(List.of(BeatDay.MONDAY))
+                .build()));
+        PlanVisitsRequest request = PlanVisitsRequest.builder()
+                .plannedDate(tuesday)
+                .outletCodes(List.of("OUT-101"))
+                .beatId("BEAT-1")
+                .build();
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> visitService.planVisits(request, user));
+
+        assertEquals(400, exception.getStatusCode().value());
     }
 
     @Test
@@ -204,6 +234,36 @@ class VisitServiceImplTest {
                 .thenReturn(Optional.empty());
         when(outletRepository.findById("OUT-101")).thenReturn(Optional.empty());
         when(outletRepository.findByOutletCode("OUT-101")).thenReturn(Optional.of(outlet));
+
+        CheckInRequest request = CheckInRequest.builder()
+                .visitId("VI000000010")
+                .outletCode("OUT-101")
+                .location(GeoPointDto.builder().latitude(0.0).longitude(0.0).build())
+                .build();
+
+        assertThrows(ResponseStatusException.class, () -> visitService.checkIn(request, user));
+    }
+
+    @Test
+    void checkInRejectsAnAssignedBeatOnAnUnscheduledWeekday() {
+        User user = fieldUser();
+        Visit visit = visit(user, VisitStatus.PLANNED);
+        visit.setBeatId("BEAT-1");
+        BeatDay otherDay = java.util.Arrays.stream(BeatDay.values())
+                .filter(day -> !day.name().equals(LocalDate.now(ZoneId.of("Asia/Kolkata")).getDayOfWeek().name()))
+                .findFirst()
+                .orElseThrow();
+        when(visitRepository.findByVisitId("VI000000010")).thenReturn(Optional.of(visit));
+        when(visitRepository.findFirstByUserIdAndStatus(user.getId(), VisitStatus.IN_PROGRESS))
+                .thenReturn(Optional.empty());
+        when(outletRepository.findById("OUT-101")).thenReturn(Optional.empty());
+        when(outletRepository.findByOutletCode("OUT-101"))
+                .thenReturn(Optional.of(outlet(new GeoJsonPoint(0.0, 0.0))));
+        when(beatRepository.findByBeatId("BEAT-1")).thenReturn(Optional.of(Beat.builder()
+                .beatId("BEAT-1")
+                .assignedUserId(user.getId())
+                .beatDays(List.of(otherDay))
+                .build()));
 
         CheckInRequest request = CheckInRequest.builder()
                 .visitId("VI000000010")
