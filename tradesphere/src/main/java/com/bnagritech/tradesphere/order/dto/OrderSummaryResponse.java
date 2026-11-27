@@ -24,6 +24,9 @@ public class OrderSummaryResponse {
     private String outletName;
     private String createdBy;
     private String createdByName;
+    private String createdByRole;
+    private String reportingToName;
+    private String reportingToRole;
     private Instant orderDate;
     private int itemCount;
     private BigDecimal grandTotal;

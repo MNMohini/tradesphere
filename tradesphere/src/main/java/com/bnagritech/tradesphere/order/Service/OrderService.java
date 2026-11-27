@@ -6,6 +6,9 @@ import com.bnagritech.tradesphere.order.dto.OrderPreviewResponse;
 import com.bnagritech.tradesphere.order.dto.OrderResponse;
 import com.bnagritech.tradesphere.order.dto.OrderSearchRequest;
 import com.bnagritech.tradesphere.order.dto.OrderSummaryResponse;
+import com.bnagritech.tradesphere.order.dto.OrderTeamSearchRequest;
+import com.bnagritech.tradesphere.order.dto.TeamMembersPageResponse;
+import com.bnagritech.tradesphere.order.dto.TeamOrdersPageResponse;
 import com.bnagritech.tradesphere.order.dto.RecordPaymentRequest;
 import com.bnagritech.tradesphere.order.dto.SyncOrdersRequest;
 import com.bnagritech.tradesphere.order.dto.SyncOrdersResponse;
@@ -55,6 +58,12 @@ public interface OrderService {
 
     /** Orders visible to the caller, narrowed by the filters, newest first. */
     List<OrderSummaryResponse> searchOrders(OrderSearchRequest request, User currentUser);
+
+    TeamMembersPageResponse getTeamMembers(OrderTeamSearchRequest request, User currentUser);
+
+    TeamOrdersPageResponse getTeamOrders(OrderTeamSearchRequest request, User currentUser);
+
+    byte[] exportTeamOrders(OrderTeamSearchRequest request, User currentUser);
 
     /** Uploads orders taken offline; each order succeeds or fails on its own. */
     SyncOrdersResponse syncOrders(SyncOrdersRequest request, User currentUser);

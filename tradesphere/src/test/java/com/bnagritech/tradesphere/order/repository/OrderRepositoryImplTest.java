@@ -10,8 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,13 +27,14 @@ class OrderRepositoryImplTest {
     private MongoTemplate mongoTemplate;
 
     @Test
-    void searchMatchesViewerIdAndUsernameForCreatorAndHierarchy() {
+    void searchScopesCreatorIdsAndLegacyUsernamesWithoutUsingSnapshotPath() {
         when(mongoTemplate.find(any(Query.class), eq(Order.class))).thenReturn(List.of());
         OrderRepositoryImpl repository = new OrderRepositoryImpl(mongoTemplate);
 
         repository.search(new OrderFilter(
-                "manager-id",
-                "manager-name",
+                List.of("manager-id", "manager-name"),
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -46,42 +45,34 @@ class OrderRepositoryImplTest {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
         verify(mongoTemplate).find(queryCaptor.capture(), eq(Order.class));
         Document query = queryCaptor.getValue().getQueryObject();
+        Document creatorFilter = (Document) query.get("createdBy");
 
-        List<?> andConditions = (List<?>) query.get("$and");
-        assertEquals(1, andConditions.size());
-        Document visibility = (Document) andConditions.get(0);
-        assertEquals(4, ((List<?>) visibility.get("$or")).size());
-        assertEquals(Set.of("manager-id", "manager-name"), valuesFor(query, "createdBy"));
-        assertEquals(Set.of("manager-id", "manager-name"), valuesFor(query, "userPath"));
+        assertEquals(Set.of("manager-id", "manager-name"), Set.copyOf((List<?>) creatorFilter.get("$in")));
+        assertTrue(query.get("userPath") == null);
     }
 
     @Test
-    void searchOmitsHierarchyFilterWhenViewerIsUnrestricted() {
+    void searchOmitsCreatorFilterOnlyForExplicitlyUnrestrictedQuery() {
         when(mongoTemplate.find(any(Query.class), eq(Order.class))).thenReturn(List.of());
         OrderRepositoryImpl repository = new OrderRepositoryImpl(mongoTemplate);
 
-        repository.search(new OrderFilter(null, null, null, null, null, null, null, null));
+        repository.search(new OrderFilter(null, null, null, null, null, null, null, null, null));
 
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
         verify(mongoTemplate).find(queryCaptor.capture(), eq(Order.class));
         assertTrue(queryCaptor.getValue().getQueryObject().isEmpty());
     }
 
-    private Set<String> valuesFor(Document document, String field) {
-        Set<String> values = new HashSet<>();
-        collectValues(document, field, values);
-        return values;
-    }
+    @Test
+    void emptyCreatorScopeMatchesNoOrders() {
+        when(mongoTemplate.find(any(Query.class), eq(Order.class))).thenReturn(List.of());
+        OrderRepositoryImpl repository = new OrderRepositoryImpl(mongoTemplate);
 
-    private void collectValues(Object node, String field, Set<String> values) {
-        if (node instanceof Document document) {
-            Object value = document.get(field);
-            if (value instanceof String stringValue) {
-                values.add(stringValue);
-            }
-            document.values().forEach(child -> collectValues(child, field, values));
-        } else if (node instanceof List<?> list) {
-            new ArrayList<>(list).forEach(child -> collectValues(child, field, values));
-        }
+        repository.search(new OrderFilter(List.of(), null, null, null, null, null, null, null, null));
+
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+        verify(mongoTemplate).find(queryCaptor.capture(), eq(Order.class));
+        Document creatorFilter = (Document) queryCaptor.getValue().getQueryObject().get("createdBy");
+        assertEquals(List.of(), creatorFilter.get("$in"));
     }
 }

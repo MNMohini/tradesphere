@@ -6,11 +6,14 @@ import com.bnagritech.tradesphere.common.enums.UserStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<User, String>, UserRepositoryCustom {
 
     Optional<User> findByUserName(String userName);
+
+    List<User> findByUserNameIn(Collection<String> userNames);
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
@@ -21,6 +24,8 @@ public interface UserRepository extends MongoRepository<User, String>, UserRepos
 
     /** Direct reports of a manager. */
     List<User> findByManagerId(String managerId);
+
+    List<User> findByManagerIdIn(Collection<String> managerIds);
 
     /** Used to stop a manager being deactivated while active people still report to them. */
     boolean existsByManagerIdAndStatus(String managerId, UserStatus status);

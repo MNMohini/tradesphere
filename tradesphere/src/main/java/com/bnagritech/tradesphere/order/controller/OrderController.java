@@ -6,6 +6,9 @@ import com.bnagritech.tradesphere.order.dto.OrderPreviewResponse;
 import com.bnagritech.tradesphere.order.dto.OrderResponse;
 import com.bnagritech.tradesphere.order.dto.OrderSearchRequest;
 import com.bnagritech.tradesphere.order.dto.OrderSummaryResponse;
+import com.bnagritech.tradesphere.order.dto.OrderTeamSearchRequest;
+import com.bnagritech.tradesphere.order.dto.TeamMembersPageResponse;
+import com.bnagritech.tradesphere.order.dto.TeamOrdersPageResponse;
 import com.bnagritech.tradesphere.order.dto.RecordPaymentRequest;
 import com.bnagritech.tradesphere.order.dto.SyncOrdersRequest;
 import com.bnagritech.tradesphere.order.dto.SyncOrdersResponse;
@@ -17,6 +20,8 @@ import com.bnagritech.tradesphere.auth.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,6 +74,30 @@ public class OrderController {
             @Valid @ModelAttribute OrderSearchRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(orderService.searchOrders(request, currentUser));
+    }
+
+    @GetMapping("/team/members")
+    public ResponseEntity<TeamMembersPageResponse> getTeamMembers(
+            @Valid @ModelAttribute OrderTeamSearchRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(orderService.getTeamMembers(request, currentUser));
+    }
+
+    @GetMapping("/team/orders")
+    public ResponseEntity<TeamOrdersPageResponse> getTeamOrders(
+            @Valid @ModelAttribute OrderTeamSearchRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(orderService.getTeamOrders(request, currentUser));
+    }
+
+    @GetMapping(value = "/team/export", produces = "text/csv")
+    public ResponseEntity<byte[]> exportTeamOrders(
+            @Valid @ModelAttribute OrderTeamSearchRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"team-orders.csv\"")
+                .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+                .body(orderService.exportTeamOrders(request, currentUser));
     }
 
     // GET /api/orders/{orderId}

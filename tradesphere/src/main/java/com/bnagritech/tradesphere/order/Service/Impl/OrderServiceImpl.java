@@ -10,10 +10,15 @@ import com.bnagritech.tradesphere.order.dto.OrderPreviewResponse;
 import com.bnagritech.tradesphere.order.dto.OrderResponse;
 import com.bnagritech.tradesphere.order.dto.OrderSearchRequest;
 import com.bnagritech.tradesphere.order.dto.OrderSummaryResponse;
+import com.bnagritech.tradesphere.order.dto.OrderTeamSearchRequest;
+import com.bnagritech.tradesphere.order.dto.OrderTotalsResponse;
 import com.bnagritech.tradesphere.order.dto.RecordPaymentRequest;
 import com.bnagritech.tradesphere.order.dto.SyncOrderResult;
 import com.bnagritech.tradesphere.order.dto.SyncOrdersRequest;
 import com.bnagritech.tradesphere.order.dto.SyncOrdersResponse;
+import com.bnagritech.tradesphere.order.dto.TeamMemberOrderSummaryResponse;
+import com.bnagritech.tradesphere.order.dto.TeamMembersPageResponse;
+import com.bnagritech.tradesphere.order.dto.TeamOrdersPageResponse;
 import com.bnagritech.tradesphere.order.dto.UpdatedDeliveryRequest;
 import com.bnagritech.tradesphere.order.dto.UpdateOrderRequest;
 import com.bnagritech.tradesphere.order.dto.UpdatedOrderStatusRequest;
@@ -23,8 +28,11 @@ import com.bnagritech.tradesphere.order.model.OrderItems;
 import com.bnagritech.tradesphere.order.model.OrderStatusHistory;
 import com.bnagritech.tradesphere.order.model.PaymentInfo;
 import com.bnagritech.tradesphere.order.repository.OrderFilter;
+import com.bnagritech.tradesphere.order.repository.OrderMetrics;
 import com.bnagritech.tradesphere.order.repository.OrderRepository;
 import com.bnagritech.tradesphere.order.service.OrderService;
+import com.bnagritech.tradesphere.order.visibility.OrderTeamResolver;
+import com.bnagritech.tradesphere.order.visibility.OrderTeamResolver.TeamTree;
 import com.bnagritech.tradesphere.auth.model.User;
 import com.bnagritech.tradesphere.outlet.model.Outlet;
 import com.bnagritech.tradesphere.outlet.repository.OutletRepository;
@@ -35,6 +43,8 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -47,13 +57,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -64,12 +76,13 @@ public class OrderServiceImpl implements OrderService {
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
     private static final Duration MAX_CLOCK_SKEW = Duration.ofMinutes(10);
     private static final int DEFAULT_SEARCH_DAYS = 30;
+    private static final int EXPORT_PAGE_SIZE = 500;
 
     // Roles allowed to create orders.
     private static final Set<UserRole> ORDER_TAKER_ROLES =
             EnumSet.of(UserRole.SALES_REPRESENTATIVE, UserRole.SALES_OFFICER, UserRole.PROMOTER, UserRole.SUPERVISOR);
 
-    // Roles that may see (and approve) every order.
+    // Roles that retain their existing approve/action permission.
     private static final Set<UserRole> SEE_ALL_ROLES =
             EnumSet.of(UserRole.ADMIN, UserRole.NATIONAL_HEAD);
 
@@ -88,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
     private final OutletRepository outletRepository;
     private final ProductRepository productRepository;
     private final VisitRepository visitRepository;
+    private final OrderTeamResolver orderTeamResolver;
     // =====================================================================
     // Create / preview / update
     // =====================================================================
@@ -297,11 +311,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderSummaryResponse> getOrdersByVisit(String visitId, User currentUser) {
-        // The repository query returns every order of the visit; keep only those the caller may see
-        return orderRepository.findByVisitIdOrderByOrderDateDesc(visitId).stream()
-                .filter(order -> canView(order, currentUser))
-                .map(this::toSummary)
-                .toList();
+        TeamTree tree = orderTeamResolver.resolve(currentUser);
+        Collection<String> creatorReferences = visibleCreatorReferences(currentUser, tree, true);
+        OrderFilter filter = new OrderFilter(
+                creatorReferences, null, null, null, null, null, visitId, null, null);
+        return toSummaries(orderRepository.search(filter), usersIn(tree));
     }
 
     @Override
@@ -315,36 +329,113 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderSummaryResponse> searchOrders(OrderSearchRequest request, User currentUser) {
-        LocalDate from = request.getFromDate();
-        LocalDate to = request.getToDate();
-
-        // No dates given: default to the last 30 days so one call can never return everything
-        if (from == null && to == null) {
-            to = LocalDate.now(IST);
-            from = to.minusDays(DEFAULT_SEARCH_DAYS);
-        }
-        if (from != null && to != null && to.isBefore(from)) {
-            throw badRequest("toDate cannot be before fromDate");
-        }
-
-        Instant fromInclusive = from != null ? from.atStartOfDay(IST).toInstant() : null;
-        Instant toExclusive = to != null ? to.plusDays(1).atStartOfDay(IST).toInstant() : null;
-
-        boolean canSeeAll = SEE_ALL_ROLES.contains(currentUser.getRole());
-        String viewerId = canSeeAll ? null : currentUser.getId();
-        String viewerUsername = canSeeAll ? null : currentUser.getUsername();
-
+        DateBounds bounds = dateBounds(request.getFromDate(), request.getToDate());
+        TeamTree tree = orderTeamResolver.resolve(currentUser);
         OrderFilter filter = new OrderFilter(
-                viewerId,
-                viewerUsername,
+                visibleCreatorReferences(currentUser, tree, true),
                 request.getStatus(),
                 request.getPaymentStatus(),
                 request.getOutletCode(),
                 request.getCreatedBy(),
-                fromInclusive,
-                toExclusive);
+                null,
+                null,
+                bounds.fromInclusive(),
+                bounds.toExclusive());
 
-        return orderRepository.search(filter).stream().map(this::toSummary).toList();
+        return toSummaries(orderRepository.search(filter), usersIn(tree));
+    }
+
+    @Override
+    public TeamMembersPageResponse getTeamMembers(OrderTeamSearchRequest request, User currentUser) {
+        TeamTree tree = orderTeamResolver.resolve(currentUser);
+        User parent = resolveTeamMember(tree, request.getMemberId(), true);
+        List<User> directReports = tree.directReports(parent).stream()
+                .sorted(Comparator.comparing(this::userDisplayName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+
+        int fromIndex = (int) Math.min((long) request.getPage() * request.getSize(), directReports.size());
+        int toIndex = Math.min(fromIndex + request.getSize(), directReports.size());
+        List<User> pageMembers = directReports.subList(fromIndex, toIndex);
+        List<String> creatorReferences = pageMembers.stream()
+                .flatMap(user -> orderTeamResolver.identityValues(user).stream())
+                .distinct()
+                .toList();
+        DateBounds bounds = dateBounds(request.getFromDate(), request.getToDate());
+        OrderFilter filter = new OrderFilter(
+                creatorReferences, request.getStatus(), null, null, null, request.getOrderNumber(),
+                null, bounds.fromInclusive(), bounds.toExclusive());
+
+        Map<String, OrderMetrics> metricsByCreator = orderRepository.aggregate(filter, true).stream()
+                .filter(metric -> metric.creatorReference() != null)
+                .collect(Collectors.toMap(OrderMetrics::creatorReference, metric -> metric));
+
+        List<TeamMemberOrderSummaryResponse> items = pageMembers.stream()
+                .map(member -> teamMemberSummary(member, metricsByCreator))
+                .toList();
+        long totalElements = directReports.size();
+        return TeamMembersPageResponse.builder()
+                .items(items)
+                .page(request.getPage())
+                .size(request.getSize())
+                .totalElements(totalElements)
+                .totalPages(totalPages(totalElements, request.getSize()))
+                .build();
+    }
+
+    @Override
+    public TeamOrdersPageResponse getTeamOrders(OrderTeamSearchRequest request, User currentUser) {
+        TeamOrderQuery teamOrderQuery = buildTeamOrderQuery(request, currentUser);
+        OrderMetrics totals = firstOrEmpty(orderRepository.aggregate(teamOrderQuery.filter(), false));
+        List<Order> page = orderRepository.search(
+                teamOrderQuery.filter(),
+                PageRequest.of(request.getPage(), request.getSize(),
+                        Sort.by(Sort.Direction.DESC, "orderDate")));
+
+        List<User> knownUsers = teamOrderQuery.tree() == null
+                ? List.of(currentUser)
+                : usersIn(teamOrderQuery.tree());
+        List<OrderSummaryResponse> items = toSummaries(page, knownUsers);
+        return TeamOrdersPageResponse.builder()
+                .items(items)
+                .totals(toTotalsResponse(totals))
+                .page(request.getPage())
+                .size(request.getSize())
+                .totalElements(totals.totalOrders())
+                .totalPages(totalPages(totals.totalOrders(), request.getSize()))
+                .build();
+    }
+
+    @Override
+    public byte[] exportTeamOrders(OrderTeamSearchRequest request, User currentUser) {
+        TeamOrderQuery teamOrderQuery = buildTeamOrderQuery(request, currentUser);
+        List<User> knownUsers = teamOrderQuery.tree() == null
+                ? List.of(currentUser)
+                : usersIn(teamOrderQuery.tree());
+
+        StringBuilder csv = new StringBuilder(
+                "Order No,Placed By,Role,Reporting To,Outlet,Amount,Pending,Status,Date\r\n");
+        int batchNumber = 0;
+        List<Order> batch;
+        do {
+            batch = orderRepository.search(
+                    teamOrderQuery.filter(),
+                    PageRequest.of(batchNumber++, EXPORT_PAGE_SIZE,
+                            Sort.by(Sort.Direction.DESC, "orderDate")));
+            for (OrderSummaryResponse order : toSummaries(batch, knownUsers)) {
+                csv.append(csvCell(order.getOrderNumber())).append(',')
+                        .append(csvCell(order.getCreatedByName())).append(',')
+                        .append(csvCell(order.getCreatedByRole())).append(',')
+                        .append(csvCell(order.getReportingToName())).append(',')
+                        .append(csvCell(order.getOutletName())).append(',')
+                        .append(csvCell(order.getGrandTotal())).append(',')
+                        .append(csvCell(order.getPendingAmount())).append(',')
+                        .append(csvCell(order.getStatus())).append(',')
+                        .append(csvCell(order.getOrderDate()))
+                        .append("\r\n");
+            }
+        }
+        while (batch.size() == EXPORT_PAGE_SIZE);
+        return csv.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     // =====================================================================
@@ -723,14 +814,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private List<String> userIdentityValues(User user) {
-        return Stream.of(user.getId(), user.getUsername())
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        return orderTeamResolver.identityValues(user);
     }
 
     private boolean canView(Order order, User user) {
-        return isCreator(order, user) || isApprover(order, user);
+        return orderTeamResolver.canViewOrder(user, order);
     }
 
     /** Hidden orders look like missing orders (404), so their existence is not revealed. */
@@ -738,6 +826,222 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(orderId)
                 .filter(order -> canView(order, user))
                 .orElseThrow(() -> notFound("Order not found"));
+    }
+
+    private record DateBounds(Instant fromInclusive, Instant toExclusive) {
+    }
+
+    private record TeamOrderQuery(OrderFilter filter, TeamTree tree) {
+    }
+
+    private DateBounds dateBounds(LocalDate from, LocalDate to) {
+        if (from == null && to == null) {
+            to = LocalDate.now(IST);
+            from = to.minusDays(DEFAULT_SEARCH_DAYS);
+        }
+        if (from != null && to != null && to.isBefore(from)) {
+            throw badRequest("toDate cannot be before fromDate");
+        }
+        Instant fromInclusive = from != null ? from.atStartOfDay(IST).toInstant() : null;
+        Instant toExclusive = to != null ? to.plusDays(1).atStartOfDay(IST).toInstant() : null;
+        return new DateBounds(fromInclusive, toExclusive);
+    }
+
+    private Collection<String> visibleCreatorReferences(User user, TeamTree tree, boolean includeRoot) {
+        if (user.getRole() == UserRole.ADMIN) {
+            return null;
+        }
+        List<User> visibleUsers = new ArrayList<>();
+        if (includeRoot) {
+            visibleUsers.add(user);
+        }
+        visibleUsers.addAll(tree.descendants());
+        return creatorReferences(visibleUsers);
+    }
+
+    private List<String> creatorReferences(Collection<User> users) {
+        return users.stream()
+                .flatMap(user -> orderTeamResolver.identityValues(user).stream())
+                .distinct()
+                .toList();
+    }
+
+    private TeamOrderQuery buildTeamOrderQuery(OrderTeamSearchRequest request, User currentUser) {
+        TeamTree tree = null;
+        Collection<String> creatorReferences;
+        if (request.isMyOrdersOnly()) {
+            if (request.getMemberId() != null && !request.getMemberId().isBlank()) {
+                throw badRequest("memberId cannot be used with myOrdersOnly");
+            }
+            creatorReferences = orderTeamResolver.identityValues(currentUser);
+        } else if (request.getMemberId() == null || request.getMemberId().isBlank()) {
+            if (currentUser.getRole() == UserRole.ADMIN) {
+                creatorReferences = null;
+            } else {
+                tree = orderTeamResolver.resolve(currentUser);
+                creatorReferences = creatorReferences(tree.descendants());
+            }
+        } else {
+            tree = orderTeamResolver.resolve(currentUser);
+            User member = resolveTeamMember(tree, request.getMemberId(), true);
+            List<User> visibleUsers = request.isIncludeTeam()
+                    ? tree.subtree(member)
+                    : List.of(member);
+            creatorReferences = creatorReferences(visibleUsers);
+        }
+
+        DateBounds bounds = dateBounds(request.getFromDate(), request.getToDate());
+        OrderFilter filter = new OrderFilter(
+                creatorReferences,
+                request.getStatus(),
+                null,
+                null,
+                null,
+                request.getOrderNumber(),
+                null,
+                bounds.fromInclusive(),
+                bounds.toExclusive());
+        return new TeamOrderQuery(filter, tree);
+    }
+
+    private User resolveTeamMember(TeamTree tree, String memberId, boolean allowRoot) {
+        if (memberId == null || memberId.isBlank()) {
+            return tree.root();
+        }
+        return tree.findMember(memberId)
+                .filter(member -> allowRoot || !Objects.equals(member.getId(), tree.root().getId()))
+                .orElseThrow(() -> notFound("Team member not found"));
+    }
+
+    private List<User> usersIn(TeamTree tree) {
+        List<User> users = new ArrayList<>();
+        users.add(tree.root());
+        users.addAll(tree.descendants());
+        return users;
+    }
+
+    private TeamMemberOrderSummaryResponse teamMemberSummary(
+            User member,
+            Map<String, OrderMetrics> metricsByCreator) {
+        OrderMetrics totals = OrderMetrics.empty();
+        for (String reference : orderTeamResolver.identityValues(member)) {
+            totals = totals.plus(metricsByCreator.getOrDefault(reference, OrderMetrics.empty()));
+        }
+        return TeamMemberOrderSummaryResponse.builder()
+                .id(member.getId())
+                .userName(member.getUsername())
+                .fullName(member.getFullName())
+                .role(member.getRole())
+                .totals(toTotalsResponse(totals))
+                .build();
+    }
+
+    private OrderMetrics firstOrEmpty(List<OrderMetrics> metrics) {
+        return metrics.isEmpty() ? OrderMetrics.empty() : metrics.get(0);
+    }
+
+    private OrderTotalsResponse toTotalsResponse(OrderMetrics metrics) {
+        return OrderTotalsResponse.builder()
+                .totalOrders(metrics.totalOrders())
+                .orderValue(metrics.orderValue())
+                .pendingAmount(metrics.pendingAmount())
+                .build();
+    }
+
+    private int totalPages(long totalElements, int size) {
+        if (size < 1) {
+            throw badRequest("size must be at least 1");
+        }
+        return (int) Math.ceil((double) totalElements / size);
+    }
+
+    private List<OrderSummaryResponse> toSummaries(List<Order> orders, Collection<User> knownUsers) {
+        Map<String, User> usersByReference = new HashMap<>();
+        knownUsers.forEach(user -> addUserReferences(usersByReference, user));
+
+        List<String> creatorReferencesToResolve = orders.stream()
+                .map(Order::getCreatedBy)
+                .filter(Objects::nonNull)
+                .filter(reference -> findUser(usersByReference, reference) == null)
+                .distinct()
+                .toList();
+        List<User> creators = orderTeamResolver.findUsers(creatorReferencesToResolve);
+        creators.forEach(user -> addUserReferences(usersByReference, user));
+
+        List<String> managerReferencesToResolve = orders.stream()
+                .map(Order::getCreatedBy)
+                .map(reference -> findUser(usersByReference, reference))
+                .filter(Objects::nonNull)
+                .map(User::getManagerId)
+                .filter(Objects::nonNull)
+                .filter(reference -> findUser(usersByReference, reference) == null)
+                .distinct()
+                .toList();
+        orderTeamResolver.findUsers(managerReferencesToResolve)
+                .forEach(user -> addUserReferences(usersByReference, user));
+
+        return orders.stream()
+                .map(order -> toSummary(order, usersByReference))
+                .toList();
+    }
+
+    private void addUserReferences(Map<String, User> usersByReference, User user) {
+        if (user.getId() != null) {
+            usersByReference.put(user.getId(), user);
+        }
+        if (user.getUsername() != null) {
+            usersByReference.put(user.getUsername(), user);
+            usersByReference.put(user.getUsername().toLowerCase(java.util.Locale.ROOT), user);
+        }
+    }
+
+    private User findUser(Map<String, User> usersByReference, String reference) {
+        if (reference == null) {
+            return null;
+        }
+        User user = usersByReference.get(reference);
+        return user != null ? user : usersByReference.get(reference.toLowerCase(java.util.Locale.ROOT));
+    }
+
+    private OrderSummaryResponse toSummary(Order order, Map<String, User> usersByReference) {
+        User creator = findUser(usersByReference, order.getCreatedBy());
+        User manager = creator == null ? null : findUser(usersByReference, creator.getManagerId());
+        return OrderSummaryResponse.builder()
+                .id(order.getId())
+                .orderNumber(order.getOrderNumber())
+                .outletCode(order.getOutletCode())
+                .outletName(order.getOutletName())
+                .createdBy(order.getCreatedBy())
+                .createdByName(creator != null && creator.getFullName() != null
+                        ? creator.getFullName() : order.getCreatedByName())
+                .createdByRole(creator != null && creator.getRole() != null
+                        ? creator.getRole().name() : null)
+                .reportingToName(manager == null ? null : userDisplayName(manager))
+                .reportingToRole(manager != null && manager.getRole() != null
+                        ? manager.getRole().name() : null)
+                .orderDate(order.getOrderDate())
+                .itemCount(order.getItems() == null ? 0 : order.getItems().size())
+                .grandTotal(order.getGrandTotal())
+                .pendingAmount(order.getPendingAmount())
+                .status(order.getStatus())
+                .paymentStatus(order.getPayment() != null ? order.getPayment().getPaymentStatus() : null)
+                .deliveryStatus(order.getDelivery() != null ? order.getDelivery().getDeliveryStatus() : null)
+                .build();
+    }
+
+    private String userDisplayName(User user) {
+        if (user.getFullName() != null && !user.getFullName().isBlank()) {
+            return user.getFullName();
+        }
+        return user.getUsername() == null ? "Unknown user" : user.getUsername();
+    }
+
+    private String csvCell(Object value) {
+        String text = value == null ? "" : value.toString();
+        if (!text.isEmpty() && "=+-@\t\r".indexOf(text.charAt(0)) >= 0) {
+            text = "'" + text;
+        }
+        return "\"" + text.replace("\"", "\"\"") + "\"";
     }
 
     private void require(boolean condition, String message) {
