@@ -1,7 +1,6 @@
 package com.bnagritech.tradesphere.beat.model;
 
 import com.bnagritech.tradesphere.common.enums.*;
-import com.bnagritech.tradesphere.outlet.model.Outlet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +22,8 @@ public class Beat {
     private String beatId;
     private String assignedUserId;
     private String userName;
+    private List<String> assignedUserIds;
+    private List<String> assignedUserNames;
     private String territoryId;
     private BeatStatus beatStatus;
     private String state;

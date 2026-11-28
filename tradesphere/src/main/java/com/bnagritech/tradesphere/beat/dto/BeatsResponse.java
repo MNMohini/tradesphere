@@ -12,6 +12,8 @@ public class BeatsResponse {
     private String beatId;
     private String assignedUserId;
     private String userName;
+    private List<String> assignedUserIds;
+    private List<String> assignedUserNames;
     private String territoryId;
     private String state;
     private String city;

@@ -15,6 +15,7 @@ import com.bnagritech.tradesphere.visit.dto.VisitorAttendancePageResponse;
 import com.bnagritech.tradesphere.visit.dto.VisitorAttendanceSearchRequest;
 
 import java.util.List;
+import java.time.LocalDate;
 
 /**
  * One visit (VI000000001) = one user's visit to one outlet on one day.
@@ -31,6 +32,8 @@ import java.util.List;
 public interface VisitService {
 
     PlanVisitsResponse planVisits(PlanVisitsRequest request, User currentUser);
+
+    List<String> getReservedOutletCodes(String beatId, LocalDate visitDay, User currentUser);
 
     VisitResponse checkIn(CheckInRequest request, User currentUser);
 

@@ -22,6 +22,10 @@ public interface VisitRepository extends MongoRepository<Visit, String>, VisitRe
     /** A user's visits on one day in the given statuses. */
     List<Visit> findByUserIdAndVisitDayAndStatusIn(String userId, String visitDay, Collection<VisitStatus> statuses);
 
+    /** Visits for a beat on one day, across all assigned users. */
+    List<Visit> findByBeatIdAndVisitDayAndStatusIn(
+            String beatId, String visitDay, Collection<VisitStatus> statuses);
+
     /** A user's visits for one day, in the order they were created. */
     List<Visit> findByUserIdAndVisitDayOrderByCreatedAtAsc(String userId, String visitDay);
 

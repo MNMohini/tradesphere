@@ -55,12 +55,14 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -153,10 +155,7 @@ public class VisitServiceImpl implements VisitService {
         }
         Beat beat = beatRepository.findByBeatId(beatId)
                 .orElseThrow(() -> new ResourceNotFoundException("Beat not found: " + beatId));
-        boolean assignedBeat = currentUser.getId().equals(beat.getAssignedUserId())
-                || (beat.getAssignedUserId() == null
-                && currentUser.getUsername().equalsIgnoreCase(beat.getUserName()));
-        if (!assignedBeat) {
+        if (!isBeatAssignedToUser(beat, currentUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This beat is not assigned to you");
         }
         requireBeatScheduledOn(beat, day);
@@ -181,21 +180,12 @@ public class VisitServiceImpl implements VisitService {
         String visitDay = day.toString();
         Instant now = Instant.now();
 
-        // An outlet already planned or visited that day cannot be planned again.
+        // An outlet already planned or visited by this user that day cannot be planned again.
         List<Visit> sameDay = visitRepository.findByUserIdAndVisitDayAndStatusIn(
                 currentUser.getId(), visitDay, EnumSet.of(VisitStatus.PLANNED, VisitStatus.IN_PROGRESS, VisitStatus.COMPLETED));
-        Set<String> alreadyTaken = new HashSet<>();
-        for (Visit v : sameDay) {
-            if (v.getOutletVisits() != null && !v.getOutletVisits().isEmpty()) {
-                for (VisitOutlet outlet : v.getOutletVisits()) {
-                    if (OUTLET_TAKEN.contains(outlet.getStatus())) {
-                        alreadyTaken.add(outlet.getOutletCode());
-                    }
-                }
-            } else if (OUTLET_TAKEN.contains(v.getStatus()) && v.getOutletCodes() != null) {
-                alreadyTaken.addAll(v.getOutletCodes());
-            }
-        }
+        Set<String> alreadyTaken = collectTakenOutletCodes(sameDay);
+        List<Visit> sameBeatDay = findTakenVisitsForBeat(beatId, visitDay);
+        alreadyTaken.addAll(collectTakenOutletCodes(sameBeatDay));
 
         Map<String, OutletInfo> toAdd = new LinkedHashMap<>();
         List<String> skipped = new ArrayList<>();
@@ -245,6 +235,41 @@ public class VisitServiceImpl implements VisitService {
                 .visits(createdVisits.stream().map(this::toSummary).toList())
                 .skippedOutletIds(skipped)
                 .build();
+    }
+
+    @Override
+    public List<String> getReservedOutletCodes(String beatId, LocalDate visitDay, User currentUser) {
+        requireVisitRole(currentUser);
+        Beat beat = beatRepository.findByBeatId(beatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Beat not found: " + beatId));
+        if (!isBeatAssignedToUser(beat, currentUser)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This beat is not assigned to you");
+        }
+        requireBeatScheduledOn(beat, visitDay);
+        return new ArrayList<>(collectTakenOutletCodes(findTakenVisitsForBeat(beatId, visitDay.toString())));
+    }
+
+    private List<Visit> findTakenVisitsForBeat(String beatId, String visitDay) {
+        return visitRepository.findByBeatIdAndVisitDayAndStatusIn(
+                beatId,
+                visitDay,
+                EnumSet.of(VisitStatus.PLANNED, VisitStatus.IN_PROGRESS, VisitStatus.COMPLETED));
+    }
+
+    private Set<String> collectTakenOutletCodes(List<Visit> visits) {
+        Set<String> outletCodes = new HashSet<>();
+        for (Visit visit : visits) {
+            if (visit.getOutletVisits() != null && !visit.getOutletVisits().isEmpty()) {
+                for (VisitOutlet outlet : visit.getOutletVisits()) {
+                    if (OUTLET_TAKEN.contains(outlet.getStatus())) {
+                        outletCodes.add(outlet.getOutletCode());
+                    }
+                }
+            } else if (OUTLET_TAKEN.contains(visit.getStatus()) && visit.getOutletCodes() != null) {
+                outletCodes.addAll(visit.getOutletCodes());
+            }
+        }
+        return outletCodes;
     }
 
     // =====================================================================
@@ -312,10 +337,7 @@ public class VisitServiceImpl implements VisitService {
         if (checkInBeatId != null) {
             Beat checkInBeat = beatRepository.findByBeatId(checkInBeatId)
                     .orElseThrow(() -> new ResourceNotFoundException("Beat not found: " + checkInBeatId));
-            boolean assignedToUser = currentUser.getId().equals(checkInBeat.getAssignedUserId())
-                    || (checkInBeat.getAssignedUserId() == null
-                    && currentUser.getUsername().equalsIgnoreCase(checkInBeat.getUserName()));
-            if (!assignedToUser) {
+            if (!isBeatAssignedToUser(checkInBeat, currentUser)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This beat is not assigned to you");
             }
             requireBeatScheduledOn(checkInBeat, checkInDay);
@@ -662,23 +684,52 @@ public class VisitServiceImpl implements VisitService {
                 .map(this::blankToNull)
                 .filter(id -> id != null)
                 .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
-        Map<String, User> usersById = new LinkedHashMap<>();
-        userRepository.findAllById(visitorIds).forEach(user -> usersById.put(user.getId(), user));
+        Map<String, User> usersByReference = new LinkedHashMap<>();
+        if (!visitorIds.isEmpty()) {
+            userRepository.findAllById(visitorIds).forEach(user -> indexUserReferences(usersByReference, user));
+        }
 
-        Set<String> managerIds = new LinkedHashSet<>();
+        Set<String> unresolvedVisitorNames = new LinkedHashSet<>();
         for (Visit visit : visits) {
-            String managerId = managerIdFor(visit, usersById.get(visit.getUserId()));
-            if (managerId != null) {
-                managerIds.add(managerId);
+            if (findUser(usersByReference, visit.getUserId()) == null) {
+                addUserNameReference(unresolvedVisitorNames, visit.getUserId());
+                addUserNameReference(unresolvedVisitorNames, visit.getUserName());
             }
         }
-        userRepository.findAllById(managerIds).forEach(user -> usersById.put(user.getId(), user));
+        if (!unresolvedVisitorNames.isEmpty()) {
+            userRepository.findByUserNameIn(unresolvedVisitorNames)
+                    .forEach(user -> indexUserReferences(usersByReference, user));
+        }
+
+        Set<String> managerReferences = new LinkedHashSet<>();
+        for (Visit visit : visits) {
+            User visitor = resolveVisitor(visit, usersByReference);
+            String managerRef = managerIdFor(visit, visitor);
+            if (managerRef != null && findUser(usersByReference, managerRef) == null) {
+                managerReferences.add(managerRef);
+            }
+        }
+        if (!managerReferences.isEmpty()) {
+            userRepository.findAllById(managerReferences)
+                    .forEach(user -> indexUserReferences(usersByReference, user));
+
+            Set<String> unresolvedManagerNames = new LinkedHashSet<>();
+            for (String managerRef : managerReferences) {
+                if (findUser(usersByReference, managerRef) == null) {
+                    addUserNameReference(unresolvedManagerNames, managerRef);
+                }
+            }
+            if (!unresolvedManagerNames.isEmpty()) {
+                userRepository.findByUserNameIn(unresolvedManagerNames)
+                        .forEach(user -> indexUserReferences(usersByReference, user));
+            }
+        }
 
         List<VisitorAttendanceItemResponse> items = new ArrayList<>();
         for (Visit visit : visits) {
-            User visitor = usersById.get(visit.getUserId());
-            String managerId = managerIdFor(visit, visitor);
-            User manager = managerId == null ? null : usersById.get(managerId);
+            User visitor = resolveVisitor(visit, usersByReference);
+            String managerRef = managerIdFor(visit, visitor);
+            User manager = findUser(usersByReference, managerRef);
 
             List<VisitOutlet> outletVisits = visit.getOutletVisits();
             if (outletVisits == null || outletVisits.isEmpty()) {
@@ -698,12 +749,65 @@ public class VisitServiceImpl implements VisitService {
         return items;
     }
 
+    private User resolveVisitor(Visit visit, Map<String, User> usersByReference) {
+        User byId = findUser(usersByReference, visit.getUserId());
+        return byId != null ? byId : findUser(usersByReference, visit.getUserName());
+    }
+
+    private void indexUserReferences(Map<String, User> usersByReference, User user) {
+        if (user == null) {
+            return;
+        }
+        String id = blankToNull(user.getId());
+        if (id != null) {
+            usersByReference.put(id, user);
+        }
+        String userName = blankToNull(user.getUsername());
+        if (userName != null) {
+            usersByReference.put(userName, user);
+            usersByReference.put(userName.toLowerCase(Locale.ROOT), user);
+        }
+    }
+
+    private User findUser(Map<String, User> usersByReference, String reference) {
+        String clean = blankToNull(reference);
+        if (clean == null) {
+            return null;
+        }
+        User user = usersByReference.get(clean);
+        return user != null ? user : usersByReference.get(clean.toLowerCase(Locale.ROOT));
+    }
+
+    private void addUserNameReference(Collection<String> targets, String reference) {
+        String clean = blankToNull(reference);
+        if (clean != null) {
+            targets.add(clean);
+            targets.add(clean.toLowerCase(Locale.ROOT));
+        }
+    }
+
     private String managerIdFor(Visit visit, User visitor) {
         String managerId = visitor == null ? null : blankToNull(visitor.getManagerId());
-        if (managerId == null && visit.getUserPath() != null && !visit.getUserPath().isEmpty()) {
-            managerId = blankToNull(visit.getUserPath().get(visit.getUserPath().size() - 1));
+        if (managerId == null && visitor != null) {
+            managerId = lastNonBlank(visitor.getPath());
+        }
+        if (managerId == null) {
+            managerId = lastNonBlank(visit.getUserPath());
         }
         return managerId;
+    }
+
+    private String lastNonBlank(List<String> values) {
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+        for (int i = values.size() - 1; i >= 0; i--) {
+            String value = blankToNull(values.get(i));
+            if (value != null) {
+                return value;
+            }
+        }
+        return null;
     }
 
     private VisitorAttendanceItemResponse toVisitorAttendanceItem(
@@ -835,6 +939,12 @@ public class VisitServiceImpl implements VisitService {
                         o.getName(),
                         o.getPhoneNumber(),
                         o.getAddress()));
+    }
+
+    private boolean isBeatAssignedToUser(Beat beat, User user) {
+        return (beat.getAssignedUserIds() != null && beat.getAssignedUserIds().contains(user.getId()))
+                || user.getId().equals(beat.getAssignedUserId())
+                || user.getUsername().equalsIgnoreCase(beat.getUserName());
     }
 
     private boolean isOutletInBeat(OutletInfo outlet, String outletReference, Beat beat) {

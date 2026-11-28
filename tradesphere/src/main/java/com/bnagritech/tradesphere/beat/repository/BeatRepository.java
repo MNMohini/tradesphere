@@ -17,6 +17,7 @@ public interface BeatRepository extends MongoRepository<Beat, String> {
     // Get single active beat
     Optional<Beat> findByBeatId(String beatId);
     List<Beat> findByAssignedUserId(String assignedUserId);
+    List<Beat> findByAssignedUserIdsContaining(String assignedUserId);
     List<Beat> findByUserNameIgnoreCase(String userName);
     // TERRITORY BASED OPERATIONS
     List<Beat> findByTerritoryId(String territoryId);

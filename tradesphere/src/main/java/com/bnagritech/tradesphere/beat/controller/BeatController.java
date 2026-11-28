@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.beat.controller;
 
 import com.bnagritech.tradesphere.auth.model.User;
+import com.bnagritech.tradesphere.auth.dto.UserSummaryResponse;
 import com.bnagritech.tradesphere.beat.dto.BeatAssignmentRequest;
 import com.bnagritech.tradesphere.beat.dto.BeatsRequest;
 import com.bnagritech.tradesphere.beat.dto.BeatsResponse;
@@ -62,6 +63,13 @@ public class BeatController {
     public ResponseEntity<List<BeatsResponse>> getAssignableBeats(
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(beatService.getAssignableBeats(currentUser));
+    }
+
+    @PreAuthorize("hasAnyRole('SALES_OFFICER', 'SUPERVISOR')")
+    @GetMapping("/assignable-users")
+    public ResponseEntity<List<UserSummaryResponse>> getAssignableUsers(
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(beatService.getAssignableUsers(currentUser));
     }
 
     @PreAuthorize("hasAnyRole('SALES_OFFICER', 'SUPERVISOR')")

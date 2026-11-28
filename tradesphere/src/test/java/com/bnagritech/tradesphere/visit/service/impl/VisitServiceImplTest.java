@@ -111,7 +111,7 @@ class VisitServiceImplTest {
                 .thenReturn(List.of());
         when(beatRepository.findByBeatId("BEAT-1")).thenReturn(Optional.of(Beat.builder()
                 .beatId("BEAT-1")
-                .assignedUserId(user.getId())
+                .assignedUserIds(List.of(user.getId()))
                 .beatDays(List.of(BeatDay.MONDAY))
                 .outletCodes(List.of("outlet-id-1", "outlet-id-2"))
                 .build()));
@@ -182,6 +182,75 @@ class VisitServiceImplTest {
                 .build();
 
         assertThrows(ResponseStatusException.class, () -> visitService.planVisits(request, user));
+    }
+
+    @Test
+    void planningSkipsOutletAlreadyPlannedByAnotherAssigneeOfTheSameBeat() {
+        User user = fieldUser();
+        LocalDate visitDay = LocalDate.now(ZoneId.of("Asia/Kolkata"))
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+        Beat beat = Beat.builder()
+                .beatId("BEAT-1")
+                .assignedUserIds(List.of(user.getId(), "another-user"))
+                .beatDays(List.of(BeatDay.MONDAY))
+                .outletCodes(List.of("outlet-id-1"))
+                .build();
+        Visit anotherUsersVisit = Visit.builder()
+                .userId("another-user")
+                .beatId("BEAT-1")
+                .visitDay(visitDay.toString())
+                .status(VisitStatus.PLANNED)
+                .outletCodes(List.of("OUT-101"))
+                .outletVisits(new ArrayList<>(List.of(VisitOutlet.builder()
+                        .outletCode("OUT-101")
+                        .status(VisitStatus.PLANNED)
+                        .build())))
+                .build();
+        when(beatRepository.findByBeatId("BEAT-1")).thenReturn(Optional.of(beat));
+        when(visitRepository.findByUserIdAndVisitDayAndStatusIn(
+                eq(user.getId()), eq(visitDay.toString()), anyCollection())).thenReturn(List.of());
+        when(visitRepository.findByBeatIdAndVisitDayAndStatusIn(
+                eq("BEAT-1"), eq(visitDay.toString()), anyCollection())).thenReturn(List.of(anotherUsersVisit));
+        when(outletRepository.findById("outlet-id-1"))
+                .thenReturn(Optional.of(outlet(new GeoJsonPoint(0.0, 0.0))));
+
+        var response = visitService.planVisits(PlanVisitsRequest.builder()
+                .plannedDate(visitDay)
+                .outletCodes(List.of("outlet-id-1"))
+                .beatId("BEAT-1")
+                .build(), user);
+
+        assertEquals(0, response.getCreated());
+        assertEquals(List.of("outlet-id-1"), response.getSkippedOutletIds());
+    }
+
+    @Test
+    void reservedOutletLookupOnlyReturnsActiveReservationsForAnAssignedBeat() {
+        User user = fieldUser();
+        LocalDate visitDay = LocalDate.now(ZoneId.of("Asia/Kolkata"))
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+        Beat beat = Beat.builder()
+                .beatId("BEAT-1")
+                .assignedUserIds(List.of(user.getId(), "another-user"))
+                .beatDays(List.of(BeatDay.MONDAY))
+                .build();
+        Visit anotherUsersVisit = Visit.builder()
+                .userId("another-user")
+                .beatId("BEAT-1")
+                .visitDay(visitDay.toString())
+                .status(VisitStatus.PLANNED)
+                .outletCodes(List.of("OUT-101", "OUT-102"))
+                .outletVisits(new ArrayList<>(List.of(
+                        VisitOutlet.builder().outletCode("OUT-101").status(VisitStatus.PLANNED).build(),
+                        VisitOutlet.builder().outletCode("OUT-102").status(VisitStatus.CANCELLED).build())))
+                .build();
+        when(beatRepository.findByBeatId("BEAT-1")).thenReturn(Optional.of(beat));
+        when(visitRepository.findByBeatIdAndVisitDayAndStatusIn(
+                eq("BEAT-1"), eq(visitDay.toString()), anyCollection())).thenReturn(List.of(anotherUsersVisit));
+
+        List<String> reservedCodes = visitService.getReservedOutletCodes("BEAT-1", visitDay, user);
+
+        assertEquals(List.of("OUT-101"), reservedCodes);
     }
 
     @Test
@@ -352,6 +421,104 @@ class VisitServiceImplTest {
         assertEquals(42L, response.getItems().get(0).getDurationMinutes());
         assertEquals(VisitOutcome.ORDER_TAKEN, response.getItems().get(0).getOutcome());
         assertEquals("Placed restock order", response.getItems().get(0).getRemarks());
+    }
+
+    @Test
+    void visitorAttendanceResolvesManagerStoredAsUsernameOrInPath() {
+        User visitorWithUsernameManager = User.builder()
+                .id("rep-id")
+                .userName("ravi.rep")
+                .fullName("Ravi Rep")
+                .managerId("Mohan.Manager")
+                .role(UserRole.SALES_REPRESENTATIVE)
+                .status(UserStatus.ACTIVE)
+                .build();
+        User visitorWithPathOnly = User.builder()
+                .id("promoter-id")
+                .userName("priya.promoter")
+                .fullName("Priya Promoter")
+                .path(List.of("head-id", "sup.user"))
+                .role(UserRole.PROMOTER)
+                .status(UserStatus.ACTIVE)
+                .build();
+        User salesOfficer = User.builder()
+                .id("manager-id")
+                .userName("mohan.manager")
+                .fullName("Mohan Manager")
+                .role(UserRole.SALES_OFFICER)
+                .status(UserStatus.ACTIVE)
+                .build();
+        User supervisor = User.builder()
+                .id("sup-id")
+                .userName("sup.user")
+                .fullName("Suman Supervisor")
+                .role(UserRole.SUPERVISOR)
+                .status(UserStatus.ACTIVE)
+                .build();
+
+        Visit firstVisit = visit(visitorWithUsernameManager, VisitStatus.COMPLETED);
+        firstVisit.setVisitId("VI000000011");
+        Visit secondVisit = visit(visitorWithPathOnly, VisitStatus.COMPLETED);
+        secondVisit.setVisitId("VI000000012");
+
+        when(visitRepository.searchAttendance(any(VisitFilter.class), eq(0L), eq(25)))
+                .thenReturn(List.of(firstVisit, secondVisit));
+        when(visitRepository.countAttendance(any(VisitFilter.class))).thenReturn(2L);
+        when(userRepository.findAllById(Set.of("rep-id", "promoter-id")))
+                .thenReturn(List.of(visitorWithUsernameManager, visitorWithPathOnly));
+        when(userRepository.findAllById(Set.of("Mohan.Manager", "sup.user")))
+                .thenReturn(List.of());
+        when(userRepository.findByUserNameIn(Set.of("Mohan.Manager", "mohan.manager", "sup.user")))
+                .thenReturn(List.of(salesOfficer, supervisor));
+
+        var response = visitService.getVisitorAttendance(
+                VisitorAttendanceSearchRequest.builder().build(),
+                User.builder().id("admin-id").role(UserRole.ADMIN).build());
+
+        assertEquals(2, response.getItems().size());
+        assertEquals("Mohan Manager", response.getItems().get(0).getManagerName());
+        assertEquals("Suman Supervisor", response.getItems().get(1).getManagerName());
+    }
+
+    @Test
+    void visitorAttendanceResolvesManagerFromVisitUserPathWhenVisitorRecordIsMissing() {
+        User manager = User.builder()
+                .id("sup-id")
+                .userName("sup.user")
+                .fullName("Suman Supervisor")
+                .role(UserRole.SUPERVISOR)
+                .status(UserStatus.ACTIVE)
+                .build();
+        Visit visitWithoutUserRecord = Visit.builder()
+                .id("visit-id-3")
+                .visitId("VI000000013")
+                .userId("missing-user-id")
+                .userName("legacy.rep")
+                .userPath(List.of("head-id", "sup.user"))
+                .visitDay(LocalDate.now(ZoneId.of("Asia/Kolkata")).toString())
+                .status(VisitStatus.COMPLETED)
+                .outletCodes(List.of("OUT-101"))
+                .outletVisits(new ArrayList<>(List.of(VisitOutlet.builder()
+                        .outletCode("OUT-101")
+                        .status(VisitStatus.COMPLETED)
+                        .build())))
+                .build();
+
+        when(visitRepository.searchAttendance(any(VisitFilter.class), eq(0L), eq(25)))
+                .thenReturn(List.of(visitWithoutUserRecord));
+        when(visitRepository.countAttendance(any(VisitFilter.class))).thenReturn(1L);
+        when(userRepository.findAllById(Set.of("missing-user-id"))).thenReturn(List.of());
+        when(userRepository.findByUserNameIn(Set.of("missing-user-id", "legacy.rep"))).thenReturn(List.of());
+        when(userRepository.findAllById(Set.of("sup.user"))).thenReturn(List.of());
+        when(userRepository.findByUserNameIn(Set.of("sup.user"))).thenReturn(List.of(manager));
+
+        var response = visitService.getVisitorAttendance(
+                VisitorAttendanceSearchRequest.builder().build(),
+                User.builder().id("admin-id").role(UserRole.ADMIN).build());
+
+        assertEquals(1, response.getItems().size());
+        assertEquals("legacy.rep", response.getItems().get(0).getVisitorName());
+        assertEquals("Suman Supervisor", response.getItems().get(0).getManagerName());
     }
 
     private User fieldUser() {

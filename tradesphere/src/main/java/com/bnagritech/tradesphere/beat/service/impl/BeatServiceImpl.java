@@ -1,6 +1,7 @@
 package com.bnagritech.tradesphere.beat.service.impl;
 
 import com.bnagritech.tradesphere.auth.model.User;
+import com.bnagritech.tradesphere.auth.dto.UserSummaryResponse;
 import com.bnagritech.tradesphere.auth.repository.UserRepository;
 import com.bnagritech.tradesphere.beat.dto.BeatsRequest;
 import com.bnagritech.tradesphere.beat.dto.BeatsResponse;
@@ -19,9 +20,12 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,6 +89,8 @@ public class BeatServiceImpl implements BeatService {
     @Override
     public List<BeatsResponse> getMyBeats(User currentUser) {
         LinkedHashMap<String, Beat> assignedBeats = new LinkedHashMap<>();
+        beatRepository.findByAssignedUserIdsContaining(currentUser.getId())
+                .forEach(beat -> assignedBeats.put(beat.getBeatId(), beat));
         beatRepository.findByAssignedUserId(currentUser.getId())
                 .forEach(beat -> assignedBeats.put(beat.getBeatId(), beat));
         beatRepository.findByUserNameIgnoreCase(currentUser.getUsername())
@@ -95,17 +101,34 @@ public class BeatServiceImpl implements BeatService {
     @Override
     public List<BeatsResponse> getAssignableBeats(User currentUser) {
         requireBeatManager(currentUser);
-        List<User> team = userRepository.findByPath(currentUser.getId());
+        List<User> team = resolveTeamMembers(currentUser);
         Set<String> teamIds = team.stream().map(User::getId).collect(Collectors.toSet());
         Set<String> teamNames = team.stream().map(User::getUsername)
+                .filter(name -> name != null)
                 .map(name -> name.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
 
         return beatRepository.findAll().stream()
-                .filter(beat -> isUnassigned(beat)
-                        || teamIds.contains(beat.getAssignedUserId())
-                        || (beat.getAssignedUserId() == null && beat.getUserName() != null
-                        && teamNames.contains(beat.getUserName().toLowerCase(Locale.ROOT))))
+                .filter(beat -> isUnassigned(beat) || isAssignedToTeam(beat, teamIds, teamNames))
                 .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public List<UserSummaryResponse> getAssignableUsers(User currentUser) {
+        requireBeatManager(currentUser);
+        return resolveTeamMembers(currentUser).stream()
+                .filter(user -> user.getStatus() == UserStatus.ACTIVE)
+                .filter(user -> isAllowedAssignee(currentUser.getRole(), user.getRole()))
+                .map(user -> UserSummaryResponse.builder()
+                        .id(user.getId())
+                        .userName(user.getUsername())
+                        .fullName(user.getFullName())
+                        .phoneNumber(user.getPhoneNumber())
+                        .role(user.getRole())
+                        .managerId(user.getManagerId())
+                        .status(user.getStatus())
+                        .lastLoginAt(user.getLastLoginAt())
+                        .build())
                 .toList();
     }
 
@@ -115,14 +138,13 @@ public class BeatServiceImpl implements BeatService {
 
         Beat beat = beatRepository.findByBeatId(beatId)
                 .orElseThrow(() -> new ResourceNotFoundException("Beat Id not found"));
-        List<User> team = userRepository.findByPath(currentUser.getId());
+        List<User> team = resolveTeamMembers(currentUser);
         Set<String> teamIds = team.stream().map(User::getId).collect(Collectors.toSet());
         Set<String> teamNames = team.stream().map(User::getUsername)
+                .filter(name -> name != null)
                 .map(name -> name.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
 
-        boolean assignedToTeam = teamIds.contains(beat.getAssignedUserId())
-                || (beat.getAssignedUserId() == null && beat.getUserName() != null
-                && teamNames.contains(beat.getUserName().toLowerCase(Locale.ROOT)));
+        boolean assignedToTeam = isAssignedToTeam(beat, teamIds, teamNames);
         if (!isUnassigned(beat) && !assignedToTeam) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This beat is assigned outside your team");
         }
@@ -136,9 +158,104 @@ public class BeatServiceImpl implements BeatService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot assign a beat to this role");
         }
 
+        LinkedHashSet<String> assignedUserIds = new LinkedHashSet<>(getAssignedUserIds(beat));
+        if (assignedUserIds.isEmpty() && beat.getUserName() != null && !beat.getUserName().isBlank()) {
+            userRepository.findByUserName(beat.getUserName().toLowerCase(Locale.ROOT))
+                    .map(User::getId)
+                    .filter(id -> id != null && !id.isBlank())
+                    .ifPresent(assignedUserIds::add);
+        }
+        LinkedHashSet<String> assignedUserNames = new LinkedHashSet<>();
+        if (beat.getAssignedUserNames() != null) {
+            beat.getAssignedUserNames().stream()
+                    .filter(name -> name != null && !name.isBlank())
+                    .forEach(assignedUserNames::add);
+        }
+        if (assignedUserNames.isEmpty() && beat.getUserName() != null && !beat.getUserName().isBlank()) {
+            assignedUserNames.add(beat.getUserName());
+        }
+        assignedUserIds.add(assignee.getId());
+        if (assignee.getUsername() != null && !assignee.getUsername().isBlank()) {
+            assignedUserNames.add(assignee.getUsername());
+        }
+        beat.setAssignedUserIds(new ArrayList<>(assignedUserIds));
+        beat.setAssignedUserNames(new ArrayList<>(assignedUserNames));
         beat.setAssignedUserId(assignee.getId());
         beat.setUserName(assignee.getUsername());
         return mapToResponse(beatRepository.save(beat));
+    }
+
+    private List<User> resolveTeamMembers(User manager) {
+        Map<String, User> members = new LinkedHashMap<>();
+        Set<String> visitedIds = new LinkedHashSet<>();
+        if (manager.getId() != null) {
+            visitedIds.add(manager.getId());
+        }
+        List<User> level = List.of(manager);
+
+        while (!level.isEmpty()) {
+            Set<String> managerReferences = new LinkedHashSet<>();
+            for (User parent : level) {
+                addReference(managerReferences, parent.getId());
+                addReference(managerReferences, parent.getUsername());
+            }
+            if (managerReferences.isEmpty()) {
+                break;
+            }
+
+            List<User> nextLevel = new ArrayList<>();
+            for (User report : userRepository.findByManagerIdIn(managerReferences)) {
+                User parent = level.stream()
+                        .filter(candidate -> isManagedBy(report, candidate))
+                        .findFirst()
+                        .orElse(null);
+                if (parent == null || parent.getRole() == null || report.getRole() == null
+                        || !parent.getRole().allowedChildren().contains(report.getRole())
+                        || report.getId() == null || !visitedIds.add(report.getId())) {
+                    continue;
+                }
+                members.put(report.getId(), report);
+                nextLevel.add(report);
+            }
+            level = nextLevel;
+        }
+        return new ArrayList<>(members.values());
+    }
+
+    private void addReference(Collection<String> references, String value) {
+        if (value != null && !value.isBlank()) {
+            references.add(value);
+            references.add(value.toLowerCase(Locale.ROOT));
+        }
+    }
+
+    private boolean isManagedBy(User report, User manager) {
+        String managerId = report.getManagerId();
+        return managerId != null && (
+                manager.getId() != null && managerId.equalsIgnoreCase(manager.getId())
+                        || manager.getUsername() != null && managerId.equalsIgnoreCase(manager.getUsername())
+        );
+    }
+
+    private boolean isAssignedToTeam(Beat beat, Set<String> teamIds, Set<String> teamNames) {
+        if (getAssignedUserIds(beat).stream().anyMatch(teamIds::contains)) {
+            return true;
+        }
+        return beat.getUserName() != null
+                && teamNames.contains(beat.getUserName().toLowerCase(Locale.ROOT));
+    }
+
+    private List<String> getAssignedUserIds(Beat beat) {
+        LinkedHashSet<String> userIds = new LinkedHashSet<>();
+        if (beat.getAssignedUserIds() != null) {
+            beat.getAssignedUserIds().stream()
+                    .filter(id -> id != null && !id.isBlank())
+                    .forEach(userIds::add);
+        }
+        if (beat.getAssignedUserId() != null && !beat.getAssignedUserId().isBlank()) {
+            userIds.add(beat.getAssignedUserId());
+        }
+        return new ArrayList<>(userIds);
     }
 
     private void requireBeatManager(User user) {
@@ -157,7 +274,7 @@ public class BeatServiceImpl implements BeatService {
     }
 
     private boolean isUnassigned(Beat beat) {
-        return (beat.getAssignedUserId() == null || beat.getAssignedUserId().isBlank())
+        return getAssignedUserIds(beat).isEmpty()
                 && (beat.getUserName() == null || beat.getUserName().isBlank());
     }
 
@@ -259,6 +376,8 @@ public class BeatServiceImpl implements BeatService {
                 .beatId(beat.getBeatId())
                 .assignedUserId(beat.getAssignedUserId())
                 .userName(beat.getUserName())
+                .assignedUserIds(getAssignedUserIds(beat))
+                .assignedUserNames(getAssignedUserNames(beat))
                 .territoryId(beat.getTerritoryId())
                 .beatStatus(beat.getBeatStatus())
                 .state(beat.getState())
@@ -273,5 +392,17 @@ public class BeatServiceImpl implements BeatService {
                 .build();
     }
 
+    private List<String> getAssignedUserNames(Beat beat) {
+        LinkedHashSet<String> names = new LinkedHashSet<>();
+        if (beat.getAssignedUserNames() != null) {
+            beat.getAssignedUserNames().stream()
+                    .filter(name -> name != null && !name.isBlank())
+                    .forEach(names::add);
+        }
+        if (names.isEmpty() && beat.getUserName() != null && !beat.getUserName().isBlank()) {
+            names.add(beat.getUserName());
+        }
+        return new ArrayList<>(names);
+    }
 
 }
